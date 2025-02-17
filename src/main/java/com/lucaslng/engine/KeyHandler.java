@@ -6,14 +6,14 @@ import java.util.HashSet;
 
 public class KeyHandler implements KeyListener {
 
-	private final HashSet<Integer> pressedKeys;
+	private final HashSet<Integer> heldKeys;
 
 	public KeyHandler() {
-		pressedKeys = new HashSet<>();
+		heldKeys = new HashSet<>();
 	}
 
-	public boolean isKeyPressed(int key) {
-		return pressedKeys.contains(key);
+	public boolean isKeyHeld(int key) {
+		return heldKeys.contains(key);
 	}
 
 	@Override
@@ -21,12 +21,12 @@ public class KeyHandler implements KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
-		pressedKeys.add(e.getKeyCode());
+		heldKeys.add(e.getKeyCode());
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		pressedKeys.remove(e.getKeyCode());
+		heldKeys.remove(e.getKeyCode());
 	}
 
 }

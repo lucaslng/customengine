@@ -71,8 +71,8 @@ public final class Engine {
 		return entityManager.getEntitiesWith(componentClasses);
 	}
 
-	public boolean isKeyPressed(int key) {
-		return keyHandler.isKeyPressed(key);
+	public boolean isKeyHeld(int key) {
+		return keyHandler.isKeyHeld(key);
 	}
 
 	public void doLoop() {
