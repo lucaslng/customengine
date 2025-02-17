@@ -42,7 +42,6 @@ public class ShaderProgram {
 		id = glCreateProgram();
 		glAttachShader(id, vertexShader);
 		glAttachShader(id, fragmentShader);
-		// compileShader();
 	}
 
 	public void compileShader() {

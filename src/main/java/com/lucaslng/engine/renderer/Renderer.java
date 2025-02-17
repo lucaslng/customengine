@@ -54,7 +54,6 @@ public final class Renderer extends AWTGLCanvas {
 		shaderPrograms[1].compileShader();
 
 		
-		// Enable depth testing
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.8f, 0.7f, 0.6f, 1.0f);
 	}
