@@ -24,18 +24,22 @@ public class EntityManager {
 	}
 
 	public <T extends Record> void addComponent(int entityId, T component) {
+		assert entities.containsKey(entityId);
 		components.computeIfAbsent(component.getClass(), k -> new HashMap<>()).put(entityId, component);
 	}
 
 	public <T extends Record> T getComponent(int entityId, Class<T> componentClass) {
+		assert entities.containsKey(entityId);
 		return componentClass.cast(components.getOrDefault(componentClass, new HashMap<>()).get(entityId));
 	}
 
 	public <T extends Record> boolean hasComponent(int entityId, Class<T> componentClass) {
+		assert entities.containsKey(entityId);
 		return components.containsKey(componentClass) && components.get(componentClass).containsKey(entityId);
 	}
 
 	public <T extends Record> void removeComponent(int entityId, Class<T> componentClass) {
+		assert entities.containsKey(entityId);
 		Map<Integer, Record> componentMap = components.get(componentClass);
 		if (componentMap != null) {
 			componentMap.remove(entityId);
