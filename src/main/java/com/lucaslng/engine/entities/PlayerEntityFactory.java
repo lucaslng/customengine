@@ -1,8 +1,10 @@
+package com.lucaslng.engine.entities;
+
 
 import org.joml.Vector3f;
 
-import com.lucaslng.ecs.AbstractEntityFactory;
-import com.lucaslng.ecs.components.*;
+import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.VelocityComponent;
 
 public class PlayerEntityFactory implements AbstractEntityFactory {
 

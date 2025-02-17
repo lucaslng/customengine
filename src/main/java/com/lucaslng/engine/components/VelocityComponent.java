@@ -1,4 +1,4 @@
-package com.lucaslng.ecs.components;
+package com.lucaslng.engine.components;
 
 import org.joml.Vector3f;
 

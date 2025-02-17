@@ -1,0 +1,29 @@
+package com.lucaslng.engine;
+
+import java.awt.Dimension;
+
+import org.lwjgl.opengl.awt.GLData;
+
+public class EngineSettings {
+	public String title = "Custom Engine";
+	public Dimension windowSize = new Dimension(600, 600);
+
+	public float FOV = (float) Math.toRadians(45.0f);
+
+	public float Z_FAR = 100.f;
+
+	public float sensitivity = 0.01f;
+
+	public int FPS = 60;
+
+	public GLData getGLData() {
+		GLData data = new GLData();
+		data.samples = 4;
+		data.swapInterval = 1;
+		data.profile = GLData.Profile.CORE;
+		data.majorVersion = 4;
+		data.minorVersion = 1;
+		return data;
+	}
+
+}

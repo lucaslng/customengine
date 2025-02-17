@@ -1,6 +1,13 @@
-package com.lucaslng.ecs;
+package com.lucaslng.engine;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import com.lucaslng.engine.entities.AbstractEntityFactory;
+import com.lucaslng.engine.entities.Entity;
 
 public class EntityManager {
 

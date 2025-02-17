@@ -1,4 +1,4 @@
-package com.lucaslng.ecs;
+package com.lucaslng.engine.entities;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

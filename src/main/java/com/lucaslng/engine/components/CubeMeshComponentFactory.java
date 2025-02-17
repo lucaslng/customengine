@@ -1,4 +1,4 @@
-package com.lucaslng.ecs.components;
+package com.lucaslng.engine.components;
 
 public class CubeMeshComponentFactory {
 	private static final int[] indices = new int[] {
