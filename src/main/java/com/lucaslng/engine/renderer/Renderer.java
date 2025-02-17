@@ -4,6 +4,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
@@ -26,7 +27,8 @@ public final class Renderer extends AWTGLCanvas {
 	private final EngineSettings engineSettings;
 	private final EntityManager entityManager;
 	private final ShaderProgram[] shaderPrograms = new ShaderProgram[2];
-	private final Matrix4f projectionMatrix, viewMatrix;
+	private final Matrix4f projectionMatrix;
+	private final Camera camera;
 	private float aspectRatio;
 
 	public Renderer(EngineSettings engineSettings, EntityManager entityManager) {
@@ -34,7 +36,7 @@ public final class Renderer extends AWTGLCanvas {
 		this.engineSettings = engineSettings;
 		this.entityManager = entityManager;
 		projectionMatrix = new Matrix4f();
-		viewMatrix = new Matrix4f();
+		camera = new Camera();
 		setAspectRatio();
 		addComponentListener(new AspectRatioListener());
 	}
@@ -62,8 +64,6 @@ public final class Renderer extends AWTGLCanvas {
 		glViewport(0, 0, getFramebufferWidth(), getFramebufferHeight());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		viewMatrix.translation(0.0f, 0.0f, -8.0f);
-
 		for (int entityId : entityManager.getEntitiesWith(DrawableComponent.class)) {
 			DrawableComponent component = entityManager.getComponent(entityId, DrawableComponent.class);
 			shaderPrograms[component.shaderProgramId()].bind();
@@ -74,7 +74,7 @@ public final class Renderer extends AWTGLCanvas {
 			va.addBuffer(vb, layout);
 			IndexBuffer ib = new IndexBuffer(component.indices());
 			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("projection", false, projectionMatrix.get(new float[16]));
-			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("view", false, viewMatrix.get(new float[16]));
+			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
 			glDrawElements(GL_TRIANGLES, component.indices().length, GL_UNSIGNED_INT, 0);
 			va.delete();
 			ib.delete();
@@ -82,6 +82,10 @@ public final class Renderer extends AWTGLCanvas {
 		}
 
 		swapBuffers();
+	}
+
+	public void setCamera(Vector3f position, Vector3f rotation) {
+		camera.setCamera(position, rotation);
 	}
 
 	private void setAspectRatio() {

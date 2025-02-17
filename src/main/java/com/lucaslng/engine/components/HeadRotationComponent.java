@@ -2,7 +2,7 @@ package com.lucaslng.engine.components;
 
 import org.joml.Vector3f;
 
-public record CameraRotationComponent(Vector3f rotation) {
+public record HeadRotationComponent(Vector3f rotation) {
 	
 	public float pitch() {
 		return rotation.x;

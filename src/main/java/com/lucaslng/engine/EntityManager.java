@@ -14,12 +14,13 @@ public class EntityManager {
 	private final Map<Integer, Entity> entities = new HashMap<>();
 	private final Map<Class<?>, Map<Integer, Record>> components = new HashMap<>();
 
-	public void buildEntity(AbstractEntityFactory entityFactory) {
+	public Entity buildEntity(AbstractEntityFactory entityFactory) {
 		Entity entity = new Entity();
 		for (Record component : entityFactory.components()) {
 			addComponent(entity.id(), component);
 		}
 		entities.put(entity.id(), entity);
+		return entity;
 	}
 
 	public <T extends Record> void addComponent(int entityId, T component) {

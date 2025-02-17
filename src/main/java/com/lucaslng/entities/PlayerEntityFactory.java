@@ -1,10 +1,12 @@
-package com.lucaslng.engine.entities;
+package com.lucaslng.entities;
 
 
 import org.joml.Vector3f;
 
+import com.lucaslng.engine.components.HeadRotationComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.components.VelocityComponent;
+import com.lucaslng.engine.entities.AbstractEntityFactory;
 
 public class PlayerEntityFactory implements AbstractEntityFactory {
 
@@ -21,8 +23,9 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 	@Override
 	public Record[] components() {
 		PositionComponent positionComponent = new PositionComponent(position);
-		VelocityComponent velocityComponent = new VelocityComponent(new Vector3f(0.0f, 0.0f, 0.0f));
-		return new Record[] { positionComponent, velocityComponent };
+		VelocityComponent velocityComponent = new VelocityComponent(new Vector3f());
+		HeadRotationComponent headRotationComponent = new HeadRotationComponent(new Vector3f());
+		return new Record[] { positionComponent, velocityComponent, headRotationComponent };
 	}
 
 }
