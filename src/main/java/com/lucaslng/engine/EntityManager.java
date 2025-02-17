@@ -16,10 +16,10 @@ public class EntityManager {
 
 	public Entity buildEntity(AbstractEntityFactory entityFactory) {
 		Entity entity = new Entity();
+		entities.put(entity.id(), entity);
 		for (Record component : entityFactory.components()) {
 			addComponent(entity.id(), component);
 		}
-		entities.put(entity.id(), entity);
 		return entity;
 	}
 

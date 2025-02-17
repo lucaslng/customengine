@@ -12,10 +12,12 @@ import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11C.GL_ZERO;
 import static org.lwjgl.opengl.GL11C.glClear;
 import static org.lwjgl.opengl.GL11C.glClearColor;
 import static org.lwjgl.opengl.GL11C.glDrawElements;
 import static org.lwjgl.opengl.GL11C.glEnable;
+import static org.lwjgl.opengl.GL11C.glGetError;
 import static org.lwjgl.opengl.GL11C.glViewport;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 
@@ -30,6 +32,8 @@ public final class Renderer extends AWTGLCanvas {
 	private final Matrix4f projectionMatrix;
 	private final Camera camera;
 	private float aspectRatio;
+	private boolean isRendering;
+	private long lastTick, lastTickDuration;
 
 	public Renderer(EngineSettings engineSettings, EntityManager entityManager) {
 		super(engineSettings.getGLData());
@@ -39,13 +43,13 @@ public final class Renderer extends AWTGLCanvas {
 		camera = new Camera();
 		setAspectRatio();
 		addComponentListener(new AspectRatioListener());
+		isRendering = false;
 	}
 
 	@Override
 	public void initGL() {
+		System.out.println("Initializing OpenGL...");
 		createCapabilities();
-		glViewport(0, 0, getFramebufferWidth(), getFramebufferHeight());
-
 
 		shaderPrograms[0] = new ShaderProgram("vertex.glsl", "fragment.glsl");
 		shaderPrograms[0].compileShader();
@@ -53,15 +57,21 @@ public final class Renderer extends AWTGLCanvas {
 		shaderPrograms[1] = new ShaderProgram("vertex2.glsl", "fragment.glsl");
 		shaderPrograms[1].compileShader();
 
-		
 		glEnable(GL_DEPTH_TEST);
 		glClearColor(0.8f, 0.7f, 0.6f, 1.0f);
+		int error = glGetError();
+		if (error == GL_ZERO) {
+			System.out.println("OpenGL initialized.");
+		} else {
+			System.out.println("OpenGL failed initialization with error: " + error + ".");
+		}
 	}
 
 	@Override
 	public void paintGL() {
-		glViewport(0, 0, getFramebufferWidth(), getFramebufferHeight());
+		isRendering = true;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, getFramebufferWidth(), getFramebufferHeight());
 
 		for (int entityId : entityManager.getEntitiesWith(DrawableComponent.class)) {
 			DrawableComponent component = entityManager.getComponent(entityId, DrawableComponent.class);
@@ -72,7 +82,8 @@ public final class Renderer extends AWTGLCanvas {
 			layout.add(GL_FLOAT, 3);
 			va.addBuffer(vb, layout);
 			IndexBuffer ib = new IndexBuffer(component.indices());
-			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("projection", false, projectionMatrix.get(new float[16]));
+			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("projection", false,
+					projectionMatrix.get(new float[16]));
 			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
 			glDrawElements(GL_TRIANGLES, component.indices().length, GL_UNSIGNED_INT, 0);
 			va.delete();
@@ -81,6 +92,9 @@ public final class Renderer extends AWTGLCanvas {
 		}
 
 		swapBuffers();
+		lastTickDuration = System.nanoTime() - lastTick;
+		lastTick = System.nanoTime();
+		isRendering = false;
 	}
 
 	public void setCamera(Vector3f position, Vector3f rotation) {
@@ -92,21 +106,37 @@ public final class Renderer extends AWTGLCanvas {
 		projectionMatrix.setPerspective(engineSettings.FOV, aspectRatio, 0.1f, engineSettings.Z_FAR);
 	}
 
+	public int fps() {
+		return 1000 / lastTickMs();
+	}
+
+	public int lastTickMs() {
+		return (int) (lastTickDuration / 1000000);
+	}
+
 	private class AspectRatioListener implements ComponentListener {
 
 		@Override
 		public void componentResized(ComponentEvent e) {
+			System.err.println("Window resized.");
 			setAspectRatio();
 		}
 
 		@Override
-		public void componentMoved(ComponentEvent e) {}
+		public void componentMoved(ComponentEvent e) {
+		}
 
 		@Override
-		public void componentShown(ComponentEvent e) {}
+		public void componentShown(ComponentEvent e) {
+		}
 
 		@Override
-		public void componentHidden(ComponentEvent e) {}
+		public void componentHidden(ComponentEvent e) {
+		}
 	}
-	
+
+	public boolean isRendering() {
+		return isRendering;
+	}
+
 }

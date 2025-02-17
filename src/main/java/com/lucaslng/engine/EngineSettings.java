@@ -23,6 +23,7 @@ public class EngineSettings {
 		data.profile = GLData.Profile.CORE;
 		data.majorVersion = 4;
 		data.minorVersion = 1;
+		data.forwardCompatible = true;
 		return data;
 	}
 
