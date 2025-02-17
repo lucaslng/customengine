@@ -2,10 +2,6 @@ package com.lucaslng.engine.renderer;
 
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
 
 import org.joml.Matrix4f;
 import static org.lwjgl.opengl.GL.createCapabilities;
@@ -13,68 +9,52 @@ import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
+import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11C.glClear;
+import static org.lwjgl.opengl.GL11C.glClearColor;
+import static org.lwjgl.opengl.GL11C.glDrawElements;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL11C.glViewport;
-import static org.lwjgl.opengl.GL15C.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15C.glBindBuffer;
-import static org.lwjgl.opengl.GL20C.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20C.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20C.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20C.glUseProgram;
-import static org.lwjgl.opengl.GL20C.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30C.glBindVertexArray;
-import static org.lwjgl.opengl.GL30C.glGenVertexArrays;
 import org.lwjgl.opengl.awt.AWTGLCanvas;
 
 import com.lucaslng.engine.EngineSettings;
+import com.lucaslng.engine.EntityManager;
+import com.lucaslng.engine.components.DrawableComponent;
 
-public class Renderer extends AWTGLCanvas {
+public final class Renderer extends AWTGLCanvas {
 	private final EngineSettings engineSettings;
-	private int vao;
-	private int shaderProgram;
-	private final Matrix4f projectionMatrix, viewMatrix, modelMatrix;
-	private int projectionLoc, viewLoc, modelLoc;
-	private int angleCube;
+	private final EntityManager entityManager;
+	private final ShaderProgram[] shaderPrograms = new ShaderProgram[2];
+	private final Matrix4f projectionMatrix, viewMatrix;
 	private float aspectRatio;
 
-	public Renderer(EngineSettings engineSettings) {
+	public Renderer(EngineSettings engineSettings, EntityManager entityManager) {
 		super(engineSettings.getGLData());
 		this.engineSettings = engineSettings;
-		setAspectRatio();
-		addComponentListener(new CanvasListener());
-		addKeyListener(new CanvasListener());
-		addMouseMotionListener(new CanvasListener());
+		this.entityManager = entityManager;
 		projectionMatrix = new Matrix4f();
 		viewMatrix = new Matrix4f();
-		modelMatrix = new Matrix4f().identity();
+		setAspectRatio();
+		addComponentListener(new AspectRatioListener());
 	}
 
 	@Override
 	public void initGL() {
 		createCapabilities();
+		glViewport(0, 0, getFramebufferWidth(), getFramebufferHeight());
 
-		// Load shaders
-		shaderProgram = ShaderUtils.createShaderProgram("vertex.glsl", "fragment.glsl");
 
-		vao = glGenVertexArrays();
-		glBindVertexArray(vao);
+		shaderPrograms[0] = new ShaderProgram("vertex.glsl", "fragment.glsl");
+		shaderPrograms[0].compileShader();
 
-		// Define vertex attributes
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
-		glEnableVertexAttribArray(0);
+		shaderPrograms[1] = new ShaderProgram("vertex2.glsl", "fragment.glsl");
+		shaderPrograms[1].compileShader();
 
-		// Unbind
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-
-		// Get shader uniform locations
-		projectionLoc = glGetUniformLocation(shaderProgram, "projection");
-		viewLoc = glGetUniformLocation(shaderProgram, "view");
-		modelLoc = glGetUniformLocation(shaderProgram, "model");
-
+		
 		// Enable depth testing
 		glEnable(GL_DEPTH_TEST);
+		glClearColor(0.8f, 0.7f, 0.6f, 1.0f);
 	}
 
 	@Override
@@ -82,91 +62,48 @@ public class Renderer extends AWTGLCanvas {
 		glViewport(0, 0, getFramebufferWidth(), getFramebufferHeight());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(shaderProgram);
-		glBindVertexArray(vao);
+		viewMatrix.translation(0.0f, 0.0f, -8.0f);
 
-		// Set transformations
-		projectionMatrix.setPerspective(engineSettings.FOV, aspectRatio, 0.1f, engineSettings.Z_FAR);
-		// viewMatrix.rotationXYZ(-player.pitch, -player.yaw, 0.0f)
-		// 		.translate(player.getPosition().mul(-1.0f, new Vector3f()));
-	
-		// System.out.println(player.getPosition());
-		// viewMatrix.identity().lookAt();
-		modelMatrix.rotationX((float) Math.toRadians(angleCube))
-				.rotateZ((float) Math.toRadians(angleCube));
+		for (int entityId : entityManager.getEntitiesWith(DrawableComponent.class)) {
+			DrawableComponent component = entityManager.getComponent(entityId, DrawableComponent.class);
+			shaderPrograms[component.shaderProgramId()].bind();
+			VertexArray va = new VertexArray();
+			VertexBuffer vb = new VertexBuffer(component.vertices());
+			VertexBufferLayout layout = new VertexBufferLayout();
+			layout.add(GL_FLOAT, 3);
+			va.addBuffer(vb, layout);
+			IndexBuffer ib = new IndexBuffer(component.indices());
+			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("projection", false, projectionMatrix.get(new float[16]));
+			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("view", false, viewMatrix.get(new float[16]));
+			glDrawElements(GL_TRIANGLES, component.indices().length, GL_UNSIGNED_INT, 0);
+			va.delete();
+			ib.delete();
+			vb.delete();
+		}
 
-		glUniformMatrix4fv(projectionLoc, false, projectionMatrix.get(new float[16]));
-		glUniformMatrix4fv(viewLoc, false, viewMatrix.get(new float[16]));
-		glUniformMatrix4fv(modelLoc, false, modelMatrix.get(new float[16]));
-
-		// glDrawElements(GL_TRIANGLES, cube.getIndices().length, GL_UNSIGNED_INT, 0);
 		swapBuffers();
 	}
 
 	private void setAspectRatio() {
 		aspectRatio = (float) getFramebufferWidth() / getFramebufferHeight();
+		projectionMatrix.setPerspective(engineSettings.FOV, aspectRatio, 0.1f, engineSettings.Z_FAR);
 	}
 
-	private class CanvasListener implements ComponentListener, KeyListener, MouseMotionListener {
+	private class AspectRatioListener implements ComponentListener {
 
 		@Override
 		public void componentResized(ComponentEvent e) {
 			setAspectRatio();
-
 		}
 
 		@Override
-		public void componentMoved(ComponentEvent e) {
-
-		}
+		public void componentMoved(ComponentEvent e) {}
 
 		@Override
-		public void componentShown(ComponentEvent e) {
-
-		}
+		public void componentShown(ComponentEvent e) {}
 
 		@Override
-		public void componentHidden(ComponentEvent e) {
-
-		}
-
-		@Override
-		public void keyTyped(KeyEvent e) {
-
-		}
-
-		@Override
-		public void keyPressed(KeyEvent e) {
-			System.out.println("Key - " + e.getKeyCode() + " - pressed.");
-			// switch (e.getKeyCode()) {
-			// 	case KeyEvent.VK_A -> player.moveX(1.0f);
-			// 	case KeyEvent.VK_E -> player.moveX(-1.0f);
-			// 	case KeyEvent.VK_W -> player.moveZ(1.0f);
-			// 	case KeyEvent.VK_O -> player.moveZ(-1.0f);
-			// 	case KeyEvent.VK_SPACE -> player.moveY(-1.0f);
-			// 	case KeyEvent.VK_SHIFT -> player.moveY(1.0f);
-			// 	default -> {
-			// 	}
-			// }
-		}
-
-		@Override
-		public void keyReleased(KeyEvent e) {
-
-		}
-
-		@Override
-		public void mouseDragged(MouseEvent e) {
-
-		}
-
-		@Override
-		public void mouseMoved(MouseEvent e) {
-			// player.yaw += (e.getX() - lastMouseX) * EngineSettings.sensitivity;
-			// player.pitch -= (e.getY() - lastMouseY) * EngineSettings.sensitivity;
-			// lastMouseX = e.getX();
-			// lastMouseY = e.getY();
-		}
-
+		public void componentHidden(ComponentEvent e) {}
 	}
+	
 }

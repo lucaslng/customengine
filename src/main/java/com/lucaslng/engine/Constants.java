@@ -2,7 +2,7 @@ package com.lucaslng.engine;
 
 public class Constants {
 
-	public static final String resourcesDir = "resources/";
-	public static final String shadersDir = resourcesDir + "shaders/";
+	public static final String RESOURCES_DIR = "resources/";
+	public static final String SHADERS_DIR = RESOURCES_DIR + "shaders/";
 	
 }

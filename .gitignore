@@ -1,4 +1,4 @@
 /.vscode
 /target
 .DS_Store
-hs_err_pid28859.log
+*.log

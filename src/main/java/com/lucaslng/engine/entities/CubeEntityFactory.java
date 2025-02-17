@@ -1,6 +1,9 @@
-package com.lucaslng.engine.components;
+package com.lucaslng.engine.entities;
 
-public class CubeMeshComponentFactory {
+import com.lucaslng.engine.components.DrawableComponent;
+
+public class CubeEntityFactory implements AbstractEntityFactory {
+
 	private static final int[] indices = new int[] {
 			0, 1, 2, 2, 3, 0, // Back face
 			1, 5, 6, 6, 2, 1, // Right face
@@ -9,10 +12,11 @@ public class CubeMeshComponentFactory {
 			3, 2, 6, 6, 7, 3, // Top face
 			4, 5, 1, 1, 0, 4 // Bottom face
 	};
+	private final float[] vertices;
 
-	static MeshComponent buildCubeMeshComponent(float x, float y, float z, float size) {
+	public CubeEntityFactory(float x, float y, float z, float size) {
 		size /= 2;
-		float[] vertices = new float[] {
+		vertices = new float[] {
 				-size + x, -size + y, -size + z,
 				size + x, -size + y, -size + z,
 				size + x, size + y, -size + z,
@@ -22,6 +26,10 @@ public class CubeMeshComponentFactory {
 				size + x, size + y, size + z,
 				-size + x, size + y, size + z
 		};
-		return new MeshComponent(vertices, indices);
+	}
+
+	@Override
+	public Record[] components() {
+		return new Record[] { new DrawableComponent(vertices, indices, 1) };
 	}
 }

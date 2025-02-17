@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL15C.GL_DYNAMIC_DRAW;
 import static org.lwjgl.opengl.GL15C.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15C.glBindBuffer;
 import static org.lwjgl.opengl.GL15C.glBufferData;
+import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15C.glGenBuffers;
 
 public final class IndexBuffer {
@@ -23,6 +24,11 @@ public final class IndexBuffer {
 
 	public void unbind() {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_ZERO);
+	}
+
+	public void delete() {
+		unbind();
+		glDeleteBuffers(id);
 	}
 
 }
