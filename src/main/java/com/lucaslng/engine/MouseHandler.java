@@ -12,14 +12,11 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 
 	private Robot robot;
 	private final Engine engine;
-	private int turnX, turnY;
 	private Vector3f rotation;
 
 	public MouseHandler(Engine engine) {
 		this.engine = engine;
 		rotation = null;
-		turnX = 0;
-		turnY = 0;
 		try {
 			robot = new Robot();
 			robot.mouseMove(engine.width() / 2, engine.height() / 2);

@@ -23,43 +23,44 @@ public class Game extends GameLoop {
 
 	@Override
 	public void init(Engine engine) {
-		player = engine.buildEntity(new PlayerEntityFactory(0.0f, 0.0f, 7.0f));
-		engine.buildEntity(new CubeEntityFactory(0.0f, 0.0f, 0.0f, 1.0f));
+		player = engine.entityManager().buildEntity(new PlayerEntityFactory(0.0f, 0.0f, 7.0f));
+		engine.entityManager().buildEntity(new CubeEntityFactory(0.0f, 0.0f, 0.0f, 1.0f));
 		engine.setCamera(player);
 		engine.linkMouseToRotation(engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation());
 	}
 
 	@Override
 	public void doLoop(Engine engine) {
+		float speed = 0.04f;
 		if (engine.isKeyHeld(KeyEvent.VK_A)) {
-			Vector3f position = engine.getComponent(player.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.getComponent(player.id(), HeadRotationComponent.class).rotation();
-			Positions.moveLeft(position, rotation, 0.02f);
+			Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
+			Vector3f rotation = engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation();
+			Positions.moveLeft(position, rotation, speed);
 		}
 		if (engine.isKeyHeld(KeyEvent.VK_E)) {
-			Vector3f position = engine.getComponent(player.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.getComponent(player.id(), HeadRotationComponent.class).rotation();
-			Positions.moveRight(position, rotation, 0.02f);
+			Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
+			Vector3f rotation = engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation();
+			Positions.moveRight(position, rotation, speed);
 		}
 		if (engine.isKeyHeld(KeyEvent.VK_W)) {
-			Vector3f position = engine.getComponent(player.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.getComponent(player.id(), HeadRotationComponent.class).rotation();
-			Positions.moveForward(position, rotation, 0.02f);
+			Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
+			Vector3f rotation = engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation();
+			Positions.moveForward(position, rotation, speed);
 		}
 		if (engine.isKeyHeld(KeyEvent.VK_O)) {
-			Vector3f position = engine.getComponent(player.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.getComponent(player.id(), HeadRotationComponent.class).rotation();
-			Positions.moveBackward(position, rotation, 0.02f);
+			Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
+			Vector3f rotation = engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation();
+			Positions.moveBackward(position, rotation, speed);
 		}
 		if (engine.isKeyHeld(KeyEvent.VK_SPACE)) {
-			Vector3f position = engine.getComponent(player.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.getComponent(player.id(), HeadRotationComponent.class).rotation();
-			Positions.moveUp(position, rotation, 0.03f);
+			Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
+			Vector3f rotation = engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation();
+			Positions.moveUp(position, rotation, speed);
 		}
 		if (engine.isKeyHeld(KeyEvent.VK_SHIFT)) {
-			Vector3f position = engine.getComponent(player.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.getComponent(player.id(), HeadRotationComponent.class).rotation();
-			Positions.moveDown(position, rotation, 0.03f);
+			Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
+			Vector3f rotation = engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation();
+			Positions.moveDown(position, rotation, speed);
 		}
 
 		engine.setCamera(player);

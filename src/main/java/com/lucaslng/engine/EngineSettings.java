@@ -8,7 +8,7 @@ public class EngineSettings {
 	public String title = "Custom Engine";
 	public Dimension windowSize = new Dimension(600, 600);
 
-	public float FOV = (float) Math.toRadians(45.0f);
+	public float FOV = (float) Math.toRadians(90.0f);
 
 	public float Z_FAR = 100.f;
 

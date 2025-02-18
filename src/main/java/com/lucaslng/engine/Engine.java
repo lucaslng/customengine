@@ -1,7 +1,6 @@
 package com.lucaslng.engine;
 
 import java.awt.BorderLayout;
-import java.util.Set;
 
 import javax.swing.JFrame;
 
@@ -9,7 +8,6 @@ import org.joml.Vector3f;
 
 import com.lucaslng.engine.components.HeadRotationComponent;
 import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.renderer.GameFrame;
 import com.lucaslng.engine.renderer.Renderer;
@@ -56,26 +54,6 @@ public final class Engine {
 		}
 		setCamera(entityManager.getComponent(entity.id(), PositionComponent.class).position(),
 				entityManager.getComponent(entity.id(), HeadRotationComponent.class).rotation());
-	}
-
-	public Entity buildEntity(AbstractEntityFactory entityFactory) {
-		return entityManager.buildEntity(entityFactory);
-	}
-
-	public <T extends Record> void addComponent(int entityId, T component) {
-		entityManager.addComponent(entityId, component);
-	}
-
-	public <T extends Record> T getComponent(int entityId, Class<T> componentClass) {
-		return entityManager.getComponent(entityId, componentClass);
-	}
-
-	public <T extends Record> void removeComponent(int entityId, Class<T> componentClass) {
-		entityManager.removeComponent(entityId, componentClass);
-	}
-
-	public Set<Integer> getEntitiesWith(Class<?>... componentClasses) {
-		return entityManager.getEntitiesWith(componentClasses);
 	}
 
 	public boolean isKeyHeld(int key) {
