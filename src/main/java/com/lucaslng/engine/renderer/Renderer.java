@@ -33,7 +33,6 @@ public final class Renderer extends AWTGLCanvas {
 	private final Camera camera;
 	private float aspectRatio;
 	private boolean isRendering;
-	private long lastTick, lastTickDuration;
 
 	public Renderer(EngineSettings engineSettings, EntityManager entityManager) {
 		super(engineSettings.getGLData());
@@ -92,8 +91,6 @@ public final class Renderer extends AWTGLCanvas {
 		}
 
 		swapBuffers();
-		lastTickDuration = System.nanoTime() - lastTick;
-		lastTick = System.nanoTime();
 		isRendering = false;
 	}
 
@@ -104,17 +101,6 @@ public final class Renderer extends AWTGLCanvas {
 	private void setAspectRatio() {
 		aspectRatio = (float) getFramebufferWidth() / getFramebufferHeight();
 		projectionMatrix.setPerspective(engineSettings.FOV, aspectRatio, 0.1f, engineSettings.Z_FAR);
-	}
-
-	public int fps() {
-		if (lastTickMs() == 0) {
-			return -1;
-		}
-		return 1000 / lastTickMs();
-	}
-
-	public int lastTickMs() {
-		return (int) (lastTickDuration / 1000000);
 	}
 
 	private class AspectRatioListener implements ComponentListener {

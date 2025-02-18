@@ -38,7 +38,7 @@ public abstract class GameLoop extends SwingWorker<Void, Void> {
 
 			@Override
 			public void run() {
-				System.out.println("Game loop fps: " + fps() + "\nRender fps: " + engine.renderer().fps());
+				System.out.println("fps: " + fps());
 			}
 
 		}, 1000, 1000);

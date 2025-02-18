@@ -74,9 +74,7 @@ public class MouseHandler implements MouseListener, MouseMotionListener {
 				-(e.getYOnScreen() - engine.height() / 2),
 				e.getXOnScreen() - engine.width() / 2,
 				0.0f));
-			// System.out.println(turnX + " " + turnY);
 			robot.mouseMove(engine.width() / 2, engine.height() / 2);
-			// System.out.println(rotation);
 		}
 	}
 

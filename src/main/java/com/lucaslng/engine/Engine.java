@@ -2,7 +2,6 @@ package com.lucaslng.engine;
 
 import java.awt.BorderLayout;
 import java.util.Set;
-import java.util.Timer;
 
 import javax.swing.JFrame;
 
@@ -17,12 +16,11 @@ import com.lucaslng.engine.renderer.Renderer;
 
 public final class Engine {
 
-	private JFrame frame;
-	private Renderer renderer;
-	private EngineSettings settings;
-	private EntityManager entityManager;
-	private KeyHandler keyHandler;
-	private Timer renderLoop;
+	private final JFrame frame;
+	private final Renderer renderer;
+	private final EngineSettings settings;
+	private final EntityManager entityManager;
+	private final KeyHandler keyHandler;
 
 	public Engine() {
 		System.out.println("Initializing engine...");
@@ -91,7 +89,6 @@ public final class Engine {
 	public void start(GameLoop gameLoop) {
 		gameLoop.init(this);
 		gameLoop.execute();
-		// renderLoop.start();
 	}
 
 	public void doLoop() {
