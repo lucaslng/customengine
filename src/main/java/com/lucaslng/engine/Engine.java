@@ -1,6 +1,10 @@
 package com.lucaslng.engine;
 
 import java.awt.BorderLayout;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import javax.swing.JFrame;
 
@@ -41,7 +45,7 @@ public final class Engine {
 	}
 
 	public void linkMouseToRotation(Vector3f rotation) {
-		MouseHandler mouseHandler = new MouseHandler(this);
+		MouseMotionToRotationListener mouseHandler = new MouseMotionToRotationListener(this);
 		mouseHandler.setRotation(rotation);
 		renderer.addMouseMotionListener(mouseHandler);
 	}
@@ -56,8 +60,8 @@ public final class Engine {
 				entityManager.getComponent(entity.id(), HeadRotationComponent.class).rotation());
 	}
 
-	public boolean isKeyHeld(int key) {
-		return keyHandler.isKeyHeld(key);
+	public KeyHandler keyHandler() {
+		return keyHandler;
 	}
 
 	public Renderer renderer() {
@@ -70,10 +74,25 @@ public final class Engine {
 	}
 
 	public void doLoop() {
-		if (renderer.isRendering()) {
-			return;
+		if (!renderer.isRendering()) {
+			renderer.render();
 		}
-		renderer.render();
+	}
+
+	public void addMouseListener(MouseListener listener) {
+		renderer.addMouseListener(listener);
+	}
+
+	public void addMouseMotionListener(MouseMotionListener listener) {
+		renderer.addMouseMotionListener(listener);
+	}
+
+	public void addComponentListener(ComponentListener listener) {
+		renderer.addComponentListener(listener);
+	}
+
+	public void addKeyListener(KeyListener listener) {
+		renderer.addKeyListener(listener);
 	}
 
 	public EngineSettings settings() {
