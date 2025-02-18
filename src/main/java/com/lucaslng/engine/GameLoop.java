@@ -26,6 +26,7 @@ public abstract class GameLoop extends SwingWorker<Void, Void> {
 			@Override
 			public void run() {
 				doLoop(engine);
+				engine.doLoop();
 				lastTickDuration = System.nanoTime() - lastTick;
 				lastTick = System.nanoTime();
 			}

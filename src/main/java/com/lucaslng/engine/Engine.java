@@ -1,13 +1,10 @@
 package com.lucaslng.engine;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
+import java.util.Timer;
 
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 
 import org.joml.Vector3f;
 
@@ -25,39 +22,32 @@ public final class Engine {
 	private EngineSettings settings;
 	private EntityManager entityManager;
 	private KeyHandler keyHandler;
-	private final Timer renderLoop;
+	private Timer renderLoop;
 
 	public Engine() {
 		System.out.println("Initializing engine...");
 		entityManager = new EntityManager();
 		settings = new EngineSettings();
-
-		try {
-			SwingUtilities.invokeAndWait(() -> {
-				frame = new GameFrame(settings);
-				renderer = new Renderer(settings, entityManager);
-				frame.add(renderer, BorderLayout.CENTER);
-				frame.pack();
-				frame.setVisible(true);
-				frame.transferFocus();
-				keyHandler = new KeyHandler();
-				renderer.addKeyListener(keyHandler);
-			});
-		} catch (InterruptedException e) {
-			System.err.println("Engine initialization interrupted.");
-			System.exit(1);
-		} catch (InvocationTargetException e) {
-			System.err.println("Engine initialization failed with error: " + e.getMessage());
-		}
-		renderLoop = new Timer(1000 / settings.FPS - 1, (ActionEvent e) -> {
-			doLoop();
-		});
+		frame = new GameFrame(settings);
+		renderer = new Renderer(settings, entityManager);
+		frame.add(renderer, BorderLayout.CENTER);
+		frame.pack();
+		frame.setVisible(true);
+		frame.transferFocus();
+		keyHandler = new KeyHandler();
+		renderer.addKeyListener(keyHandler);
 		System.out.println("Engine initialized.");
 
 	}
 
 	public void setCamera(Vector3f position, Vector3f rotation) {
 		renderer.setCamera(position, rotation);
+	}
+
+	public void linkMouseToRotation(Vector3f rotation) {
+		MouseHandler mouseHandler = new MouseHandler(this);
+		mouseHandler.setRotation(rotation);
+		renderer.addMouseMotionListener(mouseHandler);
 	}
 
 	public void setCamera(Entity entity) {
@@ -101,7 +91,7 @@ public final class Engine {
 	public void start(GameLoop gameLoop) {
 		gameLoop.init(this);
 		gameLoop.execute();
-		renderLoop.start();
+		// renderLoop.start();
 	}
 
 	public void doLoop() {
@@ -113,6 +103,18 @@ public final class Engine {
 
 	public EngineSettings settings() {
 		return settings;
+	}
+
+	public EntityManager entityManager() {
+		return entityManager;
+	}
+
+	public int width() {
+		return renderer.getWidth();
+	}
+
+	public int height() {
+		return renderer.getHeight();
 	}
 
 }

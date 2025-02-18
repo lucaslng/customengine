@@ -1,6 +1,7 @@
-package com.lucaslng.engine.entities;
+package com.lucaslng.entities;
 
 import com.lucaslng.engine.components.DrawableComponent;
+import com.lucaslng.engine.entities.AbstractEntityFactory;
 
 public class TriangleEntityFactory implements AbstractEntityFactory {
 

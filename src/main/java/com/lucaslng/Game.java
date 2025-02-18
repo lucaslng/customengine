@@ -8,9 +8,9 @@ import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
 import com.lucaslng.engine.components.HeadRotationComponent;
 import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.entities.CubeEntityFactory;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Positions;
+import com.lucaslng.entities.CubeEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
 
 public class Game extends GameLoop {
@@ -26,6 +26,7 @@ public class Game extends GameLoop {
 		player = engine.buildEntity(new PlayerEntityFactory(0.0f, 0.0f, 7.0f));
 		engine.buildEntity(new CubeEntityFactory(0.0f, 0.0f, 0.0f, 1.0f));
 		engine.setCamera(player);
+		engine.linkMouseToRotation(engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation());
 	}
 
 	@Override
