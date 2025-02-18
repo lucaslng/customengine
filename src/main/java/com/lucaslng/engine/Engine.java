@@ -49,7 +49,7 @@ public final class Engine {
 		} catch (InvocationTargetException e) {
 			System.err.println("Engine initialization failed with error: " + e.getMessage());
 		}
-		renderLoop = new Timer(1000 / settings.FPS, (ActionEvent e) -> {
+		renderLoop = new Timer(1000 / settings.FPS - 1, (ActionEvent e) -> {
 			doLoop();
 		});
 		System.out.println("Engine initialized.");

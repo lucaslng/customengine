@@ -107,6 +107,9 @@ public final class Renderer extends AWTGLCanvas {
 	}
 
 	public int fps() {
+		if (lastTickMs() == 0) {
+			return -1;
+		}
 		return 1000 / lastTickMs();
 	}
 

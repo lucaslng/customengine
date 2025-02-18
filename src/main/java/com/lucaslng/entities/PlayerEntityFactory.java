@@ -24,7 +24,7 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 	public Record[] components() {
 		PositionComponent positionComponent = new PositionComponent(position);
 		VelocityComponent velocityComponent = new VelocityComponent(new Vector3f());
-		HeadRotationComponent headRotationComponent = new HeadRotationComponent(new Vector3f());
+		HeadRotationComponent headRotationComponent = new HeadRotationComponent(new Vector3f(0.0f, -90.0f, 0.0f));
 		return new Record[] { positionComponent, velocityComponent, headRotationComponent };
 	}
 
