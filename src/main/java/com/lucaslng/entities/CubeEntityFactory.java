@@ -1,6 +1,10 @@
 package com.lucaslng.entities;
 
-import com.lucaslng.engine.components.DrawableComponent;
+import org.joml.Vector3f;
+
+import com.lucaslng.engine.components.MeshComponent;
+import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.RotationComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 
 public class CubeEntityFactory implements AbstractEntityFactory {
@@ -14,23 +18,25 @@ public class CubeEntityFactory implements AbstractEntityFactory {
 			4, 5, 1, 1, 0, 4 // Bottom face
 	};
 	private final float[] vertices;
+	private final Vector3f position;
 
 	public CubeEntityFactory(float x, float y, float z, float size) {
+		position = new Vector3f(x, y, z);
 		size /= 2;
 		vertices = new float[] {
-				-size + x, -size + y, -size + z,
-				size + x, -size + y, -size + z,
-				size + x, size + y, -size + z,
-				-size + x, size + y, -size + z,
-				-size + x, -size + y, size + z,
-				size + x, -size + y, size + z,
-				size + x, size + y, size + z,
-				-size + x, size + y, size + z
+				-size, -size, -size,
+				size, -size, -size,
+				size, size, -size,
+				-size, size, -size,
+				-size, -size, size,
+				size, -size, size,
+				size, size, size,
+				-size, size, size
 		};
 	}
 
 	@Override
 	public Record[] components() {
-		return new Record[] { new DrawableComponent(vertices, indices, 1) };
+		return new Record[] { new PositionComponent(position), new RotationComponent(new Vector3f()), new MeshComponent(vertices, indices, 1) };
 	}
 }

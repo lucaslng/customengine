@@ -23,7 +23,9 @@ import org.lwjgl.opengl.awt.AWTGLCanvas;
 
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
-import com.lucaslng.engine.components.DrawableComponent;
+import com.lucaslng.engine.components.MeshComponent;
+import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.RotationComponent;
 
 public final class Renderer extends AWTGLCanvas {
 	private final EngineSettings engineSettings;
@@ -72,8 +74,11 @@ public final class Renderer extends AWTGLCanvas {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, getFramebufferWidth(), getFramebufferHeight());
 
-		for (int entityId : entityManager.getEntitiesWith(DrawableComponent.class)) {
-			DrawableComponent component = entityManager.getComponent(entityId, DrawableComponent.class);
+		for (int entityId : entityManager.getEntitiesWith(MeshComponent.class, PositionComponent.class, RotationComponent.class)) {
+			MeshComponent component = entityManager.getComponent(entityId, MeshComponent.class);
+			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
+			Vector3f rotation = entityManager.getComponent(entityId, RotationComponent.class).rotation();
+			Matrix4f model = new Matrix4f().translate(position).rotateXYZ(rotation);
 			shaderPrograms[component.shaderProgramId()].bind();
 			VertexArray va = new VertexArray();
 			VertexBuffer vb = new VertexBuffer(component.vertices());
@@ -84,6 +89,7 @@ public final class Renderer extends AWTGLCanvas {
 			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("projection", false,
 					projectionMatrix.get(new float[16]));
 			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
+			shaderPrograms[component.shaderProgramId()].setUniformMatrix4v("model", false, model.get(new float[16]));
 			glDrawElements(GL_TRIANGLES, component.indices().length, GL_UNSIGNED_INT, 0);
 			va.delete();
 			ib.delete();

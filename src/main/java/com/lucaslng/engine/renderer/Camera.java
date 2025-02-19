@@ -16,6 +16,12 @@ public class Camera {
 	}
 
 	public void setCamera(Vector3f position, Vector3f rotation) {
+		if (rotation.x > 89.0f) {
+			rotation.x = 89.0f;
+		}
+		if (rotation.x < -89.0f) {
+			rotation.x = -89.0f;
+		}
 		matrix.setLookAt(position, position.add(Rotations.front(rotation), new Vector3f()), up);
 	}
 	
