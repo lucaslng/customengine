@@ -13,6 +13,7 @@ import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Positions;
 import com.lucaslng.entities.CubeEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
+import com.lucaslng.entities.TexturedCubeEntityFactory;
 
 public class Game extends GameLoop {
 
@@ -25,10 +26,12 @@ public class Game extends GameLoop {
 	@Override
 	public void init(Engine engine) {
 		player = engine.entityManager().buildEntity(new PlayerEntityFactory(0.0f, 0.0f, 7.0f));
-		cube = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f, 0.0f, 0.0f, 1.0f));
-		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f, -10.0f, 0.0f, 9.0f));
+		cube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(0.0f, 0.0f, 0.0f, 1.0f));
+		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f,
+		-10.0f, 0.0f, 9.0f));
 		engine.setCamera(player);
-		engine.linkMouseToRotation(engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation());
+		engine
+				.linkMouseToRotation(engine.entityManager().getComponent(player.id(), HeadRotationComponent.class).rotation());
 	}
 
 	@Override

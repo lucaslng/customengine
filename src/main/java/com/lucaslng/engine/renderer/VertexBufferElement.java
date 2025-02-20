@@ -7,7 +7,7 @@ import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_SHORT;
 
 public record VertexBufferElement(int count, int type, boolean normalized) {
 
-	public int size() {
+	protected int size() {
 		switch (type) {
 			case GL_FLOAT -> { return Float.BYTES; }
 			case GL_UNSIGNED_INT -> { return Integer.BYTES; }

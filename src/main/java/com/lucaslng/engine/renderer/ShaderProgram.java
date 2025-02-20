@@ -30,7 +30,7 @@ public class ShaderProgram {
 	private boolean isCompiled;
 	private final HashMap<String, Integer> uniformLocationCache;
 
-	public ShaderProgram(String vertexPath, String fragmentPath) {
+	protected ShaderProgram(String vertexPath, String fragmentPath) {
 		uniformLocationCache = new HashMap<>();
 		
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -44,7 +44,7 @@ public class ShaderProgram {
 		glAttachShader(id, fragmentShader);
 	}
 
-	public void compileShader() {
+	protected void compileShader() {
 		glCompileShader(vertexShader);
 		if (glGetShaderi(vertexShader, GL_COMPILE_STATUS) == GL_FALSE) {
 			throw new RuntimeException("Failed compiling vertex shader.\n" + glGetShaderInfoLog(vertexShader));
@@ -59,15 +59,15 @@ public class ShaderProgram {
 		isCompiled = true;
 	}
 
-	public void setUniform4f(CharSequence name, float x, float y, float z, float w) {
+	protected void setUniform4f(CharSequence name, float x, float y, float z, float w) {
 		glUniform4f(getUniformLocation(name), x, y, z, w);
 	}
 
-	public void setUniformMatrix4v(CharSequence name, boolean transpose, float[] value) {
+	protected void setUniformMatrix4v(CharSequence name, boolean transpose, float[] value) {
 		glUniformMatrix4fv(getUniformLocation(name), transpose, value);
 	}
 
-	public int getUniformLocation(CharSequence name) {
+	protected int getUniformLocation(CharSequence name) {
 		assert isCompiled;
 
 		String nameString = name.toString();
@@ -83,21 +83,21 @@ public class ShaderProgram {
 		return location;
 	}
 
-	public void bind() {
+	protected void bind() {
 		assert isCompiled;
 		glUseProgram(id);
 	}
 
-	public void unbind() {
+	protected void unbind() {
 		glUseProgram(GL_ZERO);
 	}
 
-	public void delete() {
+	protected void delete() {
 		unbind();
 		glDeleteProgram(id);
 	}
 
-	public int id() {
+	protected int id() {
 		return id;
 	}
 	

@@ -10,12 +10,12 @@ public class Camera {
 	private final Matrix4f matrix;
 	private final Vector3f up;
 
-	public Camera() {
+	protected Camera() {
 		matrix = new Matrix4f();
 		up = new Vector3f(0.0f, 1.0f, 0.0f);
 	}
 
-	public void setCamera(Vector3f position, Vector3f rotation) {
+	protected void setCamera(Vector3f position, Vector3f rotation) {
 		if (rotation.x > 89.0f) {
 			rotation.x = 89.0f;
 		}
@@ -25,7 +25,7 @@ public class Camera {
 		matrix.setLookAt(position, position.add(Rotations.front(rotation), new Vector3f()), up);
 	}
 	
-	public Matrix4f matrix() {
+	protected Matrix4f matrix() {
 		return matrix;
 	}
 	

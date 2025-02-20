@@ -12,34 +12,36 @@ import static org.lwjgl.opengl.GL30C.glGenVertexArrays;
 public class VertexArray {
 
 	private final int id;
+	private int i;
 
-	public VertexArray() {
+	protected VertexArray() {
 		id = glGenVertexArrays();
+		i = 0;
 	}
 
-	public void addBuffer(VertexBuffer vb, VertexBufferLayout layout) {
+	protected void addBuffer(Buffer vb, BufferLayout layout) {
 		bind();
 		vb.bind();
 		ArrayList<VertexBufferElement> elements = layout.elements();
 		int offset = 0;
-		for (int i=0;i<elements.size();i++) {
-			VertexBufferElement element = elements.get(i);
-			glEnableVertexAttribArray(i);
-			glVertexAttribPointer(i, element.count(), element.type(), element.normalized(), layout.stride(), offset);
+		for (int j=i;j<i+elements.size();j++) {
+			VertexBufferElement element = elements.get(j-i);
+			glEnableVertexAttribArray(j);
+			glVertexAttribPointer(j, element.count(), element.type(), element.normalized(), layout.stride(), offset);
 			offset += element.count() * element.size();
 		}
-		
+		i += elements.size();
 	}
 
-	public void bind() {
+	protected void bind() {
 		glBindVertexArray(id);
 	}
 
-	public void unbind() {
+	protected void unbind() {
 		glBindVertexArray(GL_ZERO);
 	}
 
-	public void delete() {
+	protected void delete() {
 		unbind();
 		glDeleteVertexArrays(id);
 	}
