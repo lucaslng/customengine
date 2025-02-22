@@ -16,17 +16,17 @@ import com.lucaslng.engine.Constants;
 
 public class FileReader {
 
-	public static String readShaderFile(String path, Class<?> c) {
+	public static String readShaderFile(String path) {
 		try {
-			return new String(Files.readAllBytes(get(Constants.shadersDir(c), path)), StandardCharsets.UTF_8);
+			return new String(Constants.getShader(path).readAllBytes(), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load shader file: " + path + "\n" + e.getMessage());
 		}
 	}
 
-	public static BufferedImage readImage(String path, Class<?> c) {
+	public static BufferedImage readImage(String path) {
 		try {
-			return ImageIO.read(new File(Constants.texturesDir(c) + "/" + path));
+			return ImageIO.read(Constants.getTexture(path));
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load image file: " + path, e);
 		}

@@ -1,17 +1,17 @@
 package com.lucaslng.engine;
 
-import java.net.URL;
+import java.io.InputStream;
 
 public class Constants {
 
 	public static final ClassLoader CLASS_LOADER = Thread.currentThread().getContextClassLoader();
 
-	public static final String shadersDir(Class<?> c) {
-		return CLASS_LOADER.getResource("shaders").getPath();
+	public static final InputStream getShader(String fileName) {
+		return CLASS_LOADER.getResourceAsStream("shaders/" + fileName);
 	}
 
-	public static final String texturesDir(Class<?> c) {
-		return CLASS_LOADER.getResource("textures").getPath() + "/";
+	public static final InputStream getTexture(String fileName) {
+		return CLASS_LOADER.getResourceAsStream("textures/" + fileName);
 	}
 
 }

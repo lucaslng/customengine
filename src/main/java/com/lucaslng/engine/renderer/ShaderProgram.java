@@ -34,10 +34,10 @@ public class ShaderProgram {
 		uniformLocationCache = new HashMap<>();
 		
 		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, readShaderFile(vertexPath, this.getClass()));
+		glShaderSource(vertexShader, readShaderFile(vertexPath));
 
 		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, readShaderFile(fragmentPath, this.getClass()));
+		glShaderSource(fragmentShader, readShaderFile(fragmentPath));
 
 		id = glCreateProgram();
 		glAttachShader(id, vertexShader);

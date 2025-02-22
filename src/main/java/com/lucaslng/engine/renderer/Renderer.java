@@ -76,7 +76,7 @@ public final class Renderer extends AWTGLCanvas {
 		shaderPrograms[2] = new ShaderProgram("texture_vertex.glsl", "texture_frag.glsl");
 		shaderPrograms[2].compileShader();
 
-		catTexture = new Texture(readImage("freakycat.png", this.getClass()));
+		catTexture = new Texture(readImage("freakycat.png"));
 
 		glEnable(GL_DEPTH_TEST);
 
