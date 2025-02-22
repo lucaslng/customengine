@@ -33,6 +33,14 @@ public class VertexArray {
 		i += elements.size();
 	}
 
+	protected void addBuffer(Buffer vb, VertexBufferElement element) {
+		bind();
+		vb.bind();
+		glEnableVertexAttribArray(i);
+		glVertexAttribPointer(i, element.count(), element.type(), element.normalized(), element.size() * element.count(), 0);
+		i++;
+	}
+
 	protected void bind() {
 		glBindVertexArray(id);
 	}
@@ -42,7 +50,6 @@ public class VertexArray {
 	}
 
 	protected void delete() {
-		unbind();
 		glDeleteVertexArrays(id);
 	}
 	

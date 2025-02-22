@@ -7,8 +7,8 @@ import org.lwjgl.BufferUtils;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_LINEAR_MIPMAP_LINEAR;
 import static org.lwjgl.opengl.GL11C.GL_PACK_ALIGNMENT;
-import static org.lwjgl.opengl.GL11C.GL_REPEAT;
 import static org.lwjgl.opengl.GL11C.GL_RGB;
+import static org.lwjgl.opengl.GL11C.GL_RGB8;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_MIN_FILTER;
@@ -16,40 +16,53 @@ import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11C.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11C.GL_UNPACK_ALIGNMENT;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
+import static org.lwjgl.opengl.GL11C.GL_ZERO;
 import static org.lwjgl.opengl.GL11C.glBindTexture;
 import static org.lwjgl.opengl.GL11C.glDeleteTextures;
 import static org.lwjgl.opengl.GL11C.glGenTextures;
 import static org.lwjgl.opengl.GL11C.glPixelStorei;
 import static org.lwjgl.opengl.GL11C.glTexImage2D;
 import static org.lwjgl.opengl.GL11C.glTexParameteri;
+import static org.lwjgl.opengl.GL13C.GL_CLAMP_TO_BORDER;
+import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
 public final class Texture {
 
-	private final int id;
+	private final int id, unit;
 
-	protected Texture(BufferedImage image) {
+	protected Texture(BufferedImage image, int unit) {
+		assert unit >= 0 && unit <= 31;
+		this.unit = unit;
 		id = glGenTextures();
-		bind();
+		glBindTexture(GL_TEXTURE_2D, id);
 
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
+		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image.getWidth(), image.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, imageToByteBuffer(image));
+		
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, image.getWidth(), image.getHeight(), 0, GL_RGB, GL_UNSIGNED_BYTE, imageToByteBuffer(image));
 		glGenerateMipmap(GL_TEXTURE_2D);
+
+		unbind();		
 	}
 
-	protected void bind() {
+	protected final void bind() {
+		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture(GL_TEXTURE_2D, id);
 	}
 
-	protected void delete() {
+	protected final static void unbind() {
+		glBindTexture(GL_TEXTURE_2D, GL_ZERO);
+	}
+
+	protected final void delete() {
 		glDeleteTextures(id);
 	}
 
@@ -67,7 +80,6 @@ public final class Texture {
 			}
 		}
 		buffer.flip();
-		System.out.println(buffer);
 		return buffer;
 	}
 

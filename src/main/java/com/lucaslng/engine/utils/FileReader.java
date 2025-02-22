@@ -26,7 +26,7 @@ public class FileReader {
 
 	public static BufferedImage readImage(String path) {
 		try {
-			return ImageIO.read(new File(Constants.IMAGES_DIR + path));
+			return ImageIO.read(new File(Constants.TEXTURES_DIR + path));
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load image file: " + path, e);
 		}

@@ -16,10 +16,10 @@ public class BufferLayout {
 		elements = new ArrayList<>();
 	}
 
-	public void add(int type, int count) {
+	public void add(int type, int count, boolean normalized) {
 		assert type == GL_FLOAT || type == GL_UNSIGNED_INT || type == GL_UNSIGNED_BYTE || type == GL_UNSIGNED_SHORT;
-		VertexBufferElement element = new VertexBufferElement(count, type, false);
-		stride += element.size() * count;
+		VertexBufferElement element = new VertexBufferElement(count, type, normalized);
+		stride += element.size() * element.count();
 		elements.add(element);
 	}
 
