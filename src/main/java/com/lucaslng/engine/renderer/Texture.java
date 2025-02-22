@@ -30,11 +30,10 @@ import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
 public final class Texture {
 
-	private final int id, unit;
+	private final int id;
 
-	protected Texture(BufferedImage image, int unit) {
-		assert unit >= 0 && unit <= 31;
-		this.unit = unit;
+	protected Texture(BufferedImage image) {
+		
 		id = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, id);
 
@@ -53,7 +52,8 @@ public final class Texture {
 		unbind();		
 	}
 
-	protected final void bind() {
+	protected final void bind(int unit) {
+		assert unit >= 0 && unit <= 31;
 		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture(GL_TEXTURE_2D, id);
 	}

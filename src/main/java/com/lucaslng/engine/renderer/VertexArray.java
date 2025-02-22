@@ -12,11 +12,12 @@ import static org.lwjgl.opengl.GL30C.glGenVertexArrays;
 public class VertexArray {
 
 	private final int id;
-	private int i;
+	private int i, length;
 
 	protected VertexArray() {
 		id = glGenVertexArrays();
 		i = 0;
+		length = -1;
 	}
 
 	protected void addBuffer(Buffer vb, BufferLayout layout) {

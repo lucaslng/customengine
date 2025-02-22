@@ -75,11 +75,11 @@ public final class Renderer extends AWTGLCanvas {
 
 		shaderPrograms[2] = new ShaderProgram("texture_vertex.glsl", "texture_frag.glsl");
 		shaderPrograms[2].compileShader();
-		
-		catTexture = new Texture(readImage("freakycat.png"), 0);
-		
+
+		catTexture = new Texture(readImage("freakycat.png"));
+
 		glEnable(GL_DEPTH_TEST);
-		
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -104,10 +104,9 @@ public final class Renderer extends AWTGLCanvas {
 			Vector3f rotation = entityManager.getComponent(entityId, RotationComponent.class).rotation();
 			Matrix4f model = new Matrix4f().translate(position).rotateXYZ(rotation);
 
-			catTexture.bind();
-			
+			catTexture.bind(0);
+
 			ShaderProgram shaderProgram;
-			
 
 			VertexArray va = new VertexArray();
 			BufferLayout layout = new BufferLayout();
@@ -117,13 +116,14 @@ public final class Renderer extends AWTGLCanvas {
 			va.addBuffer(positionBuffer, layout);
 
 			if (entityManager.hasComponent(entityId, TextureComponent.class)) {
-				texCoordBuffer = new FloatBuffer(GL_ARRAY_BUFFER, entityManager.getComponent(entityId, TextureComponent.class).textureCoordinates());
+				texCoordBuffer = new FloatBuffer(GL_ARRAY_BUFFER,
+						entityManager.getComponent(entityId, TextureComponent.class).textureCoordinates());
 				va.addBuffer(texCoordBuffer, new VertexBufferElement(2, GL_FLOAT, true));
 				shaderProgram = shaderPrograms[2];
 			} else {
 				shaderProgram = shaderPrograms[0];
 			}
-			
+
 			shaderProgram.bind();
 			IntBuffer ib = new IntBuffer(GL_ELEMENT_ARRAY_BUFFER, component.indices());
 
@@ -156,7 +156,7 @@ public final class Renderer extends AWTGLCanvas {
 		} else {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		}
-		
+
 	}
 
 	public boolean isDebugLines() {

@@ -26,5 +26,9 @@ abstract public class Buffer {
 	protected final void delete() {
 		glDeleteBuffers(id);
 	}
+
+	protected final int id() {
+		return id;
+	}
 	
 }
