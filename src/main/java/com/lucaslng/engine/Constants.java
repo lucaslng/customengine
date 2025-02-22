@@ -1,9 +1,17 @@
 package com.lucaslng.engine;
 
+import java.net.URL;
+
 public class Constants {
 
-	public static final String RESOURCES_DIR = "src/main/resources/";
-	public static final String SHADERS_DIR = RESOURCES_DIR + "shaders/";
-	public static final String TEXTURES_DIR = RESOURCES_DIR + "textures/";
-	
+	public static final ClassLoader CLASS_LOADER = Thread.currentThread().getContextClassLoader();
+
+	public static final String shadersDir(Class<?> c) {
+		return CLASS_LOADER.getResource("shaders").getPath();
+	}
+
+	public static final String texturesDir(Class<?> c) {
+		return CLASS_LOADER.getResource("textures").getPath() + "/";
+	}
+
 }
