@@ -25,4 +25,4 @@ jobs:
       uses: actions/upload-artifact@v4.6.1
       with:
         name: customengine
-        path: target/*.jar
+        path: target/*-jar-with-dependencies.jar
