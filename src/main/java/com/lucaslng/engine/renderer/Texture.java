@@ -28,7 +28,7 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
-public final class Texture {
+final class Texture {
 
 	private final int id;
 

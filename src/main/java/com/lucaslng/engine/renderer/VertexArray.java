@@ -9,15 +9,14 @@ import static org.lwjgl.opengl.GL30C.glBindVertexArray;
 import static org.lwjgl.opengl.GL30C.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30C.glGenVertexArrays;
 
-public class VertexArray {
+class VertexArray {
 
 	private final int id;
-	private int i, length;
+	private int i;
 
 	protected VertexArray() {
 		id = glGenVertexArrays();
 		i = 0;
-		length = -1;
 	}
 
 	protected void addBuffer(Buffer vb, BufferLayout layout) {

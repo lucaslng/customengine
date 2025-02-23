@@ -7,7 +7,7 @@ import java.awt.event.MouseMotionListener;
 
 import org.joml.Vector3f;
 
-public class MouseMotionToRotationListener implements MouseMotionListener {
+class MouseMotionToRotationListener implements MouseMotionListener {
 
 	private final Robot robot;
 	private final Engine engine;

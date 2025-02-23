@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL15C.glBindBuffer;
 import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15C.glGenBuffers;
 
-abstract public class Buffer {
+abstract class Buffer {
 
 	private final int id, target;
 

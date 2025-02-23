@@ -7,7 +7,7 @@ import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_SHORT;
 
-public class BufferLayout {
+class BufferLayout {
 
 	private final ArrayList<VertexBufferElement> elements;
 	private int stride;

@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 
 import com.lucaslng.engine.systems.Rotations;
 
-public class Camera {
+class Camera {
 
 	private final Matrix4f matrix;
 	private final Vector3f up;

@@ -15,7 +15,7 @@ import com.lucaslng.entities.CubeEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
 import com.lucaslng.entities.TexturedCubeEntityFactory;
 
-public class Game extends GameLoop {
+class Game extends GameLoop {
 
 	private Entity player, cube, plane;
 

@@ -1,24 +1,35 @@
 package com.lucaslng.engine.utils;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import static java.nio.file.Paths.get;
 import java.util.Collections;
 import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.lucaslng.engine.Constants;
-
 public class FileReader {
+
+	private static final ClassLoader CLASS_LOADER = Thread.currentThread().getContextClassLoader();
+
+	public static final InputStream getResource(String path) {
+		return CLASS_LOADER.getResourceAsStream(path);
+	}
+
+	private static final InputStream getShader(String fileName) {
+		return getResource("shaders/" + fileName);
+	}
+
+	private static final InputStream getTexture(String fileName) {
+		return getResource("textures/" + fileName);
+	}
 
 	public static String readShaderFile(String path) {
 		try {
-			return new String(Constants.getShader(path).readAllBytes(), StandardCharsets.UTF_8);
+			return new String(getShader(path).readAllBytes(), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load shader file: " + path + "\n" + e.getMessage());
 		}
@@ -26,7 +37,7 @@ public class FileReader {
 
 	public static BufferedImage readImage(String path) {
 		try {
-			return ImageIO.read(Constants.getTexture(path));
+			return ImageIO.read(getTexture(path));
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load image file: " + path, e);
 		}

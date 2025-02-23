@@ -5,7 +5,7 @@ import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_SHORT;
 
-public record VertexBufferElement(int count, int type, boolean normalized) {
+record VertexBufferElement(int count, int type, boolean normalized) {
 
 	protected int size() {
 		switch (type) {

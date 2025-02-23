@@ -24,7 +24,7 @@ import static org.lwjgl.opengl.GL20C.glUseProgram;
 
 import static com.lucaslng.engine.utils.FileReader.readShaderFile;
 
-public class ShaderProgram {
+class ShaderProgram {
 
 	private final int id, vertexShader, fragmentShader;
 	private boolean isCompiled;
