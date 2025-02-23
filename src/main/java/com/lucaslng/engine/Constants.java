@@ -2,16 +2,20 @@ package com.lucaslng.engine;
 
 import java.io.InputStream;
 
-public class Constants {
+public final class Constants {
 
-	public static final ClassLoader CLASS_LOADER = Thread.currentThread().getContextClassLoader();
+	private static final ClassLoader CLASS_LOADER = Thread.currentThread().getContextClassLoader();
+
+	public static final InputStream getResource(String path) {
+		return CLASS_LOADER.getResourceAsStream(path);
+	}
 
 	public static final InputStream getShader(String fileName) {
-		return CLASS_LOADER.getResourceAsStream("shaders/" + fileName);
+		return getResource("shaders/" + fileName);
 	}
 
 	public static final InputStream getTexture(String fileName) {
-		return CLASS_LOADER.getResourceAsStream("textures/" + fileName);
+		return getResource("textures/" + fileName);
 	}
 
 }
