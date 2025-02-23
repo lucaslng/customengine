@@ -10,8 +10,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.source>23</maven.compiler.source>
+    <maven.compiler.target>23</maven.compiler.target>
     <lwjgl.version>3.3.6</lwjgl.version>
     <lwjgl3-awt.version>0.2.3</lwjgl3-awt.version>
     <joml.version>1.10.7</joml.version>
