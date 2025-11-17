@@ -1,3 +1,5 @@
+// GameLoop.java
+
 package com.lucaslng.engine;
 
 import java.util.Timer;
@@ -46,6 +48,8 @@ public abstract class GameLoop extends SwingWorker<Void, Void> {
 	}
 
 	public int fps() {
+		int lastTickMs = lastTickMs();
+		if (lastTickMs == 0) return -1;
 		return 1000 / lastTickMs();
 	}
 
