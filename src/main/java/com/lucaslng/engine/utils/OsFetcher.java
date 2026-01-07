@@ -17,12 +17,12 @@ public final class OsFetcher {
         return getOsName().startsWith("Mac");
     }
 
-    public static boolean isWindows() {
-        return getOsName().startsWith("Windows");
-    }
+    // public static boolean isWindows() {
+    //     return getOsName().startsWith("Windows");
+    // }
 
-    public static boolean isUnix() {
-        String os = getOsName().toLowerCase();
-        return os.contains("nix") || os.contains("nux") || os.contains("aix");
-    }
+    // public static boolean isUnix() {
+    //     String os = getOsName().toLowerCase();
+    //     return os.contains("nix") || os.contains("nux") || os.contains("aix");
+    // }
 }
