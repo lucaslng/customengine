@@ -1,13 +1,6 @@
-// GameLoop.java
-
 package com.lucaslng.engine;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import javax.swing.SwingWorker;
-
-public abstract class GameLoop extends SwingWorker<Void, Void> {
+public abstract class GameLoop {
 
 	private final Engine engine;
 	private long lastTick, lastTickDuration;
@@ -20,31 +13,42 @@ public abstract class GameLoop extends SwingWorker<Void, Void> {
 
 	abstract public void doLoop(Engine engine);
 
-	@Override
-	protected Void doInBackground() {
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(new TimerTask() {
-
-			@Override
-			public void run() {
-				doLoop(engine);
-				engine.doLoop();
-				lastTickDuration = System.nanoTime() - lastTick;
-				lastTick = System.nanoTime();
+	public void execute() {
+		System.out.println("Starting game loop...");
+		long lastFpsTime = System.currentTimeMillis();
+		int frameCount = 0;
+		
+		while (!engine.shouldClose()) {
+			long startTime = System.nanoTime();
+			
+			doLoop(engine);
+			engine.doLoop();
+			
+			lastTickDuration = System.nanoTime() - startTime;
+			lastTick = System.nanoTime();
+			
+			frameCount++;
+			long currentTime = System.currentTimeMillis();
+			if (currentTime - lastFpsTime >= 1000) {
+				System.out.println("fps: " + frameCount);
+				frameCount = 0;
+				lastFpsTime = currentTime;
 			}
-
-		}, 0, 1000 / engine.settings().FPS);
-
-		Timer fpsTimer = new Timer();
-		fpsTimer.scheduleAtFixedRate(new TimerTask() {
-
-			@Override
-			public void run() {
-				System.out.println("fps: " + fps());
+			
+			// Sleep to maintain target FPS
+			long frameTime = (lastTickDuration / 1_000_000);
+			long targetFrameTime = 1000 / engine.settings().FPS;
+			if (frameTime < targetFrameTime) {
+				try {
+					Thread.sleep(targetFrameTime - frameTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
-
-		}, 1000, 1000);
-		return null;
+		}
+		
+		System.out.println("Game loop ended");
+		System.exit(0);
 	}
 
 	public int fps() {

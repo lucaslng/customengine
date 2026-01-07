@@ -1,10 +1,8 @@
 package com.lucaslng.engine;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.HashSet;
 
-public class KeyHandler implements KeyListener {
+public class KeyHandler {
 
 	private final HashSet<Integer> heldKeys;
 
@@ -16,17 +14,11 @@ public class KeyHandler implements KeyListener {
 		return heldKeys.contains(key);
 	}
 
-	@Override
-	public void keyTyped(KeyEvent e) {}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		heldKeys.add(e.getKeyCode());
+	public void keyPressed(int keyCode) {
+		heldKeys.add(keyCode);
 	}
 
-	@Override
-	public void keyReleased(KeyEvent e) {
-		heldKeys.remove(e.getKeyCode());
+	public void keyReleased(int keyCode) {
+		heldKeys.remove(keyCode);
 	}
-
 }
