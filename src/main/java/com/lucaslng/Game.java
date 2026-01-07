@@ -10,12 +10,14 @@ import com.lucaslng.engine.components.HeadRotationComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.components.RotationComponent;
 import com.lucaslng.engine.entities.Entity;
+import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Positions;
 import com.lucaslng.entities.*;
 
 class Game extends GameLoop {
 
 	private Entity player1, player2, plane, camera;
+	private Physics physics;
 
 	public Game(Engine engine) {
 		super(engine);
@@ -29,6 +31,7 @@ class Game extends GameLoop {
 		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f,
 		-10.0f, 0.0f, 9.0f));
 		engine.setCamera(camera);
+		physics = new Physics(engine.entityManager());
 	}
 
 	@Override
@@ -57,6 +60,7 @@ class Game extends GameLoop {
 			Positions.moveRight(position, rotation, speed);
 		}
 
+		physics.step(dt);
 		engine.setCamera(camera);
 	}
 }

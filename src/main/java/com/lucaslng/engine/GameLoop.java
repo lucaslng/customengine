@@ -11,6 +11,7 @@ public abstract class GameLoop extends SwingWorker<Void, Void> {
 
 	private final Engine engine;
 	private long lastTick, lastTickDuration;
+	public double dt = 0;
 
 	public GameLoop(Engine engine) {
 		this.engine = engine;
@@ -27,10 +28,12 @@ public abstract class GameLoop extends SwingWorker<Void, Void> {
 
 			@Override
 			public void run() {
+				long now = System.nanoTime();
+        lastTickDuration = now - lastTick;
+        lastTick = now;
+        dt = dt();
 				doLoop(engine);
 				engine.doLoop();
-				lastTickDuration = System.nanoTime() - lastTick;
-				lastTick = System.nanoTime();
 			}
 
 		}, 0, 1000 / engine.settings().FPS);
@@ -53,8 +56,12 @@ public abstract class GameLoop extends SwingWorker<Void, Void> {
 		return 1000 / lastTickMs;
 	}
 
-	public int lastTickMs() {
-		return (int) (lastTickDuration / 1000000);
+	private int lastTickMs() {
+		return (int) (lastTickDuration / 1_000_000);
 	}
+
+	private double dt() {
+    return lastTickDuration / 1_000_000_000.0;
+}
 
 }
