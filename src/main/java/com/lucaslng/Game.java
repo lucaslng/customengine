@@ -1,10 +1,7 @@
 package com.lucaslng;
 
 import org.joml.Vector3f;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
+import static org.lwjgl.glfw.GLFW.*;
 
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
@@ -13,9 +10,7 @@ import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Positions;
-import com.lucaslng.entities.CameraEntityFactory;
-import com.lucaslng.entities.CubeEntityFactory;
-import com.lucaslng.entities.PlayerEntityFactory;
+import com.lucaslng.entities.*;
 
 class Game extends GameLoop {
 
@@ -63,8 +58,28 @@ class Game extends GameLoop {
 			Vector3f rotation = engine.entityManager().getComponent(player2.id(), HeadRotationComponent.class).rotation();
 			Positions.moveRight(position, rotation, speed);
 		}
+		
+		updateCamera(engine);
+	}
 
-		physics.step(dt);
+	private void updateCamera(Engine engine) {
+		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
+		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
+		
+		// calculate midpoint between players
+		Vector3f midpoint = new Vector3f((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f);
+		
+		// calculate distance between players
+		float distance = pos1.distance(pos2);
+		
+		// calculate camera distance based on player separation
+		float baseDistance = 7.0f;
+		float cameraDistance = Math.max(baseDistance, distance * 0.8f + 3.0f);
+		
+		// position camera behind and above the midpoint
+		Vector3f cameraPos = engine.entityManager().getComponent(camera.id(), PositionComponent.class).position();
+		cameraPos.set(midpoint.x, midpoint.y + 2f, midpoint.z + cameraDistance);
+		
 		engine.setCamera(camera);
 	}
 }
