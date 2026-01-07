@@ -126,17 +126,14 @@ public final class Renderer {
 			System.err.println("Window resized.");
 		});
 
-		// Note: Window centering is skipped as Wayland doesn't support it
-		// The compositor will position the window
-
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
+		
 		// Enable v-sync
 		glfwSwapInterval(1);
 
 		// Make the window visible
 		glfwShowWindow(window);
-		System.out.println("Window shown, should be visible now");
 
 		// Initialize OpenGL
 		initGL();
@@ -153,7 +150,6 @@ public final class Renderer {
 			glfwGetFramebufferSize(window, w, h);
 			framebufferWidth = w.get(0);
 			framebufferHeight = h.get(0);
-			System.out.println("Framebuffer size: " + framebufferWidth + "x" + framebufferHeight);
 		}
 
 		shaderPrograms[0] = new ShaderProgram("vertex.glsl", "fragment.glsl");

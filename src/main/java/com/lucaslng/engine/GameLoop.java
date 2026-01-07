@@ -14,7 +14,6 @@ public abstract class GameLoop {
 	abstract public void doLoop(Engine engine);
 
 	public void execute() {
-		System.out.println("Starting game loop...");
 		long lastFpsTime = System.currentTimeMillis();
 		int frameCount = 0;
 		
@@ -34,8 +33,7 @@ public abstract class GameLoop {
 				frameCount = 0;
 				lastFpsTime = currentTime;
 			}
-			
-			// Sleep to maintain target FPS
+
 			long frameTime = (lastTickDuration / 1_000_000);
 			long targetFrameTime = 1000 / engine.settings().FPS;
 			if (frameTime < targetFrameTime) {
@@ -47,7 +45,6 @@ public abstract class GameLoop {
 			}
 		}
 		
-		System.out.println("Game loop ended");
 		System.exit(0);
 	}
 
