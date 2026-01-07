@@ -6,7 +6,10 @@ import org.lwjgl.system.Configuration;
 public class App {
 	public static void main(String[] args) {
 
-		Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
+		if (System.getProperty("os.name").equals("Mac OS X")) {
+			Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
+		}
+		
 		Engine engine = new Engine();
 		engine.start(new Game(engine));
 	}
