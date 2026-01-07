@@ -1,24 +1,15 @@
 package com.lucaslng.engine;
 
-import java.awt.BorderLayout;
-import java.awt.event.ComponentListener;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
-import javax.swing.JFrame;
-
 import org.joml.Vector3f;
+import static org.lwjgl.glfw.GLFW.*;
 
 import com.lucaslng.engine.components.HeadRotationComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.entities.Entity;
-import com.lucaslng.engine.renderer.GameFrame;
 import com.lucaslng.engine.renderer.Renderer;
 
 public final class Engine {
 
-	private final JFrame frame;
 	private final Renderer renderer;
 	private final EngineSettings settings;
 	private final EntityManager entityManager;
@@ -28,16 +19,19 @@ public final class Engine {
 		System.out.println("Initializing engine...");
 		entityManager = new EntityManager();
 		settings = new EngineSettings();
-		frame = new GameFrame(settings);
 		renderer = new Renderer(settings, entityManager);
-		frame.add(renderer, BorderLayout.CENTER);
-		frame.pack();
-		frame.setVisible(true);
-		frame.transferFocus();
 		keyHandler = new KeyHandler();
-		renderer.addKeyListener(keyHandler);
+		
+		// Setup key callback
+		glfwSetKeyCallback(renderer.getWindow(), (window, key, scancode, action, mods) -> {
+			if (action == GLFW_PRESS) {
+				keyHandler.keyPressed(key);
+			} else if (action == GLFW_RELEASE) {
+				keyHandler.keyReleased(key);
+			}
+		});
+		
 		System.out.println("Engine initialized.");
-
 	}
 
 	public void setCamera(Vector3f position, Vector3f rotation) {
@@ -47,7 +41,11 @@ public final class Engine {
 	public void linkMouseToRotation(Vector3f rotation) {
 		MouseMotionToRotationListener mouseHandler = new MouseMotionToRotationListener(this);
 		mouseHandler.setRotation(rotation);
-		renderer.addMouseMotionListener(mouseHandler);
+		
+		// Setup mouse callback
+		glfwSetCursorPosCallback(renderer.getWindow(), (window, xpos, ypos) -> {
+			mouseHandler.mouseMoved(xpos, ypos);
+		});
 	}
 
 	public void setCamera(Entity entity) {
@@ -79,22 +77,6 @@ public final class Engine {
 		}
 	}
 
-	public void addMouseListener(MouseListener listener) {
-		renderer.addMouseListener(listener);
-	}
-
-	public void addMouseMotionListener(MouseMotionListener listener) {
-		renderer.addMouseMotionListener(listener);
-	}
-
-	public void addComponentListener(ComponentListener listener) {
-		renderer.addComponentListener(listener);
-	}
-
-	public void addKeyListener(KeyListener listener) {
-		renderer.addKeyListener(listener);
-	}
-
 	public EngineSettings settings() {
 		return settings;
 	}
@@ -111,4 +93,7 @@ public final class Engine {
 		return renderer.getHeight();
 	}
 
+	public boolean shouldClose() {
+		return renderer.shouldClose();
+	}
 }

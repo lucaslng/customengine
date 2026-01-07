@@ -1,31 +1,25 @@
 package com.lucaslng.engine;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-
 import org.joml.Vector3f;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_DISABLED;
+import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
 
-class MouseMotionToRotationListener implements MouseMotionListener {
+class MouseMotionToRotationListener {
 
-	private final Robot robot;
 	private final Engine engine;
 	private Vector3f rotation;
+	private double lastX, lastY;
+	private boolean firstMouse = true;
 
 	public MouseMotionToRotationListener(Engine engine) {
 		this.engine = engine;
 		rotation = null;
-		robot = createRobot();
-		robot.mouseMove(engine.width() / 2, engine.height() / 2);
-	}
-
-	private Robot createRobot() {
-		try {
-			return new Robot();
-		} catch (AWTException e) {
-			throw new RuntimeException("Error creating awt robot: " + e.getMessage());
-		}
+		lastX = engine.width() / 2.0;
+		lastY = engine.height() / 2.0;
+		
+		// Hide and capture cursor
+		glfwSetInputMode(engine.renderer().getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
 	public void setRotation(Vector3f rotation) {
@@ -36,19 +30,25 @@ class MouseMotionToRotationListener implements MouseMotionListener {
 		return rotation != null;
 	}
 
-	@Override
-	public void mouseMoved(MouseEvent e) {
+	public void mouseMoved(double xpos, double ypos) {
 		if (isActive()) {
-			rotation.add(new Vector3f(
-					-(e.getYOnScreen() - engine.height() / 2),
-					e.getXOnScreen() - engine.width() / 2,
-					0.0f));
-			robot.mouseMove(engine.width() / 2, engine.height() / 2);
+			if (firstMouse) {
+				lastX = xpos;
+				lastY = ypos;
+				firstMouse = false;
+			}
+
+			double xoffset = xpos - lastX;
+			double yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to top
+
+			lastX = xpos;
+			lastY = ypos;
+
+			rotation.add(
+				(float) yoffset * engine.settings().sensitivity,
+				(float) xoffset * engine.settings().sensitivity,
+				0.0f
+			);
 		}
 	}
-
-	@Override
-	public void mouseDragged(MouseEvent e) {
-	}
-
 }
