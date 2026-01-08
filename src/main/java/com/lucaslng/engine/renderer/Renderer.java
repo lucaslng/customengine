@@ -96,6 +96,14 @@ public final class Renderer {
 		System.out.println("Initializing OpenGL...");
 		GL.createCapabilities();
 
+		String vendor = glGetString(GL_VENDOR);
+        String renderer = glGetString(GL_RENDERER);
+        String version = glGetString(GL_VERSION);
+
+        System.out.println("OpenGL Vendor  : " + vendor);
+        System.out.println("OpenGL Renderer: " + renderer);
+        System.out.println("OpenGL Version : " + version);
+
 		// Get initial framebuffer size
 		try (MemoryStack stack = stackPush()) {
 			IntBuffer w = stack.mallocInt(1);
