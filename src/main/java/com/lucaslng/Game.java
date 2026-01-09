@@ -13,7 +13,6 @@ import com.lucaslng.engine.systems.Positions;
 import com.lucaslng.entities.*;
 
 class Game extends GameLoop {
-
 	private Entity player1, player2, plane, camera;
 	private Physics physics;
 
@@ -32,10 +31,11 @@ class Game extends GameLoop {
 	}
 
 	@Override
-	public void doLoop(Engine engine) {
-		float speed = 0.04f;
+	public void doLoop(Engine engine, double dt) {
+		float baseSpeed = 2.5f;
+		float speed = baseSpeed * (float) dt;
 		
-		// Player 1 controls (A/D keys)
+		// player 1 controls
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_A)) {
 			Vector3f position = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 			Vector3f rotation = engine.entityManager().getComponent(player1.id(), HeadRotationComponent.class).rotation();
@@ -47,7 +47,7 @@ class Game extends GameLoop {
 			Positions.moveRight(position, rotation, speed);
 		}
 
-		// Player 2 controls (Arrow keys)
+		// player 2 controls
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_LEFT)) {
 			Vector3f position = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
 			Vector3f rotation = engine.entityManager().getComponent(player2.id(), HeadRotationComponent.class).rotation();
@@ -58,8 +58,8 @@ class Game extends GameLoop {
 			Vector3f rotation = engine.entityManager().getComponent(player2.id(), HeadRotationComponent.class).rotation();
 			Positions.moveRight(position, rotation, speed);
 		}
-		
-		updateCamera(engine);
+
+		updateCamera(engine);				// update the camera to keep both players in view
 	}
 
 	private void updateCamera(Engine engine) {
@@ -78,7 +78,7 @@ class Game extends GameLoop {
 		
 		// position camera behind and above the midpoint
 		Vector3f cameraPos = engine.entityManager().getComponent(camera.id(), PositionComponent.class).position();
-		cameraPos.set(midpoint.x, midpoint.y + 2f, midpoint.z + cameraDistance);
+		cameraPos.set(midpoint.x, midpoint.y + 2.0f, midpoint.z + cameraDistance);
 		
 		engine.setCamera(camera);
 	}

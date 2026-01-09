@@ -14,8 +14,6 @@ public class EngineSettings {
 
 	public float sensitivity = 0.01f;
 
-	public int FPS = 60;
-
 	public GLData getGLData() {
 		GLData data = new GLData();
 		data.samples = 4;
