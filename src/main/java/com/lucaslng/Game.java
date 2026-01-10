@@ -12,7 +12,7 @@ import com.lucaslng.engine.systems.Positions;
 import com.lucaslng.entities.*;
 
 class Game extends GameLoop {
-	private Entity player1, player2, plane, camera;
+	private Entity player1, player2, plane, camera, catCube;
 	private Physics physics;
 
 	public Game(Engine engine) {
@@ -21,10 +21,11 @@ class Game extends GameLoop {
 
 	@Override
 	public void init(Engine engine) {
-		player1 = engine.entityManager().buildEntity(new PlayerEntityFactory(-1.0f, 0.0f, 0.0f));
-		player2 = engine.entityManager().buildEntity(new PlayerEntityFactory(1.0f, 0.0f, 0.0f));
-		camera = engine.entityManager().buildEntity(new CameraEntityFactory(0.0f, 0.0f, 10.0f));
-		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f, -45.0f, 0.0f, 50.0f, 0.9f, 0.9f, 0.9f, 0.7f));
+		player1 = engine.entityManager().buildEntity(new PlayerEntityFactory(-1f, 0f, 0f));
+		player2 = engine.entityManager().buildEntity(new PlayerEntityFactory(1f, 0f, 0f));
+		camera = engine.entityManager().buildEntity(new CameraEntityFactory(0f, 0f, 10f));
+		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0f, -45f, 0f, 50f, 0.9f, 0.9f, 0.9f, 0.7f));
+		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-3f, -20f, 0f, 1f));
 		engine.setCamera(camera);
 		physics = new Physics(engine.entityManager());
 	}
@@ -84,18 +85,18 @@ class Game extends GameLoop {
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
 		
 		// calculate midpoint between players
-		Vector3f midpoint = new Vector3f((pos1.x + pos2.x) / 2.0f, (pos1.y + pos2.y) / 2.0f, (pos1.z + pos2.z) / 2.0f);
+		Vector3f midpoint = new Vector3f((pos1.x + pos2.x) / 2f, (pos1.y + pos2.y) / 2f, (pos1.z + pos2.z) / 2f);
 		
 		// calculate distance between players
 		float distance = pos1.distance(pos2);
 		
 		// calculate camera distance based on player separation
-		float baseDistance = 7.0f;
-		float cameraDistance = Math.max(baseDistance, distance * 0.8f + 3.0f);
+		float baseDistance = 7f;
+		float cameraDistance = Math.max(baseDistance, distance * 0.8f + 3f);
 		
 		// position camera behind and above the midpoint
 		Vector3f cameraPos = engine.entityManager().getComponent(camera.id(), PositionComponent.class).position();
-		cameraPos.set(midpoint.x, midpoint.y + 2.0f, midpoint.z + cameraDistance);
+		cameraPos.set(midpoint.x, midpoint.y + 2f, midpoint.z + cameraDistance);
 		
 		engine.setCamera(camera);
 	}
