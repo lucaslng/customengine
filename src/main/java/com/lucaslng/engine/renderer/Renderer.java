@@ -16,10 +16,8 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
-import com.lucaslng.engine.components.MeshComponent;
-import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.components.RotationComponent;
-import com.lucaslng.engine.components.TextureComponent;
+import com.lucaslng.engine.components.*;
+
 import static com.lucaslng.engine.utils.FileReader.readImage;
 
 public final class Renderer {
@@ -103,10 +101,10 @@ public final class Renderer {
 			framebufferHeight = h.get(0);
 		}
 
-		shaderPrograms[0] = new ShaderProgram("vertex.glsl", "fragment.glsl");
+		shaderPrograms[0] = new ShaderProgram("blue_vertex.glsl", "fragment.glsl");
 		shaderPrograms[0].compileShader();
 
-		shaderPrograms[1] = new ShaderProgram("vertex2.glsl", "fragment.glsl");
+		shaderPrograms[1] = new ShaderProgram("vertex.glsl", "color_frag.glsl");
 		shaderPrograms[1].compileShader();
 
 		shaderPrograms[2] = new ShaderProgram("texture_vertex.glsl", "texture_frag.glsl");
@@ -152,6 +150,8 @@ public final class Renderer {
 						entityManager.getComponent(entityId, TextureComponent.class).textureCoordinates());
 				va.addBuffer(texCoordBuffer, new VertexBufferElement(2, GL_FLOAT, true));
 				shaderProgram = shaderPrograms[2];
+			} else if (entityManager.hasComponent(entityId, ColorComponent.class)) {
+				shaderProgram = shaderPrograms[1];
 			} else {
 				shaderProgram = shaderPrograms[0];
 			}
@@ -163,6 +163,11 @@ public final class Renderer {
 					projectionMatrix.get(new float[16]));
 			shaderProgram.setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
 			shaderProgram.setUniformMatrix4v("model", false, model.get(new float[16]));
+
+			if (entityManager.hasComponent(entityId, ColorComponent.class)) {
+				ColorComponent color = entityManager.getComponent(entityId, ColorComponent.class);
+				shaderProgram.setUniform4f("uColor", color.r(), color.g(), color.b(), color.a());
+			}
 
 			glDrawElements(GL_TRIANGLES, component.indices().length, GL_UNSIGNED_INT, 0);
 

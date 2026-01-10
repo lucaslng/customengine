@@ -24,7 +24,7 @@ import static org.lwjgl.opengl.GL20C.glUseProgram;
 
 import static com.lucaslng.engine.utils.FileReader.readShaderFile;
 
-class ShaderProgram {
+class ShaderProgram{
 
 	private final int id, vertexShader, fragmentShader;
 	private boolean isCompiled;
@@ -99,6 +99,14 @@ class ShaderProgram {
 
 	protected int id() {
 		return id;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == this) return true;
+		if (!(o instanceof ShaderProgram)) return false;
+		ShaderProgram other = (ShaderProgram) o;
+		return this.id() == other.id();
 	}
 	
 }

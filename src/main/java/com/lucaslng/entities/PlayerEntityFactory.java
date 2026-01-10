@@ -21,7 +21,7 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 
 	public PlayerEntityFactory(float x, float y, float z) {
 		position = new Vector3f(x, y, z);
-		float size = 0.5f;
+		float size = 1f;
 		vertices = new float[] {
 				-size, -size, -size,
 				size, -size, -size,
@@ -39,8 +39,8 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 		PositionComponent positionComponent = new PositionComponent(position);
 		VelocityComponent velocityComponent = new VelocityComponent(new Vector3f());
 		HeadRotationComponent headRotationComponent = new HeadRotationComponent(new Vector3f(0.0f, -90.0f, 0.0f));
-		RigidBodyComponent rigidBodyComponent = new RigidBodyComponent(0.0000001f, 0.9f, 0.99f, 1f);
-		AABBComponent aabbComponent = new AABBComponent(new Vector3f(0.5f));
+		RigidBodyComponent rigidBodyComponent = new RigidBodyComponent(20f, 0.9f, 0.99f, 1f);
+		AABBComponent aabbComponent = new AABBComponent(new Vector3f(2f));
 		return new Record[] { positionComponent, velocityComponent, headRotationComponent,
 				new RotationComponent(new Vector3f()), new MeshComponent(vertices, indices), rigidBodyComponent,
 				aabbComponent };

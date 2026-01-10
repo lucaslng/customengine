@@ -17,10 +17,14 @@ public class CubeEntityFactory implements AbstractEntityFactory {
 	};
 	private final float[] vertices;
 	private final Vector3f position;
-	private final float size;
+	private final float size, r, g, b, a;
 
-	public CubeEntityFactory(float x, float y, float z, float size) {
+	public CubeEntityFactory(float x, float y, float z, float size, float r, float g, float b, float a) {
 		position = new Vector3f(x, y, z);
+		this.r = r;
+		this.g = g;
+		this.b = b;
+		this.a = a;
 		size /= 2;
 		this.size = size;
 		vertices = new float[] {
@@ -38,6 +42,6 @@ public class CubeEntityFactory implements AbstractEntityFactory {
 	@Override
 	public Record[] components() {
 		return new Record[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
-				new MeshComponent(vertices, indices), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(size)) };
+				new MeshComponent(vertices, indices), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(size)), new ColorComponent(r, g, b, a) };
 	}
 }

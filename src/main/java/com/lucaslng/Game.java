@@ -7,6 +7,7 @@ import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
 import com.lucaslng.engine.components.HeadRotationComponent;
 import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.VelocityComponent;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Positions;
@@ -24,8 +25,8 @@ class Game extends GameLoop {
 	public void init(Engine engine) {
 		player1 = engine.entityManager().buildEntity(new PlayerEntityFactory(-1.0f, 0.0f, 0.0f));
 		player2 = engine.entityManager().buildEntity(new PlayerEntityFactory(1.0f, 0.0f, 0.0f));
-		camera = engine.entityManager().buildEntity(new CameraEntityFactory(0.0f, 0.0f, 7.0f));
-		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f, -10.0f, 0.0f, 9.0f));
+		camera = engine.entityManager().buildEntity(new CameraEntityFactory(0.0f, 0.0f, 10.0f));
+		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f, -45.0f, 0.0f, 50.0f, 0.9f, 0.9f, 0.9f, 1.0f));
 		engine.setCamera(camera);
 		physics = new Physics(engine.entityManager());
 	}
@@ -58,6 +59,8 @@ class Game extends GameLoop {
 			Vector3f rotation = engine.entityManager().getComponent(player2.id(), HeadRotationComponent.class).rotation();
 			Positions.moveRight(position, rotation, speed);
 		}
+
+		// System.out.println(engine.entityManager().getComponent(player1.id(), VelocityComponent.class).velocity());
 
 		physics.step(dt);
 		
