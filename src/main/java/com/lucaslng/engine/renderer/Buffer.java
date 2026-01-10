@@ -9,25 +9,25 @@ abstract class Buffer {
 
 	private final int id, target;
 
-	protected Buffer(int target) {
+	public Buffer(int target) {
 		id = glGenBuffers();
 		this.target = target;
 		bind();
 	}
 
-	protected final void bind() {
+	public final void bind() {
 		glBindBuffer(target, id);
 	}
 
-	protected final void unbind() {
+	public final void unbind() {
 		glBindBuffer(target, GL_ZERO);
 	}
 
-	protected final void delete() {
+	public final void delete() {
 		glDeleteBuffers(id);
 	}
 
-	protected final int id() {
+	public final int id() {
 		return id;
 	}
 	

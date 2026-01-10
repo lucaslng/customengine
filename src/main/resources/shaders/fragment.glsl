@@ -1,8 +1,15 @@
 #version 410 core
 
-in vec3 vertexColor;
-out vec4 FragColor;
+in vec2 vUV;
+uniform sampler2D uTexture;
+uniform vec4 uColor;
+uniform bool uUseTexture;
+out vec4 fragColor;
 
 void main() {
-    FragColor = vec4(vertexColor, 1.0);
+    if (uUseTexture) {
+        fragColor = texture(uTexture, vUV);
+    } else {
+        fragColor = uColor;
+    }
 }

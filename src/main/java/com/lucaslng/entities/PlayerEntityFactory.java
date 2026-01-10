@@ -1,7 +1,7 @@
 package com.lucaslng.entities;
 
-
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
@@ -42,10 +42,11 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 		RigidBodyComponent rigidBodyComponent = new RigidBodyComponent(20f, 0.9f, 0.99f, 1f);
 		AABBComponent aabbComponent = new AABBComponent(new Vector3f(2f));
 		RotationComponent rotationComponent = new RotationComponent(new Vector3f());
-		MeshComponent meshComponent = new MeshComponent(vertices, indices);
+		MeshComponent meshComponent = new MeshComponent(vertices, indices, new float[indices.length * 2]);
+		MaterialComponent materialComponent = new MaterialComponent(new Vector4f(0f, 1f, 1f, 1f));
 		GroundedComponent groundedComponent = new GroundedComponent();
 		return new Object[] { positionComponent, velocityComponent, headRotationComponent,
-				rotationComponent, meshComponent, rigidBodyComponent,
+				rotationComponent, meshComponent, materialComponent, rigidBodyComponent,
 				aabbComponent, groundedComponent };
 	}
 

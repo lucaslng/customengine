@@ -2,26 +2,11 @@ package com.lucaslng.engine.renderer;
 
 import java.util.HashMap;
 
+import org.joml.Vector4f;
+
 import static org.lwjgl.opengl.GL11C.GL_FALSE;
 import static org.lwjgl.opengl.GL11C.GL_ZERO;
-import static org.lwjgl.opengl.GL20C.GL_COMPILE_STATUS;
-import static org.lwjgl.opengl.GL20C.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20C.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20C.glAttachShader;
-import static org.lwjgl.opengl.GL20C.glCompileShader;
-import static org.lwjgl.opengl.GL20C.glCreateProgram;
-import static org.lwjgl.opengl.GL20C.glCreateShader;
-import static org.lwjgl.opengl.GL20C.glDeleteProgram;
-import static org.lwjgl.opengl.GL20C.glDeleteShader;
-import static org.lwjgl.opengl.GL20C.glGetShaderInfoLog;
-import static org.lwjgl.opengl.GL20C.glGetShaderi;
-import static org.lwjgl.opengl.GL20C.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20C.glLinkProgram;
-import static org.lwjgl.opengl.GL20C.glShaderSource;
-import static org.lwjgl.opengl.GL20C.glUniform4f;
-import static org.lwjgl.opengl.GL20C.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20C.glUseProgram;
-
+import static org.lwjgl.opengl.GL20C.*;
 import static com.lucaslng.engine.utils.FileReader.readShaderFile;
 
 class ShaderProgram{
@@ -59,8 +44,16 @@ class ShaderProgram{
 		isCompiled = true;
 	}
 
+	protected void setUniform1i(CharSequence name, int i) {
+		glUniform1i(getUniformLocation(name), i);
+	}
+
 	protected void setUniform4f(CharSequence name, float x, float y, float z, float w) {
 		glUniform4f(getUniformLocation(name), x, y, z, w);
+	}
+
+	protected void setUniform4f(CharSequence name, Vector4f v) {
+		setUniform4f(name, v.x(), v.y(), v.z(), v.w());
 	}
 
 	protected void setUniformMatrix4v(CharSequence name, boolean transpose, float[] value) {

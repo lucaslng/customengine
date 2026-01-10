@@ -28,11 +28,11 @@ import static org.lwjgl.opengl.GL13C.GL_TEXTURE0;
 import static org.lwjgl.opengl.GL13C.glActiveTexture;
 import static org.lwjgl.opengl.GL30C.glGenerateMipmap;
 
-final class Texture {
+public final class Texture {
 
 	private final int id;
 
-	protected Texture(BufferedImage image) {
+	public Texture(BufferedImage image) {
 		
 		id = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, id);
@@ -52,17 +52,17 @@ final class Texture {
 		unbind();		
 	}
 
-	protected final void bind(int unit) {
+	public final void bind(int unit) {
 		assert unit >= 0 && unit <= 31;
 		glActiveTexture(GL_TEXTURE0 + unit);
 		glBindTexture(GL_TEXTURE_2D, id);
 	}
 
-	protected final static void unbind() {
+	public final static void unbind() {
 		glBindTexture(GL_TEXTURE_2D, GL_ZERO);
 	}
 
-	protected final void delete() {
+	public final void delete() {
 		glDeleteTextures(id);
 	}
 
@@ -83,7 +83,7 @@ final class Texture {
 		return buffer;
 	}
 
-	protected int id() {
+	public int id() {
 		return id;
 	}
 

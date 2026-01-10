@@ -1,6 +1,7 @@
 package com.lucaslng.entities;
 
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
@@ -42,6 +43,6 @@ public class CubeEntityFactory implements AbstractEntityFactory {
 	@Override
 	public Object[] components() {
 		return new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
-				new MeshComponent(vertices, indices), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(size)), new ColorComponent(r, g, b, a) };
+				new MeshComponent(vertices, indices, new float[indices.length * 2]), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(size)), new MaterialComponent(new Vector4f(r, g, b, a)) };
 	}
 }

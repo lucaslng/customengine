@@ -5,7 +5,6 @@ import org.joml.Vector3f;
 import com.lucaslng.engine.components.MeshComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.components.RotationComponent;
-import com.lucaslng.engine.components.TextureComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 
 public class TexturedCubeEntityFactory implements AbstractEntityFactory {
@@ -115,8 +114,7 @@ public class TexturedCubeEntityFactory implements AbstractEntityFactory {
 	@Override
 	public Object[] components() {
 		return new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
-				new MeshComponent(vertices, indices),
-				new TextureComponent(textureCoordinates)
+				new MeshComponent(vertices, indices, textureCoordinates),
 		};
 	}
 }
