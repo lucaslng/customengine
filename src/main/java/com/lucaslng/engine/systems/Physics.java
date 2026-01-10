@@ -1,9 +1,6 @@
 package com.lucaslng.engine.systems;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
-import javax.swing.text.Position;
 
 import org.joml.Vector3f;
 
@@ -14,13 +11,20 @@ public class Physics {
 
 	private final EntityManager entityManager;
 
-	public static final float G = 0.1f;
+	public static final float G = 9.8f;
 
 	public Physics(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 
 	public void step(double dt) {
+		
+		// Reset grounded status
+		for (int entityId : entityManager.getEntitiesWith(GroundedComponent.class)) {
+			GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
+			grounded.isGrounded = false;
+		}
+
 		// Apply gravity
 		for (int entityId : entityManager.getEntitiesWith(RigidBodyComponent.class, VelocityComponent.class)) {
 			RigidBodyComponent rigidBody = entityManager.getComponent(entityId, RigidBodyComponent.class);
@@ -29,12 +33,16 @@ public class Physics {
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
 			velocity.y -= G * rigidBody.gravityScale() * dt;
 		}
+
 		// Apply velocity
 		for (int entityId : entityManager.getEntitiesWith(PositionComponent.class, VelocityComponent.class)) {
 			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
-			position.add(velocity);
+			Vector3f change = new Vector3f();
+			velocity.mul((float) dt, change);
+			position.add(change);
 		}
+
 		// Check collisions
 		ArrayList<Integer[]> contactIds = new ArrayList<>();
 		ArrayList<Contact> contactData = new ArrayList<>();
@@ -55,6 +63,13 @@ public class Physics {
 				Contact contact = checkCollision(pa, halfExtentsA, pb, halfExtentsB);
 				if (contact == null)
 					continue;
+
+				// set grounded
+				if (contact.c().y < -0.001f && entityManager.hasComponent(ida, GroundedComponent.class)) {
+					GroundedComponent grounded = entityManager.getComponent(ida, GroundedComponent.class);
+          grounded.isGrounded = true;
+        
+				}
 				contactIds.add(new Integer[] { ida, idb });
 				contactData.add(contact);
 			}
@@ -190,7 +205,7 @@ public class Physics {
 		float invMassSum = ra.invMass() + rb.invMass();
 		if (invMassSum == 0f)
 			return;
-		float correctionMagnitude = Math.max(contact.penetration() - 0.01f, 0f) / invMassSum * 0.2f;
+		float correctionMagnitude = Math.max(contact.penetration() - 0.00000000000000f, 0f) / invMassSum * 0.5f;
 		Vector3f correction = new Vector3f();
 		contact.c().mul(correctionMagnitude, correction);
 		if (!ra.isStatic()) {

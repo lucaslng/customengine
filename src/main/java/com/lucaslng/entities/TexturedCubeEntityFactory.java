@@ -113,8 +113,8 @@ public class TexturedCubeEntityFactory implements AbstractEntityFactory {
 	}
 
 	@Override
-	public Record[] components() {
-		return new Record[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
+	public Object[] components() {
+		return new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
 				new MeshComponent(vertices, indices),
 				new TextureComponent(textureCoordinates)
 		};

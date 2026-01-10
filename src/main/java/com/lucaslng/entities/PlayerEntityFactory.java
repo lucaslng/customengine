@@ -35,15 +35,18 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 	}
 
 	@Override
-	public Record[] components() {
+	public Object[] components() {
 		PositionComponent positionComponent = new PositionComponent(position);
 		VelocityComponent velocityComponent = new VelocityComponent(new Vector3f());
 		HeadRotationComponent headRotationComponent = new HeadRotationComponent(new Vector3f(0.0f, -90.0f, 0.0f));
 		RigidBodyComponent rigidBodyComponent = new RigidBodyComponent(20f, 0.9f, 0.99f, 1f);
 		AABBComponent aabbComponent = new AABBComponent(new Vector3f(2f));
-		return new Record[] { positionComponent, velocityComponent, headRotationComponent,
-				new RotationComponent(new Vector3f()), new MeshComponent(vertices, indices), rigidBodyComponent,
-				aabbComponent };
+		RotationComponent rotationComponent = new RotationComponent(new Vector3f());
+		MeshComponent meshComponent = new MeshComponent(vertices, indices);
+		GroundedComponent groundedComponent = new GroundedComponent();
+		return new Object[] { positionComponent, velocityComponent, headRotationComponent,
+				rotationComponent, meshComponent, rigidBodyComponent,
+				aabbComponent, groundedComponent };
 	}
 
 }
