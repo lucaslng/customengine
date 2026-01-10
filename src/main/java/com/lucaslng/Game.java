@@ -49,7 +49,7 @@ class Game extends GameLoop {
 			GroundedComponent grounded = engine.entityManager().getComponent(player1.id(), GroundedComponent.class);
 			if (grounded.isGrounded) {
 				Vector3f velocity = engine.entityManager().getComponent(player1.id(), VelocityComponent.class).velocity();
-				velocity.y = 2f;
+				velocity.y = 10f;
 			}
 		}
 
@@ -68,7 +68,7 @@ class Game extends GameLoop {
 			GroundedComponent grounded = engine.entityManager().getComponent(player2.id(), GroundedComponent.class);
 			if (grounded.isGrounded) {
 				Vector3f velocity = engine.entityManager().getComponent(player2.id(), VelocityComponent.class).velocity();
-				velocity.y = 2f;
+				velocity.y = 10f;
 			}
 		}
 

@@ -107,15 +107,14 @@ public class Physics {
 	private static Contact checkCollision(Vector3f ca, Vector3f ha, Vector3f cb, Vector3f hb) {
 		Vector3f out = new Vector3f();
 		Vector3f d = new Vector3f();
-		cb.sub(ca, d); // direction from A to B (don't make absolute yet)
+		cb.sub(ca, d);
 
-		// Store the signs before taking absolute
 		Vector3f signs = new Vector3f(
 				d.x >= 0 ? 1f : -1f,
 				d.y >= 0 ? 1f : -1f,
 				d.z >= 0 ? 1f : -1f);
 
-		d.absolute(); // now make absolute for overlap calculation
+		d.absolute();
 
 		float ox = (ha.x + hb.x) - d.x;
 		float oy = (ha.y + hb.y) - d.y;
@@ -127,14 +126,16 @@ public class Physics {
 		float penetration;
 		if (ox < oy && ox < oz) {
 			penetration = ox;
-			out.x = signs.x * ox; // use the original sign
+			out.x = signs.x * ox;
 		} else if (oy < oz) {
 			penetration = oy;
-			out.y = signs.y * oy; // use the original sign
+			out.y = signs.y * oy;
 		} else {
 			penetration = oz;
-			out.z = signs.z * oz; // use the original sign
+			out.z = signs.z * oz;
 		}
+
+		out.normalize();
 
 		return new Contact(penetration, out);
 	}
