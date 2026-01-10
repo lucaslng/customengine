@@ -9,7 +9,6 @@ import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.renderer.Renderer;
 
 public final class Engine {
-
 	private final Renderer renderer;
 	private final EngineSettings settings;
 	private final EntityManager entityManager;
@@ -21,8 +20,7 @@ public final class Engine {
 		settings = new EngineSettings();
 		renderer = new Renderer(settings, entityManager);
 		keyHandler = new KeyHandler();
-		
-		// Setup key callback
+
 		glfwSetKeyCallback(renderer.getWindow(), (window, key, scancode, action, mods) -> {
 			if (action == GLFW_PRESS) {
 				keyHandler.keyPressed(key);

@@ -13,7 +13,6 @@ import com.lucaslng.engine.systems.Positions;
 import com.lucaslng.entities.*;
 
 class Game extends GameLoop {
-
 	private Entity player1, player2, plane, camera;
 	private Physics physics;
 
@@ -26,16 +25,17 @@ class Game extends GameLoop {
 		player1 = engine.entityManager().buildEntity(new PlayerEntityFactory(-1.0f, 0.0f, 0.0f));
 		player2 = engine.entityManager().buildEntity(new PlayerEntityFactory(1.0f, 0.0f, 0.0f));
 		camera = engine.entityManager().buildEntity(new CameraEntityFactory(0.0f, 0.0f, 7.0f));
-		Entity plane = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f, -10.0f, 0.0f, 9.0f));
+		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0.0f, -10.0f, 0.0f, 9.0f));
 		engine.setCamera(camera);
 		physics = new Physics(engine.entityManager());
 	}
 
 	@Override
-	public void doLoop(Engine engine) {
-		float speed = 0.04f;
+	public void doLoop(Engine engine, double dt) {
+		float baseSpeed = 2.5f;
+		float speed = baseSpeed * (float) dt;
 		
-		// Player 1 controls (A/D keys)
+		// player 1 controls
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_A)) {
 			Vector3f position = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 			Vector3f rotation = engine.entityManager().getComponent(player1.id(), HeadRotationComponent.class).rotation();
@@ -47,7 +47,7 @@ class Game extends GameLoop {
 			Positions.moveRight(position, rotation, speed);
 		}
 
-		// Player 2 controls (Arrow keys)
+		// player 2 controls
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_LEFT)) {
 			Vector3f position = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
 			Vector3f rotation = engine.entityManager().getComponent(player2.id(), HeadRotationComponent.class).rotation();
@@ -80,7 +80,7 @@ class Game extends GameLoop {
 		
 		// position camera behind and above the midpoint
 		Vector3f cameraPos = engine.entityManager().getComponent(camera.id(), PositionComponent.class).position();
-		cameraPos.set(midpoint.x, midpoint.y + 2f, midpoint.z + cameraDistance);
+		cameraPos.set(midpoint.x, midpoint.y + 2.0f, midpoint.z + cameraDistance);
 		
 		engine.setCamera(camera);
 	}

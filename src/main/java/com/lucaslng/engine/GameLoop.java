@@ -1,33 +1,34 @@
 package com.lucaslng.engine;
 
-public abstract class GameLoop {
-
+public abstract class GameLoop { 
 	private final Engine engine;
-	private long lastTick = 0, lastTickDuration;
-	public double dt = 0;
+	private long lastTick = 0;
+	private double dt = 0;
 
 	public GameLoop(Engine engine) {
 		this.engine = engine;
 	}
 
 	abstract public void init(Engine engine);
-
-	abstract public void doLoop(Engine engine);
+	abstract public void doLoop(Engine engine, double dt);
 
 	public void execute() {
+		System.out.println("Starting game loop...");
 		long lastFpsTime = System.currentTimeMillis();
 		int frameCount = 0;
+		lastTick = System.nanoTime();
 		
 		while (!engine.shouldClose()) {
-			long now = System.nanoTime();
+			long frameStart = System.nanoTime();
 			
-			doLoop(engine);
+			// calculate delta time in seconds
+			dt = (frameStart - lastTick) / 1_000_000_000.0;
+			lastTick = frameStart;
+
+			doLoop(engine, dt);
 			engine.doLoop();
 			
-			lastTickDuration = now - lastTick;
-			lastTick = now;
-			dt = dt();
-			
+			// FPS tracking
 			frameCount++;
 			long currentTime = System.currentTimeMillis();
 			if (currentTime - lastFpsTime >= 1000) {
@@ -35,33 +36,13 @@ public abstract class GameLoop {
 				frameCount = 0;
 				lastFpsTime = currentTime;
 			}
-
-			long frameTime = (lastTickDuration / 1_000_000);
-			long targetFrameTime = 1000 / engine.settings().FPS;
-			if (frameTime < targetFrameTime) {
-				try {
-					Thread.sleep(targetFrameTime - frameTime);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
 		}
-		
+
 		System.exit(0);
 	}
 
-	public int fps() {
-		int lastTickMs = lastTickMs();
-		if (lastTickMs == 0) return -1;
-		return 1000 / lastTickMs;
+	public double getDeltaTime() {
+		return dt;
 	}
-
-	private int lastTickMs() {
-		return (int) (lastTickDuration / 1_000_000);
-	}
-
-	private double dt() {
-    return lastTickDuration / 1_000_000_000.0;
-}
 
 }

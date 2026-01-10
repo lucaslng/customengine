@@ -47,15 +47,13 @@ public final class Renderer {
 	}
 
 	private void initWindow() {
-		// Setup error callback
 		GLFWErrorCallback.createPrint(System.err).set();
 
-		// Initialize GLFW
 		if (!glfwInit()) {
 			throw new IllegalStateException("Unable to initialize GLFW");
 		}
 
-		// Configure GLFW
+		// configure GLFW
 		glfwDefaultWindowHints();
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -65,38 +63,38 @@ public final class Renderer {
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 		glfwWindowHint(GLFW_SAMPLES, 4);
 
-		// Create window
+		// create window
 		window = glfwCreateWindow(width, height, engineSettings.title, NULL, NULL);
 		if (window == NULL) {
 			throw new RuntimeException("Failed to create the GLFW window");
 		}
 		System.out.println("GLFW window created successfully");
 
-		// Setup resize callback
 		glfwSetFramebufferSizeCallback(window, (window, w, h) -> {
 			framebufferWidth = w;
 			framebufferHeight = h;
 			setAspectRatio();
-			System.err.println("Window resized.");
 		});
 
-		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
-		// Enable v-sync
-		glfwSwapInterval(1);
-
-		// Make the window visible
-		glfwShowWindow(window);
-
-		// Initialize OpenGL
-		initGL();
+		glfwSwapInterval(1);						 // vsync
+		glfwShowWindow(window);								// makes window visible
+		initGL();											
 	}
 
 	public void initGL() {
 		System.out.println("Initializing OpenGL...");
 		GL.createCapabilities();
 
-		// Get initial framebuffer size
+		String vendor = glGetString(GL_VENDOR);
+        String renderer = glGetString(GL_RENDERER);
+        String version = glGetString(GL_VERSION);
+
+        System.out.println("OpenGL Vendor  : " + vendor);
+        System.out.println("OpenGL Renderer: " + renderer);
+        System.out.println("OpenGL Version : " + version);
+
+		// get initial framebuffer size
 		try (MemoryStack stack = stackPush()) {
 			IntBuffer w = stack.mallocInt(1);
 			IntBuffer h = stack.mallocInt(1);
