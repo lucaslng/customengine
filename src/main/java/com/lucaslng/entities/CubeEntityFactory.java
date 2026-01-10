@@ -2,9 +2,7 @@ package com.lucaslng.entities;
 
 import org.joml.Vector3f;
 
-import com.lucaslng.engine.components.MeshComponent;
-import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.components.RotationComponent;
+import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 
 public class CubeEntityFactory implements AbstractEntityFactory {
@@ -19,10 +17,12 @@ public class CubeEntityFactory implements AbstractEntityFactory {
 	};
 	private final float[] vertices;
 	private final Vector3f position;
+	private final float size;
 
 	public CubeEntityFactory(float x, float y, float z, float size) {
 		position = new Vector3f(x, y, z);
 		size /= 2;
+		this.size = size;
 		vertices = new float[] {
 				-size, -size, -size,
 				size, -size, -size,
@@ -37,6 +37,7 @@ public class CubeEntityFactory implements AbstractEntityFactory {
 
 	@Override
 	public Record[] components() {
-		return new Record[] { new PositionComponent(position), new RotationComponent(new Vector3f()), new MeshComponent(vertices, indices) };
+		return new Record[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
+				new MeshComponent(vertices, indices), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(size)) };
 	}
 }

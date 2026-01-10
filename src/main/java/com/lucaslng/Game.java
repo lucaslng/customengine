@@ -58,6 +58,8 @@ class Game extends GameLoop {
 			Vector3f rotation = engine.entityManager().getComponent(player2.id(), HeadRotationComponent.class).rotation();
 			Positions.moveRight(position, rotation, speed);
 		}
+
+		physics.step(dt);
 		
 		updateCamera(engine);
 	}
