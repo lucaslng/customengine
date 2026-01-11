@@ -11,6 +11,7 @@ import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Positions;
+import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.entities.*;
 
 class Game extends GameLoop {
@@ -40,13 +41,15 @@ class Game extends GameLoop {
 		// player 1 controls
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_A)) {
 			Vector3f position = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.entityManager().getComponent(player1.id(), HeadRotationComponent.class).rotation();
-			Positions.moveLeft(position, rotation, speed);
+			Vector3f rotation = engine.entityManager().getComponent(player1.id(), RotationComponent.class).rotation();
+			position.x -= speed;
+			rotation.y = 0f;
 		}
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_D)) {
 			Vector3f position = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.entityManager().getComponent(player1.id(), HeadRotationComponent.class).rotation();
-			Positions.moveRight(position, rotation, speed);
+			Vector3f rotation = engine.entityManager().getComponent(player1.id(), RotationComponent.class).rotation();
+			position.x += speed;
+			rotation.y = Rotations.PI; // TODO: fix the rotation order of operations prioritizing facing rightwards when pressing both keys down at the same time
 		}
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_SPACE)) {
 			GroundedComponent grounded = engine.entityManager().getComponent(player1.id(), GroundedComponent.class);
@@ -59,13 +62,15 @@ class Game extends GameLoop {
 		// player 2 controls
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_LEFT)) {
 			Vector3f position = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.entityManager().getComponent(player2.id(), HeadRotationComponent.class).rotation();
-			Positions.moveLeft(position, rotation, speed);
+			Vector3f rotation = engine.entityManager().getComponent(player2.id(), RotationComponent.class).rotation();
+			position.x -= speed;
+			rotation.y = 0f;
 		}
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_RIGHT)) {
 			Vector3f position = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
-			Vector3f rotation = engine.entityManager().getComponent(player2.id(), HeadRotationComponent.class).rotation();
-			Positions.moveRight(position, rotation, speed);
+			Vector3f rotation = engine.entityManager().getComponent(player2.id(), RotationComponent.class).rotation();
+			position.x += speed;
+			rotation.y = Rotations.PI;
 		}
 		if (engine.keyHandler().isKeyHeld(GLFW_KEY_UP)) {
 			GroundedComponent grounded = engine.entityManager().getComponent(player2.id(), GroundedComponent.class);
