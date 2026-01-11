@@ -48,43 +48,73 @@ class Game extends GameLoop {
 	public void doLoop(Engine engine, double dt) {
 		float baseSpeed = 4f;
 		float speed = baseSpeed * (float) dt;
-		
-		handlePlayerMovement(engine, player1, speed, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE);	// player 1 controls
-		handlePlayerMovement(engine, player2, speed, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP);	// player 2 controls
 
-		physics.step(dt);	
+		handlePlayerMovement(engine, player1, speed, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE); // player 1 controls
+		handlePlayerMovement(engine, player2, speed, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP); // player 2 controls
+
+		physics.step(dt);
 
 		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
-		
-		exits.handleExits(player1, player2);
 
-		// System.out.println(engine.entityManager().hasComponent(player2.id(), DisabledComponent.class));
+		// System.out.println(engine.entityManager().hasComponent(player2.id(),
+		// DisabledComponent.class));
 
 		// Deaths
 		if (pos1.y < 0f) {
 			System.out.println("player 1 died!");
 			DeathsComponent deaths = engine.entityManager().getComponent(player1.id(), DeathsComponent.class);
-			deaths.deaths++;
+			deaths.died();
 			pos1.set(levels.currentLevel().player1Spawn(), 0f);
 			pos2.set(levels.currentLevel().player2Spawn(), 0f);
 		}
 		if (pos2.y < 0f) {
 			System.out.println("player 2 died!");
 			DeathsComponent deaths = engine.entityManager().getComponent(player2.id(), DeathsComponent.class);
-			deaths.deaths++;
+			deaths.died();
 			pos1.set(levels.currentLevel().player1Spawn(), 0f);
 			pos2.set(levels.currentLevel().player2Spawn(), 0f);
+		}
+
+		exits.handleExits(player1, player2);
+
+		if (exits.player1Exited && exits.player2Exited) {
+			nextLevel(engine);
 		}
 
 		updateCamera(engine);
 	}
 
+	private void nextLevel(Engine engine) {
+		levels.currentLevelIndex++;
+		Level level = levels.currentLevel();
+		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
+		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
+		pos1.set(levels.currentLevel().player1Spawn(), 0f);
+		pos2.set(levels.currentLevel().player2Spawn(), 0f);
+		DeathsComponent deaths1 = engine.entityManager().getComponent(player1.id(), DeathsComponent.class);
+		DeathsComponent deaths2 = engine.entityManager().getComponent(player2.id(), DeathsComponent.class);
+		deaths1.nextLevel();
+		deaths2.nextLevel();
+		Set<Integer> entityIds = engine.entityManager().entities().keySet();
+		for (Integer entityId : entityIds) {
+			if (entityId == player1.id() || entityId == player2.id() || entityId == camera.id())
+				continue;
+			engine.entityManager().removeEntity(entityId);
+		}
+		for (AbstractEntityFactory entityFactory : level.entityFactories())
+			engine.entityManager().buildEntity(entityFactory);
+		engine.entityManager().removeComponent(player1.id(), DisabledComponent.class);
+		engine.entityManager().removeComponent(player2.id(), DisabledComponent.class);
+		exits.refresh();
+	}
+
 	private void handlePlayerMovement(Engine engine, Entity player, float speed, int leftKey, int rightKey, int jumpKey) {
-		if (isDisabled(engine, player)) return;
+		if (isDisabled(engine, player))
+			return;
 		boolean leftPressed = engine.keyHandler().isKeyHeld(leftKey);
 		boolean rightPressed = engine.keyHandler().isKeyHeld(rightKey);
-		
+
 		Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
 		Vector3f rotation = engine.entityManager().getComponent(player.id(), RotationComponent.class).rotation();
 
@@ -96,7 +126,7 @@ class Game extends GameLoop {
 			position.x += speed;
 			rotation.y = Rotations.PI;
 		}
-		
+
 		// jumping
 		if (engine.keyHandler().isKeyHeld(jumpKey)) {
 			GroundedComponent grounded = engine.entityManager().getComponent(player.id(), GroundedComponent.class);

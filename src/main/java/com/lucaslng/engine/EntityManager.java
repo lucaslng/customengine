@@ -5,14 +5,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
 
 public class EntityManager {
 
-	private final Map<Integer, Entity> entities = new HashMap<>();
-	private final Map<Class<?>, Map<Integer, Object>> components = new HashMap<>(); // Map<Component.class, Map<EntityId,
+	private final Map<Integer, Entity> entities = new ConcurrentHashMap<>();
+	private final Map<Class<?>, Map<Integer, Object>> components = new ConcurrentHashMap<>(); // Map<Component.class, Map<EntityId,
 																																									// Component>>
 
 	public Entity buildEntity(AbstractEntityFactory entityFactory) {
@@ -64,6 +65,10 @@ public class EntityManager {
 
 	public boolean entityExists(int entityId) {
 		return entities.containsKey(entityId);
+	}
+
+	public Map<Integer, Entity> entities() {
+		return entities;
 	}
 
 }

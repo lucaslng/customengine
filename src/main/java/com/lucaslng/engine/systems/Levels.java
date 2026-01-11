@@ -13,7 +13,7 @@ import com.lucaslng.entities.ExitEntityFactory;
 
 public class Levels {
 
-	private static final int LEVEL_COUNT = 1;
+	private static final int LEVEL_COUNT = 2;
 	private final Level[] levels;
 	public int currentLevelIndex;
 
