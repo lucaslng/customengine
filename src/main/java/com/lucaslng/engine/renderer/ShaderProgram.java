@@ -36,7 +36,7 @@ class ShaderProgram{
 		}
 		glCompileShader(fragmentShader);
 		if (glGetShaderi(fragmentShader, GL_COMPILE_STATUS) == GL_FALSE) {
-			throw new RuntimeException("Failed compiling vertex shader.\n" + glGetShaderInfoLog(fragmentShader));
+			throw new RuntimeException("Failed compiling fragment shader.\n" + glGetShaderInfoLog(fragmentShader));
 		}
 		glLinkProgram(id);
 		glDeleteShader(vertexShader);
