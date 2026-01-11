@@ -35,10 +35,11 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 		AABBComponent aabbComponent = new AABBComponent(parsedObject.halfExtents());
 		RotationComponent rotationComponent = new RotationComponent(new Vector3f());
 		GroundedComponent groundedComponent = new GroundedComponent();
+		DeathsComponent deathsComponent = new DeathsComponent();
 
 		return new Object[] { positionComponent, velocityComponent, headRotationComponent,
 				rotationComponent, meshComponent, rigidBodyComponent,
-				aabbComponent, groundedComponent };
+				aabbComponent, groundedComponent, deathsComponent };
 	}
 
 }

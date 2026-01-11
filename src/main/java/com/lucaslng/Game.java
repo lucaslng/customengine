@@ -10,10 +10,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
-import com.lucaslng.engine.components.GroundedComponent;
-import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.components.RotationComponent;
-import com.lucaslng.engine.components.VelocityComponent;
+import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Levels;
@@ -60,11 +57,22 @@ class Game extends GameLoop {
 		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
 		
-		if (pos1.y < 0f || pos2.y < 0f) {
-			System.out.println("die!");
+		if (pos1.y < 0f) {
+			System.out.println("player 1 died!");
+			DeathsComponent deaths = engine.entityManager().getComponent(player1.id(), DeathsComponent.class);
+			deaths.deaths++;
 			pos1.set(levels.currentLevel().player1Spawn(), 0f);
 			pos2.set(levels.currentLevel().player2Spawn(), 0f);
 		}
+
+		if (pos2.y < 0f) {
+			System.out.println("player 2 died!");
+			DeathsComponent deaths = engine.entityManager().getComponent(player2.id(), DeathsComponent.class);
+			deaths.deaths++;
+			pos1.set(levels.currentLevel().player1Spawn(), 0f);
+			pos2.set(levels.currentLevel().player2Spawn(), 0f);
+		}
+
 		updateCamera(engine);
 	}
 
