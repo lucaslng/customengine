@@ -1,18 +1,28 @@
 package com.lucaslng;
 
 import org.joml.Vector3f;
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
-import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.components.GroundedComponent;
+import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.RotationComponent;
+import com.lucaslng.engine.components.VelocityComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
-import com.lucaslng.entities.*;
+import com.lucaslng.entities.CameraEntityFactory;
+import com.lucaslng.entities.PlayerEntityFactory;
+import com.lucaslng.entities.TexturedCubeEntityFactory;
 
 class Game extends GameLoop {
 	private Entity player1, player2, camera, catCube;
@@ -39,62 +49,49 @@ class Game extends GameLoop {
 
 	@Override
 	public void doLoop(Engine engine, double dt) {
-		float baseSpeed = 2.5f;
+		float baseSpeed = 4f;
 		float speed = baseSpeed * (float) dt;
+		
+		handlePlayerMovement(engine, player1, speed, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE);	// player 1 controls
+		handlePlayerMovement(engine, player2, speed, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP);	// player 2 controls
+
+		physics.step(dt);	
 
 		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
+		
+		if (pos1.y < 0f || pos2.y < 0f) {
+			System.out.println("die!");
+			pos1.set(levels.currentLevel().player1Spawn(), 0f);
+			pos2.set(levels.currentLevel().player2Spawn(), 0f);
+		}
+		updateCamera(engine);
+	}
 
-		// player 1 controls
-		if (engine.keyHandler().isKeyHeld(GLFW_KEY_A)) {
-			Vector3f rotation = engine.entityManager().getComponent(player1.id(), RotationComponent.class).rotation();
-			pos1.x -= speed;
-			rotation.y = 0f;
-		}
-		if (engine.keyHandler().isKeyHeld(GLFW_KEY_D)) {
-			Vector3f rotation = engine.entityManager().getComponent(player1.id(), RotationComponent.class).rotation();
-			pos1.x += speed;
-			rotation.y = Rotations.PI; // TODO: fix the rotation order of operations prioritizing facing rightwards
-																	// when pressing both keys down at the same time
-		}
-		if (engine.keyHandler().isKeyHeld(GLFW_KEY_SPACE)) {
-			GroundedComponent grounded = engine.entityManager().getComponent(player1.id(), GroundedComponent.class);
-			if (grounded.isGrounded) {
-				Vector3f velocity = engine.entityManager().getComponent(player1.id(), VelocityComponent.class).velocity();
-				velocity.y = 10f;
-			}
-		}
+	private void handlePlayerMovement(Engine engine, Entity player, float speed, int leftKey, int rightKey, int jumpKey) {
+		boolean leftPressed = engine.keyHandler().isKeyHeld(leftKey);
+		boolean rightPressed = engine.keyHandler().isKeyHeld(rightKey);
+		
+		Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
+		Vector3f rotation = engine.entityManager().getComponent(player.id(), RotationComponent.class).rotation();
 
-		// player 2 controls
-		if (engine.keyHandler().isKeyHeld(GLFW_KEY_LEFT)) {
-			Vector3f rotation = engine.entityManager().getComponent(player2.id(), RotationComponent.class).rotation();
-			pos2.x -= speed;
+		if (leftPressed && rightPressed) {
+		} else if (leftPressed) {
+			position.x -= speed;
 			rotation.y = 0f;
-		}
-		if (engine.keyHandler().isKeyHeld(GLFW_KEY_RIGHT)) {
-			Vector3f rotation = engine.entityManager().getComponent(player2.id(), RotationComponent.class).rotation();
-			pos2.x += speed;
+		} else if (rightPressed) {
+			position.x += speed;
 			rotation.y = Rotations.PI;
 		}
-		if (engine.keyHandler().isKeyHeld(GLFW_KEY_UP)) {
-			GroundedComponent grounded = engine.entityManager().getComponent(player2.id(), GroundedComponent.class);
+		
+		// jumping
+		if (engine.keyHandler().isKeyHeld(jumpKey)) {
+			GroundedComponent grounded = engine.entityManager().getComponent(player.id(), GroundedComponent.class);
 			if (grounded.isGrounded) {
-				Vector3f velocity = engine.entityManager().getComponent(player2.id(), VelocityComponent.class).velocity();
+				Vector3f velocity = engine.entityManager().getComponent(player.id(), VelocityComponent.class).velocity();
 				velocity.y = 10f;
 			}
 		}
-
-		// System.out.println(engine.entityManager().getComponent(player1.id(),
-		// PositionComponent.class).position());
-
-		physics.step(dt);
-
-		if (pos1.y < 0f || pos2.y < 0f) {
-
-			System.out.println("die!");
-		}
-
-		updateCamera(engine);
 	}
 
 	private void updateCamera(Engine engine) {
