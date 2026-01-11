@@ -6,14 +6,18 @@ import static org.lwjgl.glfw.GLFW.*;
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
 import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
+import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.entities.*;
 
 class Game extends GameLoop {
-	private Entity player1, player2, plane, camera, catCube, model;
+	private Entity player1, player2, camera, catCube;
 	private Physics physics;
+	private Levels levels;
+	private int level = 1;
 
 	public Game(Engine engine) {
 		super(engine);
@@ -21,12 +25,16 @@ class Game extends GameLoop {
 
 	@Override
 	public void init(Engine engine) {
-		player1 = engine.entityManager().buildEntity(new PlayerEntityFactory(-1f, 0f, 0f));
-		player2 = engine.entityManager().buildEntity(new PlayerEntityFactory(1f, 0f, 0f));
-		camera = engine.entityManager().buildEntity(new CameraEntityFactory(0f, 0f, 10f));
-		plane = engine.entityManager().buildEntity(new BoxEntityFactory(0f, -20f, -1f, 50f, 20f, 2.2f, "Platform"));
-		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-12f, 0f, 0f, 1f));
+		Levels levels = new Levels();
+		AbstractEntityFactory[] entityFactories = levels.getLevelEntities(level);
+		player1 = engine.entityManager().buildEntity(entityFactories[0]);
+		player2 = engine.entityManager().buildEntity(entityFactories[1]);
+		for (int i=2;i<entityFactories.length;i++) {
+			engine.entityManager().buildEntity(entityFactories[i]);
+		}
+		camera = engine.entityManager().buildEntity(new CameraEntityFactory());
 		engine.setCamera(camera);
+		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-12f, 0f, 0f, 1f));
 		physics = new Physics(engine.entityManager());
 	}
 

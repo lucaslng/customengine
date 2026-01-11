@@ -12,7 +12,8 @@ import com.lucaslng.engine.entities.Entity;
 public class EntityManager {
 
 	private final Map<Integer, Entity> entities = new HashMap<>();
-	private final Map<Class<?>, Map<Integer, Object>> components = new HashMap<>();
+	private final Map<Class<?>, Map<Integer, Object>> components = new HashMap<>(); // Map<Component.class, Map<EntityId,
+																																									// Component>>
 
 	public Entity buildEntity(AbstractEntityFactory entityFactory) {
 		Entity entity = new Entity();
@@ -21,6 +22,13 @@ public class EntityManager {
 			addComponent(entity.id(), component);
 		}
 		return entity;
+	}
+
+	public void removeEntity(int entityId) {
+		assert entityExists(entityId);
+		for (Map<Integer, Object> componentMap : components.values())
+			componentMap.remove(entityId);
+		entities.remove(entityId);
 	}
 
 	public <T> void addComponent(int entityId, T component) {
@@ -57,5 +65,5 @@ public class EntityManager {
 	public boolean entityExists(int entityId) {
 		return entities.containsKey(entityId);
 	}
-	
+
 }
