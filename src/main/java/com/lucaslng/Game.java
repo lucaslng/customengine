@@ -24,6 +24,7 @@ class Game extends GameLoop {
 	private Physics physics;
 	private Levels levels;
 	private Exits exits;
+	private Deaths deaths;
 
 	public Game(Engine engine) {
 		super(engine);
@@ -42,6 +43,7 @@ class Game extends GameLoop {
 		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-12f, 0f, 0f, 1f));
 		physics = new Physics(engine.entityManager());
 		exits = new Exits(engine.entityManager());
+		deaths = new Deaths(engine.entityManager(), player1, player2);
 	}
 
 	@Override
@@ -54,27 +56,7 @@ class Game extends GameLoop {
 
 		physics.step(dt);
 
-		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
-		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
-
-		// System.out.println(engine.entityManager().hasComponent(player2.id(),
-		// DisabledComponent.class));
-
-		// Deaths
-		if (pos1.y < 0f) {
-			System.out.println("player 1 died!");
-			DeathsComponent deaths = engine.entityManager().getComponent(player1.id(), DeathsComponent.class);
-			deaths.died();
-			pos1.set(levels.currentLevel().player1Spawn(), 0f);
-			pos2.set(levels.currentLevel().player2Spawn(), 0f);
-		}
-		if (pos2.y < 0f) {
-			System.out.println("player 2 died!");
-			DeathsComponent deaths = engine.entityManager().getComponent(player2.id(), DeathsComponent.class);
-			deaths.died();
-			pos1.set(levels.currentLevel().player1Spawn(), 0f);
-			pos2.set(levels.currentLevel().player2Spawn(), 0f);
-		}
+		deaths.checkDeaths(levels.currentLevel());
 
 		exits.handleExits(player1, player2);
 
