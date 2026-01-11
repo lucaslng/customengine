@@ -10,23 +10,21 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
-import com.lucaslng.engine.components.GroundedComponent;
-import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.components.RotationComponent;
-import com.lucaslng.engine.components.VelocityComponent;
+import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Levels;
+import com.lucaslng.engine.systems.Levels.Level;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.entities.CameraEntityFactory;
+import com.lucaslng.entities.PlayerEntityFactory;
 import com.lucaslng.entities.TexturedCubeEntityFactory;
 
 class Game extends GameLoop {
 	private Entity player1, player2, camera, catCube;
 	private Physics physics;
 	private Levels levels;
-	private int level = 1;
 
 	public Game(Engine engine) {
 		super(engine);
@@ -34,13 +32,12 @@ class Game extends GameLoop {
 
 	@Override
 	public void init(Engine engine) {
-		Levels levels = new Levels();
-		AbstractEntityFactory[] entityFactories = levels.getLevelEntities(level);
-		player1 = engine.entityManager().buildEntity(entityFactories[0]);
-		player2 = engine.entityManager().buildEntity(entityFactories[1]);
-		for (int i=2;i<entityFactories.length;i++) {
-			engine.entityManager().buildEntity(entityFactories[i]);
-		}
+		levels = new Levels();
+		Level level = levels.currentLevel();
+		player1 = engine.entityManager().buildEntity(new PlayerEntityFactory(level.player1Spawn()));
+		player2 = engine.entityManager().buildEntity(new PlayerEntityFactory(level.player2Spawn()));
+		for (AbstractEntityFactory entityFactory : level.entityFactories())
+			engine.entityManager().buildEntity(entityFactory);
 		camera = engine.entityManager().buildEntity(new CameraEntityFactory());
 		engine.setCamera(camera);
 		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-12f, 0f, 0f, 1f));
@@ -56,6 +53,26 @@ class Game extends GameLoop {
 		handlePlayerMovement(engine, player2, speed, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP);	// player 2 controls
 
 		physics.step(dt);	
+
+		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
+		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
+		
+		if (pos1.y < 0f) {
+			System.out.println("player 1 died!");
+			DeathsComponent deaths = engine.entityManager().getComponent(player1.id(), DeathsComponent.class);
+			deaths.deaths++;
+			pos1.set(levels.currentLevel().player1Spawn(), 0f);
+			pos2.set(levels.currentLevel().player2Spawn(), 0f);
+		}
+
+		if (pos2.y < 0f) {
+			System.out.println("player 2 died!");
+			DeathsComponent deaths = engine.entityManager().getComponent(player2.id(), DeathsComponent.class);
+			deaths.deaths++;
+			pos1.set(levels.currentLevel().player1Spawn(), 0f);
+			pos2.set(levels.currentLevel().player2Spawn(), 0f);
+		}
+
 		updateCamera(engine);
 	}
 
@@ -88,21 +105,22 @@ class Game extends GameLoop {
 	private void updateCamera(Engine engine) {
 		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
-		
+
 		// calculate midpoint between players
 		Vector3f midpoint = new Vector3f((pos1.x + pos2.x) / 2f, (pos1.y + pos2.y) / 2f, (pos1.z + pos2.z) / 2f);
-		
+
 		// calculate distance between players
 		float distance = pos1.distance(pos2);
-		
+
 		// calculate camera distance based on player separation
 		float baseDistance = 15f;
 		float cameraDistance = Math.max(baseDistance, distance * 0.8f + 3f);
-		
+
 		// position camera behind and above the midpoint
 		Vector3f cameraPos = engine.entityManager().getComponent(camera.id(), PositionComponent.class).position();
 		cameraPos.set(midpoint.x, midpoint.y + 2f, midpoint.z + cameraDistance);
-		
+
 		engine.setCamera(camera);
 	}
+
 }

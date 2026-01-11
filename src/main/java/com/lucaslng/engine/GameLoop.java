@@ -41,7 +41,7 @@ public abstract class GameLoop {
 		System.exit(0);
 	}
 
-	public double getDeltaTime() {
+	public double getDt() {
 		return dt;
 	}
 
