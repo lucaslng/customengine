@@ -121,12 +121,15 @@ public final class Renderer {
 		glViewport(0, 0, framebufferWidth, framebufferHeight);
 
 		for (int entityId : entityManager.getEntitiesWith(MeshComponent.class,
-				PositionComponent.class,
-				RotationComponent.class)) {
+				PositionComponent.class)) {
 
 			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
-			Vector3f rotation = entityManager.getComponent(entityId, RotationComponent.class).rotation();
-			Matrix4f model = new Matrix4f().translate(position).rotateXYZ(rotation);
+			Matrix4f model = new Matrix4f().translate(position);
+			if (entityManager.hasComponent(entityId, RotationComponent.class)) {
+				Vector3f rotation = entityManager.getComponent(entityId, RotationComponent.class).rotation();
+				model.rotateXYZ(rotation);
+			}
+			
 
 			shader.setUniformMatrix4v("projection", false,
 					projectionMatrix.get(new float[16]));
