@@ -9,5 +9,4 @@ public final class IntegerBuffer extends Buffer {
 		super(target);
 		glBufferData(target, data, GL_STATIC_DRAW);
 	}
-	
 }
