@@ -5,11 +5,7 @@ import java.util.ArrayList;
 import org.joml.Vector3f;
 
 import com.lucaslng.engine.EntityManager;
-import com.lucaslng.engine.components.AABBComponent;
-import com.lucaslng.engine.components.GroundedComponent;
-import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.components.RigidBodyComponent;
-import com.lucaslng.engine.components.VelocityComponent;
+import com.lucaslng.engine.components.*;
 
 public class Physics {
 
@@ -38,12 +34,14 @@ public class Physics {
 		
 		// Reset grounded status
 		for (int entityId : entityManager.getEntitiesWith(GroundedComponent.class)) {
+			if (entityManager.hasComponent(entityId, DisabledComponent.class)) continue;
 			GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
 			grounded.isGrounded = false;
 		}
 
 		// Apply gravity
 		for (int entityId : entityManager.getEntitiesWith(RigidBodyComponent.class, VelocityComponent.class)) {
+			if (entityManager.hasComponent(entityId, DisabledComponent.class)) continue;
 			RigidBodyComponent rigidBody = entityManager.getComponent(entityId, RigidBodyComponent.class);
 			if (rigidBody.isStatic())
 				continue;
@@ -71,6 +69,7 @@ public class Physics {
 
 		// Apply velocity with swept collision detection per-axis
 		for (int entityId : entityManager.getEntitiesWith(PositionComponent.class, VelocityComponent.class)) {
+			if (entityManager.hasComponent(entityId, DisabledComponent.class)) continue;
 			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
 			
@@ -107,6 +106,7 @@ public class Physics {
 				
 				// Check all colliders
 				for (int otherId : entityManager.getEntitiesWith(PositionComponent.class, RigidBodyComponent.class, AABBComponent.class)) {
+					if (entityManager.hasComponent(entityId, DisabledComponent.class)) continue;
 					if (otherId == entityId)
 						continue;
 					

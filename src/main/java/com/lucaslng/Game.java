@@ -57,19 +57,24 @@ class Game extends GameLoop {
 		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
 		
+		// Exits
 		Set<Integer> exits = engine.entityManager().getEntitiesWith(ExitComponent.class);
 		for (int exit : exits) {
 			Vector3f exitPos = engine.entityManager().getComponent(exit, PositionComponent.class).position();
 			float s = ExitEntityFactory.halfSize;
-			if (pos1.x() > exitPos.x() - s && pos1.x() < exitPos.x() + s && pos1.y() > exitPos.y() - s && pos1.y() < exitPos.y() + s) {
+			if (!isDisabled(engine, player1) && pos1.x() > exitPos.x() - s && pos1.x() < exitPos.x() + s && pos1.y() > exitPos.y() - s && pos1.y() < exitPos.y() + s) {
 				System.out.println("player 1 exit");
+				engine.entityManager().addComponent(player1.id(), new DisabledComponent());
 			}
-			if (pos2.x() > exitPos.x() - s && pos2.x() < exitPos.x() + s && pos2.y() > exitPos.y() - s && pos2.y() < exitPos.y() + s) {
+			if (!isDisabled(engine, player2) && pos2.x() > exitPos.x() - s && pos2.x() < exitPos.x() + s && pos2.y() > exitPos.y() - s && pos2.y() < exitPos.y() + s) {
 				System.out.println("player 2 exit");
+				engine.entityManager().addComponent(player2.id(), new DisabledComponent());
 			}
 		}
 
+		// System.out.println(engine.entityManager().hasComponent(player2.id(), DisabledComponent.class));
 
+		// Deaths
 		if (pos1.y < 0f) {
 			System.out.println("player 1 died!");
 			DeathsComponent deaths = engine.entityManager().getComponent(player1.id(), DeathsComponent.class);
@@ -77,7 +82,6 @@ class Game extends GameLoop {
 			pos1.set(levels.currentLevel().player1Spawn(), 0f);
 			pos2.set(levels.currentLevel().player2Spawn(), 0f);
 		}
-
 		if (pos2.y < 0f) {
 			System.out.println("player 2 died!");
 			DeathsComponent deaths = engine.entityManager().getComponent(player2.id(), DeathsComponent.class);
@@ -90,6 +94,7 @@ class Game extends GameLoop {
 	}
 
 	private void handlePlayerMovement(Engine engine, Entity player, float speed, int leftKey, int rightKey, int jumpKey) {
+		if (isDisabled(engine, player)) return;
 		boolean leftPressed = engine.keyHandler().isKeyHeld(leftKey);
 		boolean rightPressed = engine.keyHandler().isKeyHeld(rightKey);
 		
@@ -113,6 +118,10 @@ class Game extends GameLoop {
 				velocity.y = 10f;
 			}
 		}
+	}
+
+	private boolean isDisabled(Engine engine, Entity entity) {
+		return engine.entityManager().hasComponent(entity.id(), DisabledComponent.class);
 	}
 
 	private void updateCamera(Engine engine) {
