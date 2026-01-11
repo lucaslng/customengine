@@ -71,7 +71,7 @@ public class ModelParser {
 		Vector3f min = new Vector3f(Float.POSITIVE_INFINITY);
 		Vector3f max = new Vector3f(Float.NEGATIVE_INFINITY);
 
-		subParsedObj[] subParsedObjects = new subParsedObj[vertexData.size()];
+		SubParsedObj[] subParsedObjects = new SubParsedObj[vertexData.size()];
 
 		int s = 0;
 		for (String m : vertexData.keySet()) {
@@ -83,7 +83,7 @@ public class ModelParser {
 			for (int i = 0; i < indicesArray.length; i++)
 				indicesArray[i] = indices.get(m).get(i);
 
-			subParsedObjects[s] = new subParsedObj(verticesArray, indicesArray, m);
+			subParsedObjects[s] = new SubParsedObj(verticesArray, indicesArray, m);
 
 			for (int i = 0; i < verticesArray.length; i += STRIDE) {
 				min.min(new Vector3f(verticesArray[i], verticesArray[i + 1], verticesArray[i + 2]));
@@ -102,7 +102,7 @@ public class ModelParser {
 		halfExtents.mul(0.5f);
 
 		// adjust vertices based on center
-		for (subParsedObj subParsedObject : subParsedObjects) {
+		for (SubParsedObj subParsedObject : subParsedObjects) {
 			for (int i = 0; i < subParsedObject.vertices().length; i += STRIDE) {
 				subParsedObject.vertices()[i] -= center.x();
 				subParsedObject.vertices()[i + 1] -= center.y();

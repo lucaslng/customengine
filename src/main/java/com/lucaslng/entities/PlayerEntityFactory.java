@@ -19,7 +19,7 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 
 		SubMesh[] subMeshes = new SubMesh[parsedObject.subParsedObjects().length];
 		for (int i=0;i<subMeshes.length;i++) {
-			subParsedObj subParsedObject = parsedObject.subParsedObjects()[i];
+			SubParsedObj subParsedObject = parsedObject.subParsedObjects()[i];
 			subMeshes[i] = new SubMesh(subParsedObject.vertices(), subParsedObject.indices(), subParsedObject.materialName());
 		}
 		meshComponent = new MeshComponent(subMeshes);
