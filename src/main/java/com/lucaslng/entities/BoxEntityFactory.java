@@ -6,7 +6,7 @@ import org.joml.Vector4f;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 
-public class CubeEntityFactory implements AbstractEntityFactory {
+public class BoxEntityFactory implements AbstractEntityFactory {
 
 	private static final int[] indices = new int[] {
 			0, 1, 2, 2, 3, 0, // Back face
@@ -18,31 +18,32 @@ public class CubeEntityFactory implements AbstractEntityFactory {
 	};
 	private final float[] vertices;
 	private final Vector3f position;
-	private final float size, r, g, b, a;
+	private final float hx, hy, hz, r, g, b, a;
 
-	public CubeEntityFactory(float x, float y, float z, float size, float r, float g, float b, float a) {
+	public BoxEntityFactory(float x, float y, float z, float width, float height, float length, float r, float g, float b, float a) {
 		position = new Vector3f(x, y, z);
 		this.r = r;
 		this.g = g;
 		this.b = b;
 		this.a = a;
-		size /= 2;
-		this.size = size;
+		hx = width / 2f;
+		hy = height / 2f;
+		hz = length / 2f;
 		vertices = new float[] {
-				-size, -size, -size, 0f, 0f,
-				size, -size, -size, 0f, 0f,
-				size, size, -size, 0f, 0f,
-				-size, size, -size, 0f, 0f,
-				-size, -size, size, 0f, 0f,
-				size, -size, size, 0f, 0f,
-				size, size, size, 0f, 0f,
-				-size, size, size, 0f, 0f
+				-hx, -hy, -hz, 0f, 0f,
+				 hx, -hy, -hz, 0f, 0f,
+				 hx,  hy, -hz, 0f, 0f,
+				-hx,  hy, -hz, 0f, 0f,
+				-hx, -hy,  hz, 0f, 0f,
+				 hx, -hy,  hz, 0f, 0f,
+				 hx,  hy,  hz, 0f, 0f,
+				-hx,  hy,  hz, 0f, 0f
 		};
 	}
 
 	@Override
 	public Object[] components() {
 		return new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
-				new MeshComponent(vertices, indices), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(size)), new MaterialComponent(new Vector4f(r, g, b, a)) };
+				new MeshComponent(vertices, indices), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(hx, hy, hz)), new MaterialComponent(new Vector4f(r, g, b, a)) };
 	}
 }
