@@ -11,7 +11,7 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 
 	private final Vector3f position;
 	private static final parsedObj parsedObject = ModelParser
-			.parseObj(FileReader.readLines("src/main/resources/models/model.obj"));
+			.parseObj(FileReader.readLines("models/model.obj"));
 	private final MeshComponent meshComponent;
 
 	public PlayerEntityFactory(float x, float y, float z) {

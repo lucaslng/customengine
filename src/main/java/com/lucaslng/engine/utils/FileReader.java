@@ -48,7 +48,7 @@ public class FileReader {
 
 		try {
 			lines = Files.readAllLines(
-					Paths.get(path),
+					Paths.get("src/main/resources/" + path),
 					StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to load file: " + path, e);
