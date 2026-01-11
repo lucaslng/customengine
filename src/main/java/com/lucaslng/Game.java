@@ -69,6 +69,10 @@ class Game extends GameLoop {
 
 	private void nextLevel(Engine engine) {
 		levels.currentLevelIndex++;
+		if (levels.currentLevelIndex > Levels.LEVEL_COUNT) {
+			System.out.println("You won!");
+			System.exit(0);
+		}
 		Level level = levels.currentLevel();
 		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
