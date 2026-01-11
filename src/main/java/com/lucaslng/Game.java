@@ -3,6 +3,8 @@ package com.lucaslng;
 import org.joml.Vector3f;
 import static org.lwjgl.glfw.GLFW.*;
 
+import javax.swing.text.Position;
+
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
 import com.lucaslng.engine.components.*;
@@ -73,7 +75,7 @@ class Game extends GameLoop {
 			}
 		}
 
-		// System.out.println(engine.entityManager().getComponent(player1.id(), VelocityComponent.class).velocity());
+		// System.out.println(engine.entityManager().getComponent(player1.id(), PositionComponent.class).position());
 
 		physics.step(dt);
 		

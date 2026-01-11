@@ -5,11 +5,11 @@ import java.util.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import com.lucaslng.engine.components.MeshComponent;
-
 public class ObjParser {
 
-	public static MeshComponent parse(List<String> lines) {
+	private static final int STRIDE = 5;
+
+	public static ParsedObject parse(List<String> lines) {
 
 		ArrayList<Vector3f> positions = new ArrayList<>();
 		ArrayList<Vector2f> uvs = new ArrayList<>();
@@ -50,7 +50,7 @@ public class ObjParser {
 							// vertexData.add(n.y);
 							// vertexData.add(n.z);
 
-							index = (vertexData.size() / 5) - 1; // change to / 8 after adding back normals
+							index = (vertexData.size() / STRIDE) - 1; // change to / 8 after adding back normals
 							vertexMap.put(tokens[t], index);
 						}
 						indices.add(index);
@@ -67,7 +67,31 @@ public class ObjParser {
 		int[] indicesArray = new int[indices.size()];
 		for (int i = 0; i < indicesArray.length; i++)
 			indicesArray[i] = indices.get(i);
-		return new MeshComponent(verticesArray, indicesArray);
+
+		// calculate model center and half extents based on model
+		Vector3f min = new Vector3f(Float.POSITIVE_INFINITY);
+		Vector3f max = new Vector3f(Float.NEGATIVE_INFINITY);
+		for (int i = 0; i < verticesArray.length; i += STRIDE) {
+			min.min(new Vector3f(verticesArray[i], verticesArray[i + 1], verticesArray[i + 2]));
+			max.max(new Vector3f(verticesArray[i], verticesArray[i + 1], verticesArray[i + 2]));
+		}
+
+		Vector3f center = new Vector3f();
+		min.add(max, center);
+		center.mul(0.5f);
+
+		Vector3f halfExtents = new Vector3f();
+		max.sub(min, halfExtents);
+		halfExtents.mul(0.5f);
+
+		// adjust vertices based on center
+		for (int i=0;i< verticesArray.length; i += STRIDE) {
+			verticesArray[i] -= center.x();
+			verticesArray[i+1] -= center.y();
+			verticesArray[i+2] -= center.z();
+		}
+
+		return new ParsedObject(verticesArray, indicesArray, halfExtents);
 	}
 
 }
