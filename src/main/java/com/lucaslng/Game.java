@@ -8,6 +8,8 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
+import java.util.Set;
+
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
 import com.lucaslng.engine.components.*;
@@ -15,11 +17,9 @@ import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
+import com.lucaslng.entities.*;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
-import com.lucaslng.entities.CameraEntityFactory;
-import com.lucaslng.entities.PlayerEntityFactory;
-import com.lucaslng.entities.TexturedCubeEntityFactory;
 
 class Game extends GameLoop {
 	private Entity player1, player2, camera, catCube;
@@ -57,6 +57,19 @@ class Game extends GameLoop {
 		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
 		
+		Set<Integer> exits = engine.entityManager().getEntitiesWith(ExitComponent.class);
+		for (int exit : exits) {
+			Vector3f exitPos = engine.entityManager().getComponent(exit, PositionComponent.class).position();
+			float s = ExitEntityFactory.halfSize;
+			if (pos1.x() > exitPos.x() - s && pos1.x() < exitPos.x() + s && pos1.y() > exitPos.y() - s && pos1.y() < exitPos.y() + s) {
+				System.out.println("player 1 exit");
+			}
+			if (pos2.x() > exitPos.x() - s && pos2.x() < exitPos.x() + s && pos2.y() > exitPos.y() - s && pos2.y() < exitPos.y() + s) {
+				System.out.println("player 2 exit");
+			}
+		}
+
+
 		if (pos1.y < 0f) {
 			System.out.println("player 1 died!");
 			DeathsComponent deaths = engine.entityManager().getComponent(player1.id(), DeathsComponent.class);
