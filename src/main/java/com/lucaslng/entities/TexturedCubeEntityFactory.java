@@ -127,7 +127,7 @@ public class TexturedCubeEntityFactory implements AbstractEntityFactory {
 	@Override
 	public Object[] components() {
 		return new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
-				new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(size / 2f)),
+				new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(size)),
 				new MeshComponent(vertices, indices),
 				new MaterialComponent(new Texture(FileReader.readImage("freakycat.png")))
 		};
