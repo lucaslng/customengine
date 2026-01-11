@@ -12,7 +12,7 @@ import com.lucaslng.engine.systems.Positions;
 import com.lucaslng.entities.*;
 
 class Game extends GameLoop {
-	private Entity player1, player2, plane, camera, catCube;
+	private Entity player1, player2, plane, camera, catCube, model;
 	private Physics physics;
 
 	public Game(Engine engine) {
@@ -26,6 +26,7 @@ class Game extends GameLoop {
 		camera = engine.entityManager().buildEntity(new CameraEntityFactory(0f, 0f, 10f));
 		plane = engine.entityManager().buildEntity(new CubeEntityFactory(0f, -45f, 0f, 50f, 0.9f, 0.9f, 0.9f, 0.7f));
 		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-3f, -20f, 0f, 1f));
+		model = engine.entityManager().buildEntity(new TestModelEntityFactory(3f, -20f, 1.0f, "model"));
 		engine.setCamera(camera);
 		physics = new Physics(engine.entityManager());
 	}

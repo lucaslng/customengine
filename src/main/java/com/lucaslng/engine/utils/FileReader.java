@@ -51,7 +51,7 @@ public class FileReader {
 					Paths.get(path),
 					StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to load image file: " + path, e);
+			throw new RuntimeException("Failed to load file: " + path, e);
 		}
 
 		return lines;

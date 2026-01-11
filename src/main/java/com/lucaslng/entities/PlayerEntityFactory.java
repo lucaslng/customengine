@@ -23,14 +23,14 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 		position = new Vector3f(x, y, z);
 		float size = 1f;
 		vertices = new float[] {
-				-size, -size, -size,
-				size, -size, -size,
-				size, size, -size,
-				-size, size, -size,
-				-size, -size, size,
-				size, -size, size,
-				size, size, size,
-				-size, size, size
+				-size, -size, -size, 0f, 0f,
+				size, -size, -size, 0f, 0f,
+				size, size, -size, 0f, 0f,
+				-size, size, -size, 0f, 0f,
+				-size, -size, size, 0f, 0f,
+				size, -size, size, 0f, 0f,
+				size, size, size, 0f, 0f,
+				-size, size, size, 0f, 0f
 		};
 	}
 
@@ -42,7 +42,7 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 		RigidBodyComponent rigidBodyComponent = new RigidBodyComponent(20f, 0.9f, 0.99f, 1f);
 		AABBComponent aabbComponent = new AABBComponent(new Vector3f(2f));
 		RotationComponent rotationComponent = new RotationComponent(new Vector3f());
-		MeshComponent meshComponent = new MeshComponent(vertices, indices, new float[indices.length * 2]);
+		MeshComponent meshComponent = new MeshComponent(vertices, indices);
 		MaterialComponent materialComponent = new MaterialComponent(new Vector4f(0f, 1f, 1f, 1f));
 		GroundedComponent groundedComponent = new GroundedComponent();
 		return new Object[] { positionComponent, velocityComponent, headRotationComponent,

@@ -11,21 +11,17 @@ public final class MeshComponent {
 	public final VertexArray vao;
 	public final int indexCount;
 
-	public MeshComponent(float[] vertices, int[] indices, float[] uvs) {
+	public MeshComponent(float[] vertices, int[] indices) {
 		this.vao = new VertexArray();
 		vao.bind();
 
-		// position VBO
-		FloatBuffer posVbo = new FloatBuffer(GL_ARRAY_BUFFER, vertices);
-		BufferLayout posLayout = new BufferLayout();
-		posLayout.add(GL_FLOAT, 3, false);
-		vao.addBuffer(posVbo, posLayout);
-
-		// uv VBO
-		FloatBuffer uvVbo = new FloatBuffer(GL_ARRAY_BUFFER, uvs);
-		BufferLayout uvLayout = new BufferLayout();
-		uvLayout.add(GL_FLOAT, 2, true);
-		vao.addBuffer(uvVbo, uvLayout);
+		// vertex buffer object
+		FloatBuffer vbo = new FloatBuffer(GL_ARRAY_BUFFER, vertices);
+		BufferLayout layout = new BufferLayout();
+		layout.add(GL_FLOAT, 3, false); // position
+		layout.add(GL_FLOAT, 2, true); // uv
+		// layout.add(GL_FLOAT, 3, true); // normal
+		vao.addBuffer(vbo, layout);
 
 		IntegerBuffer ebo = new IntegerBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
 
