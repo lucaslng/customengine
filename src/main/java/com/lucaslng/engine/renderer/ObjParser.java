@@ -46,11 +46,11 @@ public class ObjParser {
 							vertexData.add(p.z);
 							vertexData.add(uv.x);
 							vertexData.add(uv.y);
-							// vertexData.add(n.x);
+							// vertexData.add(n.x); // normals
 							// vertexData.add(n.y);
 							// vertexData.add(n.z);
 
-							index = (vertexData.size() / 5) - 1;
+							index = (vertexData.size() / 5) - 1; // change to / 8 after adding back normals
 							vertexMap.put(tokens[t], index);
 						}
 						indices.add(index);
