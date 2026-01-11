@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.DeathsComponent;
+import com.lucaslng.engine.components.DisabledComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Levels.Level;
@@ -24,14 +25,14 @@ public class Deaths {
 		Vector3f pos2 = entityManager.getComponent(player2.id(), PositionComponent.class).position();
 
 		// Deaths
-		if (pos1.y < 0f) {
+		if (entityManager.hasComponent(player1.id(), DisabledComponent.class) && pos1.y < 0f) {
 			System.out.println("player 1 died!");
 			DeathsComponent deaths = entityManager.getComponent(player1.id(), DeathsComponent.class);
 			deaths.died();
 			pos1.set(currentLevel.player1Spawn(), 0f);
 			pos2.set(currentLevel.player2Spawn(), 0f);
 		}
-		if (pos2.y < 0f) {
+		if (entityManager.hasComponent(player2.id(), DisabledComponent.class) && pos2.y < 0f) {
 			System.out.println("player 2 died!");
 			DeathsComponent deaths = entityManager.getComponent(player2.id(), DeathsComponent.class);
 			deaths.died();
