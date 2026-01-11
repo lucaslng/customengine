@@ -2,7 +2,6 @@ package com.lucaslng.engine.renderer;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
@@ -18,7 +17,6 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.*;
-import com.lucaslng.engine.utils.FileReader;
 
 public final class Renderer {
 	private final EngineSettings engineSettings;
@@ -104,12 +102,7 @@ public final class Renderer {
 		shader = new ShaderProgram("vertex.glsl", "fragment.glsl");
 		shader.compileShader();
 
-		materials = new HashMap<>();
-		materials.put("Cat", new Material(new Texture(FileReader.readImage("freakycat.png"))));
-		materials.put("Black", new Material(new Vector4f(0f, 0f, 0f, 1f)));
-		materials.put("Platform", new Material(new Vector4f(0.9f, 0.9f, 0.9f, 0.7f)));
-		materials.putAll(ModelParser.parseMtl(FileReader.readLines("src/main/resources/materials/model.mtl")));
-		System.out.println("Materials: " + materials.keySet());
+		materials = Materials.createMaterials();
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);

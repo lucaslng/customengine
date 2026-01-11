@@ -1,7 +1,6 @@
 package com.lucaslng.entities;
 
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;

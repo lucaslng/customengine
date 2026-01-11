@@ -2,8 +2,6 @@ package com.lucaslng.engine.renderer;
 
 import org.joml.Vector4f;
 
-import com.lucaslng.engine.renderer.Texture;
-
 public class Material {
 
 	public Texture texture;
