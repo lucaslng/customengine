@@ -5,18 +5,25 @@ import org.joml.Vector4f;
 
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
-import com.lucaslng.engine.renderer.ParsedObject;
-import com.lucaslng.engine.renderer.ObjParser;
+import com.lucaslng.engine.renderer.*;
 import com.lucaslng.engine.utils.FileReader;
 
 public class PlayerEntityFactory implements AbstractEntityFactory {
 
 	private final Vector3f position;
-	private static final ParsedObject parsedObject = ObjParser
-			.parse(FileReader.readLines("src/main/resources/models/model.obj"));
+	private static final parsedObj parsedObject = ModelParser
+			.parseObj(FileReader.readLines("src/main/resources/models/model.obj"));
+	private final MeshComponent meshComponent;
 
 	public PlayerEntityFactory(float x, float y, float z) {
 		position = new Vector3f(x, y, z);
+
+		SubMesh[] subMeshes = new SubMesh[parsedObject.subParsedObjects().length];
+		for (int i=0;i<subMeshes.length;i++) {
+			subParsedObj subParsedObject = parsedObject.subParsedObjects()[i];
+			subMeshes[i] = new SubMesh(subParsedObject.vertices(), subParsedObject.indices(), subParsedObject.materialName());
+		}
+		meshComponent = new MeshComponent(subMeshes);
 	}
 
 	@Override
@@ -27,12 +34,10 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 		RigidBodyComponent rigidBodyComponent = new RigidBodyComponent(20f, 0.9f, 0.99f, 1f);
 		AABBComponent aabbComponent = new AABBComponent(parsedObject.halfExtents());
 		RotationComponent rotationComponent = new RotationComponent(new Vector3f());
-		MeshComponent meshComponent = new MeshComponent(parsedObject.vertices(), parsedObject.indices());
-		MaterialComponent materialComponent = new MaterialComponent(new Vector4f(0.1f, 0.1f, 0.1f, 1f));
 		GroundedComponent groundedComponent = new GroundedComponent();
 
 		return new Object[] { positionComponent, velocityComponent, headRotationComponent,
-				rotationComponent, meshComponent, materialComponent, rigidBodyComponent,
+				rotationComponent, meshComponent, rigidBodyComponent,
 				aabbComponent, groundedComponent };
 	}
 

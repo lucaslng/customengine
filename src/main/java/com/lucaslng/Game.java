@@ -24,7 +24,7 @@ class Game extends GameLoop {
 		player1 = engine.entityManager().buildEntity(new PlayerEntityFactory(-1f, 0f, 0f));
 		player2 = engine.entityManager().buildEntity(new PlayerEntityFactory(1f, 0f, 0f));
 		camera = engine.entityManager().buildEntity(new CameraEntityFactory(0f, 0f, 10f));
-		plane = engine.entityManager().buildEntity(new BoxEntityFactory(0f, -20f, -1f, 50f, 20f, 2.2f, 0.9f, 0.9f, 0.9f, 0.7f));
+		plane = engine.entityManager().buildEntity(new BoxEntityFactory(0f, -20f, -1f, 50f, 20f, 2.2f, "Platform"));
 		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-12f, 0f, 0f, 1f));
 		engine.setCamera(camera);
 		physics = new Physics(engine.entityManager());

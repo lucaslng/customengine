@@ -1,7 +1,6 @@
 package com.lucaslng.entities;
 
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
@@ -18,14 +17,12 @@ public class BoxEntityFactory implements AbstractEntityFactory {
 	};
 	private final float[] vertices;
 	private final Vector3f position;
-	private final float hx, hy, hz, r, g, b, a;
+	private final float hx, hy, hz;
+	private final String materialName;
 
-	public BoxEntityFactory(float x, float y, float z, float width, float height, float length, float r, float g, float b, float a) {
+	public BoxEntityFactory(float x, float y, float z, float width, float height, float length, String materialName) {
 		position = new Vector3f(x, y, z);
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
+		this.materialName = materialName;
 		hx = width / 2f;
 		hy = height / 2f;
 		hz = length / 2f;
@@ -44,6 +41,6 @@ public class BoxEntityFactory implements AbstractEntityFactory {
 	@Override
 	public Object[] components() {
 		return new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
-				new MeshComponent(vertices, indices), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(hx, hy, hz)), new MaterialComponent(new Vector4f(r, g, b, a)) };
+				new MeshComponent(new SubMesh[] { new SubMesh(vertices, indices, materialName) }), new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(hx, hy, hz)) };
 	}
 }

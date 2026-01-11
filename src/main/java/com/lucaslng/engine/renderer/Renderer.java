@@ -2,11 +2,13 @@ package com.lucaslng.engine.renderer;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.MemoryStack;
 
 import java.nio.IntBuffer;
+import java.util.HashMap;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
@@ -16,11 +18,13 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.utils.FileReader;
 
 public final class Renderer {
 	private final EngineSettings engineSettings;
 	private final EntityManager entityManager;
 	private ShaderProgram shader;
+	private HashMap<String, Material> materials;
 	private final Matrix4f projectionMatrix;
 	private final Camera camera;
 	private float aspectRatio;
@@ -100,7 +104,12 @@ public final class Renderer {
 		shader = new ShaderProgram("vertex.glsl", "fragment.glsl");
 		shader.compileShader();
 
-		// catTexture = new Texture(readImage("freakycat.png"));
+		materials = new HashMap<>();
+		materials.put("Cat", new Material(new Texture(FileReader.readImage("freakycat.png"))));
+		materials.put("Black", new Material(new Vector4f(0f, 0f, 0f, 1f)));
+		materials.put("Platform", new Material(new Vector4f(0.9f, 0.9f, 0.9f, 0.7f)));
+		materials.putAll(ModelParser.parseMtl(FileReader.readLines("src/main/resources/materials/model.mtl")));
+		System.out.println("Materials: " + materials.keySet());
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
@@ -117,15 +126,14 @@ public final class Renderer {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, framebufferWidth, framebufferHeight);
 
-		for (int entityId : entityManager.getEntitiesWith(MeshComponent.class, MaterialComponent.class,
+		for (int entityId : entityManager.getEntitiesWith(MeshComponent.class,
 				PositionComponent.class,
 				RotationComponent.class)) {
-			MeshComponent mesh = entityManager.getComponent(entityId, MeshComponent.class);
-			MaterialComponent material = entityManager.getComponent(entityId, MaterialComponent.class);
+
 			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
 			Vector3f rotation = entityManager.getComponent(entityId, RotationComponent.class).rotation();
 			Matrix4f model = new Matrix4f().translate(position).rotateXYZ(rotation);
-	
+
 			shader.bind();
 
 			shader.setUniformMatrix4v("projection", false,
@@ -133,17 +141,22 @@ public final class Renderer {
 			shader.setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
 			shader.setUniformMatrix4v("model", false, model.get(new float[16]));
 
-			if (material.texture != null) {
-				material.texture.bind(0);
-				shader.setUniform1i("uUseTexture", 1);
-			} else {
-				shader.setUniform1i("uUseTexture", 0);
-				shader.setUniform4f("uColor", material.color);
-			}
+			MeshComponent meshComponent = entityManager.getComponent(entityId, MeshComponent.class);
+			for (SubMesh subMesh : meshComponent.subMeshes()) {
+				// System.out.println(subMesh.materialName);
+				Material material = materials.getOrDefault(subMesh.materialName, materials.get("Black"));
+				if (material.textured) {
+					material.texture.bind(0);
+					shader.setUniform1i("uUseTexture", 1);
+				} else {
+					shader.setUniform1i("uUseTexture", 0);
+					shader.setUniform4f("uColor", material.color);
+				}
 
-			mesh.vao.bind();
-			glDrawElements(GL_TRIANGLES, mesh.indexCount, GL_UNSIGNED_INT, 0);
-			mesh.vao.unbind();
+				subMesh.vao.bind();
+				glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT, 0);
+				subMesh.vao.unbind();
+			}
 		}
 
 		glfwSwapBuffers(window);
