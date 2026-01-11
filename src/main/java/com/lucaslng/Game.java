@@ -15,16 +15,15 @@ import com.lucaslng.engine.GameLoop;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
-import com.lucaslng.engine.systems.Levels;
+import com.lucaslng.engine.systems.*;
 import com.lucaslng.engine.systems.Levels.Level;
 import com.lucaslng.entities.*;
-import com.lucaslng.engine.systems.Physics;
-import com.lucaslng.engine.systems.Rotations;
 
 class Game extends GameLoop {
 	private Entity player1, player2, camera, catCube;
 	private Physics physics;
 	private Levels levels;
+	private Exits exits;
 
 	public Game(Engine engine) {
 		super(engine);
@@ -42,6 +41,7 @@ class Game extends GameLoop {
 		engine.setCamera(camera);
 		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-12f, 0f, 0f, 1f));
 		physics = new Physics(engine.entityManager());
+		exits = new Exits(engine.entityManager());
 	}
 
 	@Override
@@ -57,20 +57,7 @@ class Game extends GameLoop {
 		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
 		
-		// Exits
-		Set<Integer> exits = engine.entityManager().getEntitiesWith(ExitComponent.class);
-		for (int exit : exits) {
-			Vector3f exitPos = engine.entityManager().getComponent(exit, PositionComponent.class).position();
-			float s = ExitEntityFactory.halfSize;
-			if (!isDisabled(engine, player1) && pos1.x() > exitPos.x() - s && pos1.x() < exitPos.x() + s && pos1.y() > exitPos.y() - s && pos1.y() < exitPos.y() + s) {
-				System.out.println("player 1 exit");
-				engine.entityManager().addComponent(player1.id(), new DisabledComponent());
-			}
-			if (!isDisabled(engine, player2) && pos2.x() > exitPos.x() - s && pos2.x() < exitPos.x() + s && pos2.y() > exitPos.y() - s && pos2.y() < exitPos.y() + s) {
-				System.out.println("player 2 exit");
-				engine.entityManager().addComponent(player2.id(), new DisabledComponent());
-			}
-		}
+		exits.handleExits(player1, player2);
 
 		// System.out.println(engine.entityManager().hasComponent(player2.id(), DisabledComponent.class));
 
