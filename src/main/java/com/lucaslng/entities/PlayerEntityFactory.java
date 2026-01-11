@@ -17,7 +17,6 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 
 	public PlayerEntityFactory(float x, float y, float z) {
 		position = new Vector3f(x, y, z);
-		System.out.println(parsedObject.halfExtents());
 	}
 
 	@Override
