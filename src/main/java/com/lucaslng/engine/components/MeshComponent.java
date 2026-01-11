@@ -1,7 +1,6 @@
 package com.lucaslng.engine.components;
 
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
-import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_INT;
 import static org.lwjgl.opengl.GL15C.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15C.GL_ELEMENT_ARRAY_BUFFER;
 
@@ -23,7 +22,7 @@ public final class MeshComponent {
 		// layout.add(GL_FLOAT, 3, true); // normal
 		vao.addBuffer(vbo, layout);
 
-		IntegerBuffer ebo = new IntegerBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
+		new IntegerBuffer(GL_ELEMENT_ARRAY_BUFFER, indices); // ebo
 
 		this.indexCount = indices.length;
 

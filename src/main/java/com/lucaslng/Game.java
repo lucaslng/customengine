@@ -3,14 +3,11 @@ package com.lucaslng;
 import org.joml.Vector3f;
 import static org.lwjgl.glfw.GLFW.*;
 
-import javax.swing.text.Position;
-
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.Physics;
-import com.lucaslng.engine.systems.Positions;
 import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.entities.*;
 
