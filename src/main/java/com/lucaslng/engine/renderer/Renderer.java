@@ -101,6 +101,7 @@ public final class Renderer {
 
 		shader = new ShaderProgram("vertex.glsl", "fragment.glsl");
 		shader.compileShader();
+		shader.bind();
 
 		materials = Materials.createMaterials();
 
@@ -126,8 +127,6 @@ public final class Renderer {
 			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
 			Vector3f rotation = entityManager.getComponent(entityId, RotationComponent.class).rotation();
 			Matrix4f model = new Matrix4f().translate(position).rotateXYZ(rotation);
-
-			shader.bind();
 
 			shader.setUniformMatrix4v("projection", false,
 					projectionMatrix.get(new float[16]));
