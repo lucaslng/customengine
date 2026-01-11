@@ -95,7 +95,7 @@ class Game extends GameLoop {
 		float distance = pos1.distance(pos2);
 		
 		// calculate camera distance based on player separation
-		float baseDistance = 7f;
+		float baseDistance = 15f;
 		float cameraDistance = Math.max(baseDistance, distance * 0.8f + 3f);
 		
 		// position camera behind and above the midpoint
