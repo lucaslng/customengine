@@ -1,5 +1,7 @@
 package com.lucaslng;
 
+import java.util.Set;
+
 import org.joml.Vector3f;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
@@ -8,16 +10,26 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
-import java.util.Set;
-
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameLoop;
-import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.components.DeathsComponent;
+import com.lucaslng.engine.components.DisabledComponent;
+import com.lucaslng.engine.components.GroundedComponent;
+import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.RotationComponent;
+import com.lucaslng.engine.components.VelocityComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
-import com.lucaslng.engine.systems.*;
+import com.lucaslng.engine.systems.Deaths;
+import com.lucaslng.engine.systems.Exits;
+import com.lucaslng.engine.systems.LevelTransition;
+import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
-import com.lucaslng.entities.*;
+import com.lucaslng.engine.systems.Physics;
+import com.lucaslng.engine.systems.Rotations;
+import com.lucaslng.entities.CameraEntityFactory;
+import com.lucaslng.entities.PlayerEntityFactory;
+import com.lucaslng.entities.TexturedCubeEntityFactory;
 
 class Game extends GameLoop {
 	private Entity player1, player2, camera, catCube;
@@ -25,6 +37,7 @@ class Game extends GameLoop {
 	private Levels levels;
 	private Exits exits;
 	private Deaths deaths;
+	private LevelTransition transition;
 
 	public Game(Engine engine) {
 		super(engine);
@@ -44,6 +57,7 @@ class Game extends GameLoop {
 		physics = new Physics(engine.entityManager());
 		exits = new Exits(engine.entityManager());
 		deaths = new Deaths(engine.entityManager(), player1, player2);
+		transition = new LevelTransition();
 	}
 
 	@Override
@@ -51,23 +65,26 @@ class Game extends GameLoop {
 		float baseSpeed = 4f;
 		float speed = baseSpeed * (float) dt;
 
-		handlePlayerMovement(engine, player1, speed, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE); // player 1 controls
-		handlePlayerMovement(engine, player2, speed, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP); // player 2 controls
+		transition.update((float) dt);
 
-		physics.step(dt);
+		if (!transition.isTransitioning()) {
+			handlePlayerMovement(engine, player1, speed, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE);
+			handlePlayerMovement(engine, player2, speed, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP);
 
-		deaths.checkDeaths(levels.currentLevel());
+			physics.step(dt);
+			deaths.checkDeaths(levels.currentLevel());
+			exits.handleExits(player1, player2);
 
-		exits.handleExits(player1, player2);
-
-		if (exits.player1Exited && exits.player2Exited) {
-			nextLevel(engine);
+			if (exits.player1Exited && exits.player2Exited) {
+				transition.startTransition(() -> performLevelChange(engine));
+			}
 		}
 
 		updateCamera(engine);
+		engine.renderer().setFadeAlpha(transition.getFadeAlpha());
 	}
 
-	private void nextLevel(Engine engine) {
+	private void performLevelChange (Engine engine) {
 		levels.currentLevelIndex++;
 		if (levels.currentLevelIndex > Levels.LEVEL_COUNT) {
 			System.out.println("You won!");

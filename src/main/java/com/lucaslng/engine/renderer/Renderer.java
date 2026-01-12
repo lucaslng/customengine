@@ -1,22 +1,72 @@
 package com.lucaslng.engine.renderer;
 
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryStack;
-
 import java.nio.IntBuffer;
 import java.util.HashMap;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11C.*;
-import static org.lwjgl.system.MemoryStack.*;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
+import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
+import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
+import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
+import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_FORWARD_COMPAT;
+import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_PROFILE;
+import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
+import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
+import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
+import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
+import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
+import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
+import static org.lwjgl.glfw.GLFW.glfwInit;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwShowWindow;
+import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.opengl.GL;
+import static org.lwjgl.opengl.GL11C.GL_BLEND;
+import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11C.GL_FILL;
+import static org.lwjgl.opengl.GL11C.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11C.GL_LINE;
+import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11C.GL_POLYGON_MODE;
+import static org.lwjgl.opengl.GL11C.GL_RENDERER;
+import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11C.GL_VENDOR;
+import static org.lwjgl.opengl.GL11C.GL_VERSION;
+import static org.lwjgl.opengl.GL11C.GL_ZERO;
+import static org.lwjgl.opengl.GL11C.glBlendFunc;
+import static org.lwjgl.opengl.GL11C.glClear;
+import static org.lwjgl.opengl.GL11C.glClearColor;
+import static org.lwjgl.opengl.GL11C.glDisable;
+import static org.lwjgl.opengl.GL11C.glDrawElements;
+import static org.lwjgl.opengl.GL11C.glEnable;
+import static org.lwjgl.opengl.GL11C.glGetError;
+import static org.lwjgl.opengl.GL11C.glGetInteger;
+import static org.lwjgl.opengl.GL11C.glGetString;
+import static org.lwjgl.opengl.GL11C.glPolygonMode;
+import static org.lwjgl.opengl.GL11C.glViewport;
+import org.lwjgl.system.MemoryStack;
+import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
-import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.components.DisabledComponent;
+import com.lucaslng.engine.components.MeshComponent;
+import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.RotationComponent;
+import com.lucaslng.engine.components.SubMesh;
 
 public final class Renderer {
 	private final EngineSettings engineSettings;
@@ -30,6 +80,7 @@ public final class Renderer {
 	private long window;
 	private int width, height;
 	private int framebufferWidth, framebufferHeight;
+	private float fadeAlpha = 0f;
 
 	public Renderer(EngineSettings engineSettings, EntityManager entityManager) {
 		this.engineSettings = engineSettings;
@@ -157,9 +208,46 @@ public final class Renderer {
 			}
 		}
 
+		// Render fade overlay if needed
+		if (fadeAlpha > 0f) {
+			renderFadeOverlay();
+		}
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		isRendering = false;
+	}
+
+	private void renderFadeOverlay() {
+		glDisable(GL_DEPTH_TEST);
+
+		Matrix4f ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1);
+		Matrix4f identity = new Matrix4f();
+		
+		shader.setUniformMatrix4v("projection", false, ortho.get(new float[16]));
+		shader.setUniformMatrix4v("view", false, identity.get(new float[16]));
+		shader.setUniformMatrix4v("model", false, identity.get(new float[16]));
+		shader.setUniform1i("uUseTexture", 0);
+		shader.setUniform4f("uColor", 0f, 0f, 0f, fadeAlpha);
+
+		float[] quadVertices = {
+			0f, 0f, 0f,  0f, 0f, 1f,  0f, 0f,
+			1f, 0f, 0f,  0f, 0f, 1f,  1f, 0f,
+			1f, 1f, 0f,  0f, 0f, 1f,  1f, 1f,
+			0f, 1f, 0f,  0f, 0f, 1f,  0f, 1f
+		};
+		int[] quadIndices = { 0, 1, 2, 2, 3, 0 };
+		
+		SubMesh overlay = new SubMesh(quadVertices, quadIndices, "Black");
+		overlay.vao.bind();
+		glDrawElements(GL_TRIANGLES, overlay.indexCount, GL_UNSIGNED_INT, 0);
+		overlay.vao.unbind();
+
+		glEnable(GL_DEPTH_TEST);
+	}
+
+	public void setFadeAlpha(float alpha) {
+		this.fadeAlpha = Math.max(0f, Math.min(1f, alpha));
 	}
 
 	public void setCamera(Vector3f position, Vector3f rotation) {
