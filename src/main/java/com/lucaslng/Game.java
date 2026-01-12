@@ -143,7 +143,6 @@ class Game extends GameLoop {
 
 		// position camera behind and above the midpoint
 		Vector3f cameraPos = engine.entityManager().getComponent(camera.id(), PositionComponent.class).position();
-		System.out.println(cameraPos);
 		cameraPos.set(midpoint.x, midpoint.y + 2f, midpoint.z + cameraDistance);
 
 		engine.setCamera(camera);
