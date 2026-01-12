@@ -20,8 +20,8 @@ public final class SubMesh {
 		FloatBuffer vbo = new FloatBuffer(GL_ARRAY_BUFFER, vertices);
 		BufferLayout layout = new BufferLayout();
 		layout.add(GL_FLOAT, 3, false); // position
+		layout.add(GL_FLOAT, 3, true); // normal
 		layout.add(GL_FLOAT, 2, true); // uv
-		// layout.add(GL_FLOAT, 3, true); // normal
 		vao.addBuffer(vbo, layout);
 
 		new IntegerBuffer(GL_ELEMENT_ARRAY_BUFFER, indices); // ebo

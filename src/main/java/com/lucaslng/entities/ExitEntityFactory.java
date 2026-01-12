@@ -16,10 +16,10 @@ public class ExitEntityFactory implements AbstractEntityFactory {
 	static {
 		float s = halfSize;
 		vertices = new float[] {
-				-s, -s, 0f, 1f, 1f,
-				s, -s, 0f, 0f, 1f,
-				s, s, 0f, 0f, 0f,
-				-s, s, 0f, 1f, 0f,
+				-s, -s, 0f, 0f, 0f, 1f, 1f, 1f,
+				s, -s, 0f, 0f, 0f, 1f, 0f, 1f,
+				s, s, 0f, 0f, 0f, 1f, 0f, 0f,
+				-s, s, 0f, 0f, 0f, 1f, 1f, 0f,
 		};
 	}
 

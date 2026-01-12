@@ -26,41 +26,41 @@ public class TexturedCubeEntityFactory implements AbstractEntityFactory {
 
 		// 24 vertices: position + uv
 		vertices = new float[] {
-				// Front
-				-s, -s, s, 0, 0,
-				s, -s, s, 1, 0,
-				s, s, s, 1, 1,
-				-s, s, s, 0, 1,
+				// Front (+Z)
+				-s, -s, s, 0, 0, 1, 0, 0,
+				s, -s, s, 0, 0, 1, 1, 0,
+				s, s, s, 0, 0, 1, 1, 1,
+				-s, s, s, 0, 0, 1, 0, 1,
 
-				// Back
-				s, -s, -s, 0, 0,
-				-s, -s, -s, 1, 0,
-				-s, s, -s, 1, 1,
-				s, s, -s, 0, 1,
+				// Back (-Z)
+				s, -s, -s, 0, 0, -1, 0, 0,
+				-s, -s, -s, 0, 0, -1, 1, 0,
+				-s, s, -s, 0, 0, -1, 1, 1,
+				s, s, -s, 0, 0, -1, 0, 1,
 
-				// Left
-				-s, -s, -s, 0, 0,
-				-s, -s, s, 1, 0,
-				-s, s, s, 1, 1,
-				-s, s, -s, 0, 1,
+				// Left (-X)
+				-s, -s, -s, -1, 0, 0, 0, 0,
+				-s, -s, s, -1, 0, 0, 1, 0,
+				-s, s, s, -1, 0, 0, 1, 1,
+				-s, s, -s, -1, 0, 0, 0, 1,
 
-				// Right
-				s, -s, s, 0, 0,
-				s, -s, -s, 1, 0,
-				s, s, -s, 1, 1,
-				s, s, s, 0, 1,
+				// Right (+X)
+				s, -s, s, 1, 0, 0, 0, 0,
+				s, -s, -s, 1, 0, 0, 1, 0,
+				s, s, -s, 1, 0, 0, 1, 1,
+				s, s, s, 1, 0, 0, 0, 1,
 
-				// Bottom
-				-s, -s, -s, 0, 0,
-				s, -s, -s, 1, 0,
-				s, -s, s, 1, 1,
-				-s, -s, s, 0, 1,
+				// Bottom (-Y)
+				-s, -s, -s, 0, -1, 0, 0, 0,
+				s, -s, -s, 0, -1, 0, 1, 0,
+				s, -s, s, 0, -1, 0, 1, 1,
+				-s, -s, s, 0, -1, 0, 0, 1,
 
-				// Top
-				-s, s, s, 0, 0,
-				s, s, s, 1, 0,
-				s, s, -s, 1, 1,
-				-s, s, -s, 0, 1
+				// Top (+Y)
+				-s, s, s, 0, 1, 0, 0, 0,
+				s, s, s, 0, 1, 0, 1, 0,
+				s, s, -s, 0, 1, 0, 1, 1,
+				-s, s, -s, 0, 1, 0, 0, 1
 		};
 	}
 

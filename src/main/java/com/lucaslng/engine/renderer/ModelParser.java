@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 public class ModelParser {
 
-	private static final int STRIDE = 5;
+	private static final int STRIDE = 8;
 
 	public static parsedObj parseObj(List<String> lines) {
 
@@ -51,11 +51,11 @@ public class ModelParser {
 							vertexData.get(material).add(p.x);
 							vertexData.get(material).add(p.y);
 							vertexData.get(material).add(p.z);
+							vertexData.get(material).add(n.x);
+							vertexData.get(material).add(n.y);
+							vertexData.get(material).add(n.z);
 							vertexData.get(material).add(uv.x);
 							vertexData.get(material).add(uv.y);
-							// vertexData.get(material).add(n.x); // normals
-							// vertexData.get(material).add(n.y);
-							// vertexData.get(material).add(n.z);
 
 							index = (vertexData.get(material).size() / STRIDE) - 1; // change to / 8 after adding back normals
 							vertexMap.get(material).put(tokens[t], index);
