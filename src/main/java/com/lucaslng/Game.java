@@ -56,13 +56,13 @@ class Game extends GameLoop {
 		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-12f, 0f, 0f, 1f));
 		physics = new Physics(engine.entityManager());
 		exits = new Exits(engine.entityManager());
-		deaths = new Deaths(engine.entityManager(), player1, player2);
+		deaths = new Deaths(engine.entityManager(), player1, player2, exits);
 		transition = new LevelTransition();
 	}
 
 	@Override
 	public void doLoop(Engine engine, double dt) {
-		float baseSpeed = 4f;
+		float baseSpeed = 6f;
 		float speed = baseSpeed * (float) dt;
 
 		transition.update((float) dt);
