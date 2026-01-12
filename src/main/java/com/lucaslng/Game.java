@@ -32,7 +32,7 @@ import com.lucaslng.entities.PlayerEntityFactory;
 import com.lucaslng.entities.TexturedCubeEntityFactory;
 
 class Game extends GameLoop {
-	private Entity player1, player2, camera, catCube;
+	private Entity player1, player2, camera;
 	private Physics physics;
 	private Levels levels;
 	private Exits exits;
@@ -47,16 +47,15 @@ class Game extends GameLoop {
 	public void init(Engine engine) {
 		levels = new Levels();
 		Level level = levels.currentLevel();
-		player1 = engine.entityManager().buildEntity(new PlayerEntityFactory(level.player1Spawn()));
-		player2 = engine.entityManager().buildEntity(new PlayerEntityFactory(level.player2Spawn()));
+		player1 = engine.entityManager.buildEntity(new PlayerEntityFactory(level.player1Spawn()));
+		player2 = engine.entityManager.buildEntity(new PlayerEntityFactory(level.player2Spawn()));
 		for (AbstractEntityFactory entityFactory : level.entityFactories())
-			engine.entityManager().buildEntity(entityFactory);
-		camera = engine.entityManager().buildEntity(new CameraEntityFactory());
+			engine.entityManager.buildEntity(entityFactory);
+		camera = engine.entityManager.buildEntity(new CameraEntityFactory());
 		engine.setCamera(camera);
-		catCube = engine.entityManager().buildEntity(new TexturedCubeEntityFactory(-12f, 0f, 0f, 1f));
-		physics = new Physics(engine.entityManager());
-		exits = new Exits(engine.entityManager());
-		deaths = new Deaths(engine.entityManager(), player1, player2, exits);
+		physics = new Physics(engine.entityManager);
+		exits = new Exits(engine.entityManager);
+		deaths = new Deaths(engine.entityManager, player1, player2, exits);
 		transition = new LevelTransition();
 	}
 
@@ -81,7 +80,7 @@ class Game extends GameLoop {
 		}
 
 		updateCamera(engine);
-		engine.renderer().setFadeAlpha(transition.getFadeAlpha());
+		engine.renderer.setFadeAlpha(transition.getFadeAlpha());
 	}
 
 	private void performLevelChange (Engine engine) {
@@ -91,35 +90,35 @@ class Game extends GameLoop {
 			System.exit(0);
 		}
 		Level level = levels.currentLevel();
-		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
-		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
+		Vector3f pos1 = engine.entityManager.getComponent(player1.id(), PositionComponent.class).position();
+		Vector3f pos2 = engine.entityManager.getComponent(player2.id(), PositionComponent.class).position();
 		pos1.set(levels.currentLevel().player1Spawn(), 0f);
 		pos2.set(levels.currentLevel().player2Spawn(), 0f);
-		DeathsComponent deaths1 = engine.entityManager().getComponent(player1.id(), DeathsComponent.class);
-		DeathsComponent deaths2 = engine.entityManager().getComponent(player2.id(), DeathsComponent.class);
+		DeathsComponent deaths1 = engine.entityManager.getComponent(player1.id(), DeathsComponent.class);
+		DeathsComponent deaths2 = engine.entityManager.getComponent(player2.id(), DeathsComponent.class);
 		deaths1.nextLevel();
 		deaths2.nextLevel();
-		Set<Integer> entityIds = engine.entityManager().entities().keySet();
+		Set<Integer> entityIds = engine.entityManager.entities().keySet();
 		for (Integer entityId : entityIds) {
 			if (entityId == player1.id() || entityId == player2.id() || entityId == camera.id())
 				continue;
-			engine.entityManager().removeEntity(entityId);
+			engine.entityManager.removeEntity(entityId);
 		}
 		for (AbstractEntityFactory entityFactory : level.entityFactories())
-			engine.entityManager().buildEntity(entityFactory);
-		engine.entityManager().removeComponent(player1.id(), DisabledComponent.class);
-		engine.entityManager().removeComponent(player2.id(), DisabledComponent.class);
+			engine.entityManager.buildEntity(entityFactory);
+		engine.entityManager.removeComponent(player1.id(), DisabledComponent.class);
+		engine.entityManager.removeComponent(player2.id(), DisabledComponent.class);
 		exits.refresh();
 	}
 
 	private void handlePlayerMovement(Engine engine, Entity player, float speed, int leftKey, int rightKey, int jumpKey) {
 		if (isDisabled(engine, player))
 			return;
-		boolean leftPressed = engine.keyHandler().isKeyHeld(leftKey);
-		boolean rightPressed = engine.keyHandler().isKeyHeld(rightKey);
+		boolean leftPressed = engine.keyHandler.isKeyHeld(leftKey);
+		boolean rightPressed = engine.keyHandler.isKeyHeld(rightKey);
 
-		Vector3f position = engine.entityManager().getComponent(player.id(), PositionComponent.class).position();
-		Vector3f rotation = engine.entityManager().getComponent(player.id(), RotationComponent.class).rotation();
+		Vector3f position = engine.entityManager.getComponent(player.id(), PositionComponent.class).position();
+		Vector3f rotation = engine.entityManager.getComponent(player.id(), RotationComponent.class).rotation();
 
 		if (leftPressed && rightPressed) {
 		} else if (leftPressed) {
@@ -131,22 +130,22 @@ class Game extends GameLoop {
 		}
 
 		// jumping
-		if (engine.keyHandler().isKeyHeld(jumpKey)) {
-			GroundedComponent grounded = engine.entityManager().getComponent(player.id(), GroundedComponent.class);
+		if (engine.keyHandler.isKeyHeld(jumpKey)) {
+			GroundedComponent grounded = engine.entityManager.getComponent(player.id(), GroundedComponent.class);
 			if (grounded.isGrounded) {
-				Vector3f velocity = engine.entityManager().getComponent(player.id(), VelocityComponent.class).velocity();
+				Vector3f velocity = engine.entityManager.getComponent(player.id(), VelocityComponent.class).velocity();
 				velocity.y = 10f;
 			}
 		}
 	}
 
 	private boolean isDisabled(Engine engine, Entity entity) {
-		return engine.entityManager().hasComponent(entity.id(), DisabledComponent.class);
+		return engine.entityManager.hasComponent(entity.id(), DisabledComponent.class);
 	}
 
 	private void updateCamera(Engine engine) {
-		Vector3f pos1 = engine.entityManager().getComponent(player1.id(), PositionComponent.class).position();
-		Vector3f pos2 = engine.entityManager().getComponent(player2.id(), PositionComponent.class).position();
+		Vector3f pos1 = engine.entityManager.getComponent(player1.id(), PositionComponent.class).position();
+		Vector3f pos2 = engine.entityManager.getComponent(player2.id(), PositionComponent.class).position();
 
 		// calculate midpoint between players
 		Vector3f midpoint = new Vector3f((pos1.x + pos2.x) / 2f, (pos1.y + pos2.y) / 2f, (pos1.z + pos2.z) / 2f);
@@ -159,7 +158,7 @@ class Game extends GameLoop {
 		float cameraDistance = Math.max(baseDistance, distance * 0.8f + 3f);
 
 		// position camera behind and above the midpoint
-		Vector3f cameraPos = engine.entityManager().getComponent(camera.id(), PositionComponent.class).position();
+		Vector3f cameraPos = engine.entityManager.getComponent(camera.id(), PositionComponent.class).position();
 		cameraPos.set(midpoint.x, midpoint.y + 2f, midpoint.z + cameraDistance);
 
 		engine.setCamera(camera);

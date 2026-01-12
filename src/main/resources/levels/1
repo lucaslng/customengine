@@ -3,4 +3,6 @@ platform 0 0 10 5
 platform 15 0 10 5
 platform 30 0 10 5
 platform 45 0 10 5
-exit 15 5
+platform 60 0 10 5
+platform 75 0 10 5
+exit 75 5

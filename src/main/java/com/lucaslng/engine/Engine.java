@@ -9,10 +9,10 @@ import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.renderer.Renderer;
 
 public final class Engine {
-	private final Renderer renderer;
-	private final EngineSettings settings;
-	private final EntityManager entityManager;
-	private final KeyHandler keyHandler;
+	public final Renderer renderer;
+	public final EngineSettings settings;
+	public final EntityManager entityManager;
+	public final KeyHandler keyHandler;
 
 	public Engine() {
 		System.out.println("Initializing engine...");
@@ -55,15 +55,6 @@ public final class Engine {
 		setCamera(entityManager.getComponent(entity.id(), PositionComponent.class).position(),
 				entityManager.getComponent(entity.id(), HeadRotationComponent.class).rotation(), entity.id());
 	}
-
-	public KeyHandler keyHandler() {
-		return keyHandler;
-	}
-
-	public Renderer renderer() {
-		return renderer;
-	}
-
 	public void start(GameLoop gameLoop) {
 		gameLoop.init(this);
 		gameLoop.execute();
@@ -73,14 +64,6 @@ public final class Engine {
 		if (!renderer.isRendering()) {
 			renderer.render();
 		}
-	}
-
-	public EngineSettings settings() {
-		return settings;
-	}
-
-	public EntityManager entityManager() {
-		return entityManager;
 	}
 
 	public int width() {
