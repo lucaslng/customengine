@@ -2,6 +2,7 @@ package com.lucaslng.engine.renderer;
 
 import java.util.HashMap;
 
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11C.GL_FALSE;
@@ -46,6 +47,14 @@ class ShaderProgram{
 
 	protected void setUniform1i(CharSequence name, int i) {
 		glUniform1i(getUniformLocation(name), i);
+	}
+
+	protected void setUniform3f(CharSequence name, float x, float y, float z) {
+		glUniform3f(getUniformLocation(name), x, y, z);
+	}
+
+	protected void setUniform3f(CharSequence name, Vector3f v) {
+		setUniform3f(name, v.x(), v.y(), v.z());
 	}
 
 	protected void setUniform4f(CharSequence name, float x, float y, float z, float w) {

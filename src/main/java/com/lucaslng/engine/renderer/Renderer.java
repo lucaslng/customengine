@@ -176,7 +176,6 @@ public final class Renderer {
 
 			if (entityManager.hasComponent(entityId, DisabledComponent.class))
 				continue;
-			
 
 			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
 			Matrix4f model = new Matrix4f().translate(position);
@@ -189,6 +188,12 @@ public final class Renderer {
 					projectionMatrix.get(new float[16]));
 			shader.setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
 			shader.setUniformMatrix4v("model", false, model.get(new float[16]));
+			if (entityManager.entityExists(camera.entityId())) {
+				Vector3f cameraPos = entityManager.getComponent(camera.entityId(), PositionComponent.class).position();
+				shader.setUniform3f("lightPos", cameraPos);
+			} else {
+				shader.setUniform3f("lightPos", new Vector3f());
+			}
 
 			MeshComponent meshComponent = entityManager.getComponent(entityId, MeshComponent.class);
 			for (SubMesh subMesh : meshComponent.subMeshes()) {
@@ -250,8 +255,8 @@ public final class Renderer {
 		this.fadeAlpha = Math.max(0f, Math.min(1f, alpha));
 	}
 
-	public void setCamera(Vector3f position, Vector3f rotation) {
-		camera.setCamera(position, rotation);
+	public void setCamera(Vector3f position, Vector3f rotation, int entityId) {
+		camera.setCamera(position, rotation, entityId);
 	}
 
 	public void toggleDebugLines() {
