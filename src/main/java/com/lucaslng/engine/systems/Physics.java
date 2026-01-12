@@ -172,12 +172,14 @@ public class Physics {
 			// Check all pairs
 			for (int i = 0; i < colliders.size(); i++) {
 				int ida = colliders.get(i);
+				if (entityManager.hasComponent(ida, DisabledComponent.class)) continue;
 				RigidBodyComponent ra = entityManager.getComponent(ida, RigidBodyComponent.class);
 				Vector3f pa = entityManager.getComponent(ida, PositionComponent.class).position();
 				Vector3f halfExtentsA = entityManager.getComponent(ida, AABBComponent.class).halfExtents();
 				
 				for (int j = i + 1; j < colliders.size(); j++) {
 					int idb = colliders.get(j);
+					if (entityManager.hasComponent(idb, DisabledComponent.class)) continue;
 					RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
 					
 					// Skip if both are static
