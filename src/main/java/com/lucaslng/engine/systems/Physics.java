@@ -26,8 +26,6 @@ public class Physics {
 	}
 
 	public void step(double dt) {
-		dt = Math.min(dt, 0.05);
-		
 		if (DEBUG_VELOCITIES) {
 			System.out.println("=== Physics Step, dt=" + dt + " ===");
 		}
