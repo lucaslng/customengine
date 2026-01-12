@@ -9,7 +9,7 @@ public class ModelParser {
 
 	private static final int STRIDE = 8;
 
-	public static parsedObj parseObj(List<String> lines) {
+	public static ParsedObj parseObj(List<String> lines) {
 
 		ArrayList<Vector3f> positions = new ArrayList<>();
 		ArrayList<Vector2f> uvs = new ArrayList<>();
@@ -109,7 +109,7 @@ public class ModelParser {
 				subParsedObject.vertices()[i + 2] -= center.z();
 			}
 		}
-		return new parsedObj(subParsedObjects, halfExtents);
+		return new ParsedObj(subParsedObjects, halfExtents);
 
 	}
 

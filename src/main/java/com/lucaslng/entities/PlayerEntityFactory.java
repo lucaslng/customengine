@@ -11,7 +11,7 @@ import com.lucaslng.engine.utils.FileReader;
 public class PlayerEntityFactory implements AbstractEntityFactory {
 
 	private final Vector3f position;
-	private static final parsedObj parsedObject = ModelParser
+	private static final ParsedObj parsedObject = ModelParser
 			.parseObj(FileReader.readLines("models/model.obj"));
 	private final MeshComponent meshComponent;
 
