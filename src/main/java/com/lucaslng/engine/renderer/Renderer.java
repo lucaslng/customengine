@@ -138,6 +138,7 @@ public final class Renderer {
 					projectionMatrix.get(new float[16]));
 			shader.setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
 			shader.setUniformMatrix4v("model", false, model.get(new float[16]));
+			shader.setUniform3f("lightPos", new Vector3f(0f, 1f, -10f));
 
 			MeshComponent meshComponent = entityManager.getComponent(entityId, MeshComponent.class);
 			for (SubMesh subMesh : meshComponent.subMeshes()) {
