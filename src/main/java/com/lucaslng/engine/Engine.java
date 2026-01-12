@@ -32,8 +32,8 @@ public final class Engine {
 		System.out.println("Engine initialized.");
 	}
 
-	public void setCamera(Vector3f position, Vector3f rotation) {
-		renderer.setCamera(position, rotation);
+	public void setCamera(Vector3f position, Vector3f rotation, int entityId) {
+		renderer.setCamera(position, rotation, entityId);
 	}
 
 	public void linkMouseToRotation(Vector3f rotation) {
@@ -53,7 +53,7 @@ public final class Engine {
 					"Entity passed into setCamera() does not have position component or head rotation component.");
 		}
 		setCamera(entityManager.getComponent(entity.id(), PositionComponent.class).position(),
-				entityManager.getComponent(entity.id(), HeadRotationComponent.class).rotation());
+				entityManager.getComponent(entity.id(), HeadRotationComponent.class).rotation(), entity.id());
 	}
 
 	public KeyHandler keyHandler() {

@@ -9,13 +9,14 @@ class Camera {
 
 	private final Matrix4f matrix;
 	private final Vector3f up;
+	private int entityId;
 
 	protected Camera() {
 		matrix = new Matrix4f();
 		up = new Vector3f(0.0f, 1.0f, 0.0f);
 	}
 
-	protected void setCamera(Vector3f position, Vector3f rotation) {
+	protected void setCamera(Vector3f position, Vector3f rotation, int entityId) {
 		if (rotation.x > 89.0f) {
 			rotation.x = 89.0f;
 		}
@@ -27,6 +28,10 @@ class Camera {
 	
 	protected Matrix4f matrix() {
 		return matrix;
+	}
+
+	protected int entityId() {
+		return entityId;
 	}
 	
 }
