@@ -72,7 +72,7 @@ public class Physics {
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
 			
 			if (!entityManager.hasComponent(entityId, RigidBodyComponent.class) || 
-				!entityManager.hasComponent(entityId, AABBComponent.class)) {
+			    !entityManager.hasComponent(entityId, AABBComponent.class)) {
 				// No collision, just move
 				Vector3f change = new Vector3f();
 				velocity.mul((float) dt, change);
@@ -199,69 +199,40 @@ public class Physics {
 						// Normal points from A to B
 						// If normal.y > 0.7, B is above A, so A is on ground
 						// If normal.y < -0.7, A is above B, so B is on ground
-						
-						// Only mark as grounded if the entity is moving downward (or nearly stationary)
-						// AND the entities are moving toward each other (not separating)
 						if (contact.c().y > 0.7f && !ra.isStatic() && entityManager.hasComponent(ida, GroundedComponent.class)) {
-							Vector3f va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
-							Vector3f vb = entityManager.hasComponent(idb, VelocityComponent.class) 
-								? entityManager.getComponent(idb, VelocityComponent.class).velocity() 
-								: new Vector3f();
+							GroundedComponent grounded = entityManager.getComponent(ida, GroundedComponent.class);
+							grounded.isGrounded = true;
 							
-							// Calculate relative velocity along the contact normal
-							Vector3f relativeVel = new Vector3f(va).sub(vb);
-							float relativeVelAlongNormal = relativeVel.dot(contact.c());
+							// If grounded on another dynamic entity, match their vertical velocity to prevent jitter
+							if (!rb.isStatic() && entityManager.hasComponent(idb, VelocityComponent.class)) {
+								Vector3f va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
+								Vector3f vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
+								// Only match if falling faster than the entity below
+								if (va.y < vb.y) {
+									va.y = vb.y;
+								}
+							}
 							
-							// Only mark grounded if:
-							// 1. Entity A is falling or stationary (not jumping up)
-							// 2. Entities are moving toward each other (relative velocity < 0 means approaching)
-							if (va.y <= 0.1f && relativeVelAlongNormal <= 0.1f) {
-								GroundedComponent grounded = entityManager.getComponent(ida, GroundedComponent.class);
-								grounded.isGrounded = true;
-								
-								// If grounded on another dynamic entity, match their vertical velocity to prevent jitter
-								// BUT only if the bottom entity is moving upward or stable (not falling)
-								if (!rb.isStatic() && entityManager.hasComponent(idb, VelocityComponent.class)) {
-									// Only match if falling faster than the entity below AND the entity below isn't falling fast
-									if (va.y < vb.y && vb.y > -0.5f) {
-										va.y = vb.y;
-									}
-								}
-								
-								if (DEBUG_GROUNDED) {
-									System.out.println("Entity " + ida + " is GROUNDED on entity " + idb);
-								}
+							if (DEBUG_GROUNDED) {
+								System.out.println("Entity " + ida + " is GROUNDED on entity " + idb);
 							}
 						}
 						if (contact.c().y < -0.7f && !rb.isStatic() && entityManager.hasComponent(idb, GroundedComponent.class)) {
-							Vector3f va = entityManager.hasComponent(ida, VelocityComponent.class)
-								? entityManager.getComponent(ida, VelocityComponent.class).velocity()
-								: new Vector3f();
-							Vector3f vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
+							GroundedComponent grounded = entityManager.getComponent(idb, GroundedComponent.class);
+							grounded.isGrounded = true;
 							
-							// Calculate relative velocity along the contact normal
-							Vector3f relativeVel = new Vector3f(vb).sub(va);
-							float relativeVelAlongNormal = relativeVel.dot(new Vector3f(contact.c()).mul(-1));
+							// If grounded on another dynamic entity, match their vertical velocity to prevent jitter
+							if (!ra.isStatic() && entityManager.hasComponent(ida, VelocityComponent.class)) {
+								Vector3f va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
+								Vector3f vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
+								// Only match if falling faster than the entity below
+								if (vb.y < va.y) {
+									vb.y = va.y;
+								}
+							}
 							
-							// Only mark grounded if:
-							// 1. Entity B is falling or stationary (not jumping up)
-							// 2. Entities are moving toward each other
-							if (vb.y <= 0.1f && relativeVelAlongNormal <= 0.1f) {
-								GroundedComponent grounded = entityManager.getComponent(idb, GroundedComponent.class);
-								grounded.isGrounded = true;
-								
-								// If grounded on another dynamic entity, match their vertical velocity to prevent jitter
-								// BUT only if the bottom entity is moving upward or stable (not falling)
-								if (!ra.isStatic() && entityManager.hasComponent(ida, VelocityComponent.class)) {
-									// Only match if falling faster than the entity below AND the entity below isn't falling fast
-									if (vb.y < va.y && va.y > -0.5f) {
-										vb.y = va.y;
-									}
-								}
-								
-								if (DEBUG_GROUNDED) {
-									System.out.println("Entity " + idb + " is GROUNDED on entity " + ida);
-								}
+							if (DEBUG_GROUNDED) {
+								System.out.println("Entity " + idb + " is GROUNDED on entity " + ida);
 							}
 						}
 					}
@@ -333,7 +304,8 @@ public class Physics {
 		return new Contact(penetration, normal);
 	}
 
-	private static float sweptAABB(Vector3f startPos, Vector3f endPos, Vector3f movingExtents, Vector3f staticPos, Vector3f staticExtents) {
+	private static float sweptAABB(Vector3f startPos, Vector3f endPos, Vector3f movingExtents, 
+	                                Vector3f staticPos, Vector3f staticExtents) {
 		Vector3f velocity = new Vector3f(endPos).sub(startPos);
 		
 		if (velocity.lengthSquared() < 0.0001f)
@@ -374,8 +346,9 @@ public class Physics {
 		
 		return tmin;
 	}
-
-	private static Vector3f getCollisionNormal(Vector3f movingPos, Vector3f movingExtents, Vector3f staticPos, Vector3f staticExtents) {
+	
+	private static Vector3f getCollisionNormal(Vector3f movingPos, Vector3f movingExtents,
+	                                            Vector3f staticPos, Vector3f staticExtents) {
 		Vector3f d = new Vector3f(staticPos).sub(movingPos);
 		
 		float ox = (movingExtents.x + staticExtents.x) - Math.abs(d.x);
@@ -395,7 +368,8 @@ public class Physics {
 		return normal;
 	}
 
-	private static void resolveContact(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f va, Vector3f vb, Vector3f normal) {
+	private static void resolveContact(RigidBodyComponent ra, RigidBodyComponent rb,
+			Vector3f va, Vector3f vb, Vector3f normal) {
 		Vector3f rv = new Vector3f();
 		va.sub(vb, rv);
 		float rvAlongNormal = rv.dot(normal);
@@ -460,7 +434,8 @@ public class Physics {
 		}
 	}
 
-	private static void correctPosition(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f pa, Vector3f pb, Contact contact) {
+	private static void correctPosition(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f pa, Vector3f pb,
+			Contact contact) {
 		float invMassSum = ra.invMass() + rb.invMass();
 		if (invMassSum == 0f)
 			return;
