@@ -62,11 +62,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
-import com.lucaslng.engine.components.DisabledComponent;
-import com.lucaslng.engine.components.MeshComponent;
-import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.components.RotationComponent;
-import com.lucaslng.engine.components.SubMesh;
+import com.lucaslng.engine.components.*;
 
 public final class Renderer {
 	private final EngineSettings engineSettings;

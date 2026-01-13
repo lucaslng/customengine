@@ -1,10 +1,8 @@
-package com.lucaslng.engine.components;
+package com.lucaslng.engine.renderer;
 
 import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL15C.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15C.GL_ELEMENT_ARRAY_BUFFER;
-
-import com.lucaslng.engine.renderer.*;
 
 public final class SubMesh {
 	public final VertexArray vao;

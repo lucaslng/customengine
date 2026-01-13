@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
+import com.lucaslng.engine.renderer.SubMesh;
 
 public class TexturedCubeEntityFactory implements AbstractEntityFactory {
 
