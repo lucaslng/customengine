@@ -63,10 +63,12 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.ui.UIManager;
 
 public final class Renderer {
 	private final EngineSettings engineSettings;
 	private final EntityManager entityManager;
+	private final UIManager uiManager;
 	private ShaderProgram shader;
 	private HashMap<String, Material> materials;
 	private final Matrix4f projectionMatrix;
@@ -78,9 +80,10 @@ public final class Renderer {
 	private int framebufferWidth, framebufferHeight;
 	private float fadeAlpha = 0f;
 
-	public Renderer(EngineSettings engineSettings, EntityManager entityManager) {
+	public Renderer(EngineSettings engineSettings, EntityManager entityManager, UIManager uiManager) {
 		this.engineSettings = engineSettings;
 		this.entityManager = entityManager;
+		this.uiManager = uiManager;
 		this.width = engineSettings.windowSize.width;
 		this.height = engineSettings.windowSize.height;
 		projectionMatrix = new Matrix4f();
