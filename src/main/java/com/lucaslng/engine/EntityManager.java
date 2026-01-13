@@ -12,13 +12,13 @@ import com.lucaslng.engine.entities.Entity;
 
 public class EntityManager {
 
-	private final Map<Integer, Entity> entities = new ConcurrentHashMap<>();
+	public final HashSet<Integer> entities = new HashSet<>();
 	private final Map<Class<?>, Map<Integer, Object>> components = new ConcurrentHashMap<>(); // Map<Component.class, Map<EntityId,
 																																									// Component>>
 
 	public Entity buildEntity(AbstractEntityFactory entityFactory) {
 		Entity entity = new Entity();
-		entities.put(entity.id(), entity);
+		entities.add(entity.id());
 		for (Object component : entityFactory.components()) {
 			addComponent(entity.id(), component);
 		}
@@ -56,7 +56,8 @@ public class EntityManager {
 	}
 
 	public Set<Integer> getEntitiesWith(Class<?>... componentClasses) {
-		Set<Integer> result = new HashSet<>(entities.keySet());
+		@SuppressWarnings("unchecked")
+		HashSet<Integer> result = (HashSet<Integer>) entities.clone();
 		for (Class<?> componentClass : componentClasses) {
 			result.retainAll(components.getOrDefault(componentClass, Collections.emptyMap()).keySet());
 		}
@@ -64,11 +65,7 @@ public class EntityManager {
 	}
 
 	public boolean entityExists(int entityId) {
-		return entities.containsKey(entityId);
-	}
-
-	public Map<Integer, Entity> entities() {
-		return entities;
+		return entities.contains(entityId);
 	}
 
 }
