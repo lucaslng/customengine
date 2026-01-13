@@ -69,7 +69,7 @@ public final class Renderer {
 	private final EngineSettings engineSettings;
 	private final EntityManager entityManager;
 	private final UIManager uiManager;
-	private ShaderProgram shader;
+	private ShaderProgram shader, uiShader;
 	private HashMap<String, Material> materials;
 	private final Matrix4f projectionMatrix;
 	private final Camera camera;
@@ -79,6 +79,8 @@ public final class Renderer {
 	private int width, height;
 	private int framebufferWidth, framebufferHeight;
 	private float fadeAlpha = 0f;
+
+	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
 
 	public Renderer(EngineSettings engineSettings, EntityManager entityManager, UIManager uiManager) {
 		this.engineSettings = engineSettings;
@@ -151,11 +153,11 @@ public final class Renderer {
 
 		shader = new ShaderProgram("vertex.glsl", "fragment.glsl");
 		shader.compileShader();
-		shader.bind();
+		uiShader = new ShaderProgram("ui-vertex.glsl", "ui-fragment.glsl");
+		uiShader.compileShader();
 
 		materials = Materials.createMaterials();
 
-		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClearColor(0.8f, 0.7f, 0.6f, 1.0f);
@@ -170,6 +172,30 @@ public final class Renderer {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, framebufferWidth, framebufferHeight);
 
+		renderGame();
+
+		// Render fade overlay if needed
+		if (fadeAlpha > 0f) {
+			renderFadeOverlay();
+		}
+
+		renderUI();
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+		isRendering = false;
+	}
+
+	private void renderUI() {
+		glDisable(GL_DEPTH_TEST);
+		uiShader.bind();
+
+		uiShader.unbind();
+	}
+
+	private void renderGame() {
+		glEnable(GL_DEPTH_TEST);
+		shader.bind();
 		for (int entityId : entityManager.getEntitiesWith(MeshComponent.class,
 				PositionComponent.class)) {
 
@@ -211,43 +237,29 @@ public final class Renderer {
 				subMesh.vao.unbind();
 			}
 		}
-
-		// Render fade overlay if needed
-		if (fadeAlpha > 0f) {
-			renderFadeOverlay();
-		}
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-		isRendering = false;
+		shader.unbind();
 	}
 
 	private void renderFadeOverlay() {
 		glDisable(GL_DEPTH_TEST);
-
-		Matrix4f ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1);
-		Matrix4f identity = new Matrix4f();
-		
-		shader.setUniformMatrix4v("projection", false, ortho.get(new float[16]));
-		shader.setUniformMatrix4v("view", false, identity.get(new float[16]));
-		shader.setUniformMatrix4v("model", false, identity.get(new float[16]));
-		shader.setUniform1i("uUseTexture", 0);
-		shader.setUniform4f("uColor", 0f, 0f, 0f, fadeAlpha);
+		uiShader.bind();
+		uiShader.setUniformMatrix4v("ortho", false, ortho);
+		uiShader.setUniform1i("uUseTexture", 0);
+		uiShader.setUniform4f("uColor", 0f, 0f, 0f, fadeAlpha);
 
 		float[] quadVertices = {
-			0f, 0f, 0f,  0f, 0f, 1f,  0f, 0f,
-			1f, 0f, 0f,  0f, 0f, 1f,  1f, 0f,
-			1f, 1f, 0f,  0f, 0f, 1f,  1f, 1f,
-			0f, 1f, 0f,  0f, 0f, 1f,  0f, 1f
+				0f, 0f, 0f, 0f, 0f, 1f, 0f, 0f,
+				1f, 0f, 0f, 0f, 0f, 1f, 1f, 0f,
+				1f, 1f, 0f, 0f, 0f, 1f, 1f, 1f,
+				0f, 1f, 0f, 0f, 0f, 1f, 0f, 1f
 		};
 		int[] quadIndices = { 0, 1, 2, 2, 3, 0 };
-		
+
 		SubMesh overlay = new SubMesh(quadVertices, quadIndices, "Black");
 		overlay.vao.bind();
 		glDrawElements(GL_TRIANGLES, overlay.indexCount, GL_UNSIGNED_INT, 0);
 		overlay.vao.unbind();
-
-		glEnable(GL_DEPTH_TEST);
+		uiShader.unbind();
 	}
 
 	public void setFadeAlpha(float alpha) {
