@@ -1,6 +1,6 @@
 package com.lucaslng;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import org.joml.Vector3f;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
@@ -98,7 +98,7 @@ class Game extends GameLoop {
 		DeathsComponent deaths2 = engine.entityManager.getComponent(player2.id(), DeathsComponent.class);
 		deaths1.nextLevel();
 		deaths2.nextLevel();
-		HashSet<Integer> entityIds = engine.entityManager.entities;
+		Set<Integer> entityIds = engine.entityManager.entities;
 		for (Integer entityId : entityIds) {
 			if (entityId == player1.id() || entityId == player2.id() || entityId == camera.id())
 				continue;

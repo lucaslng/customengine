@@ -1,10 +1,6 @@
 package com.lucaslng.engine;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.lucaslng.engine.entities.AbstractEntityFactory;
@@ -12,7 +8,7 @@ import com.lucaslng.engine.entities.Entity;
 
 public class EntityManager {
 
-	public final HashSet<Integer> entities = new HashSet<>();
+	public final Set<Integer> entities = ConcurrentHashMap.newKeySet();
 	private final Map<Class<?>, Map<Integer, Object>> components = new ConcurrentHashMap<>(); // Map<Component.class, Map<EntityId,
 																																									// Component>>
 
@@ -56,8 +52,7 @@ public class EntityManager {
 	}
 
 	public Set<Integer> getEntitiesWith(Class<?>... componentClasses) {
-		@SuppressWarnings("unchecked")
-		HashSet<Integer> result = (HashSet<Integer>) entities.clone();
+		HashSet<Integer> result = new HashSet<>(entities);
 		for (Class<?> componentClass : componentClasses) {
 			result.retainAll(components.getOrDefault(componentClass, Collections.emptyMap()).keySet());
 		}

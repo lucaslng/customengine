@@ -19,15 +19,7 @@ public final class Engine {
 		entityManager = new EntityManager();
 		settings = new EngineSettings();
 		renderer = new Renderer(settings, entityManager);
-		keyHandler = new KeyHandler();
-
-		glfwSetKeyCallback(renderer.getWindow(), (window, key, scancode, action, mods) -> {
-			if (action == GLFW_PRESS) {
-				keyHandler.keyPressed(key);
-			} else if (action == GLFW_RELEASE) {
-				keyHandler.keyReleased(key);
-			}
-		});
+		keyHandler = new KeyHandler(renderer.getWindow());
 		
 		System.out.println("Engine initialized.");
 	}
