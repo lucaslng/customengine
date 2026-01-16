@@ -31,4 +31,7 @@ abstract class Buffer {
 		return id;
 	}
 	
+	public final int target() {
+		return target;
+	}
 }
