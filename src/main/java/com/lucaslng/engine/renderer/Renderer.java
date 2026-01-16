@@ -72,7 +72,6 @@ public final class Renderer {
 	private final UIManager uiManager;
 	private ShaderProgram shader, uiShader;
 	private HashMap<String, Material> materials;
-	private final FontAtlas fontAtlas;
 	private final Matrix4f projectionMatrix;
 	private final Camera camera;
 	private float aspectRatio;
@@ -92,7 +91,6 @@ public final class Renderer {
 		this.height = engineSettings.windowSize.height;
 		projectionMatrix = new Matrix4f();
 		camera = new Camera();
-		fontAtlas = new FontAtlas(1000, 200);
 		isRendering = false;
 		initWindow();
 	}
