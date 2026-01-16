@@ -47,10 +47,13 @@ class Game extends GameLoop {
 	public void init(Engine engine) {
 		levels = new Levels();
 		Level level = levels.currentLevel();
+
 		player1 = engine.entityManager.buildEntity(new PlayerEntityFactory(level.player1Spawn()));
 		player2 = engine.entityManager.buildEntity(new PlayerEntityFactory(level.player2Spawn()));
+
 		for (AbstractEntityFactory entityFactory : level.entityFactories())
 			engine.entityManager.buildEntity(entityFactory);
+
 		camera = engine.entityManager.buildEntity(new CameraEntityFactory());
 		engine.setCamera(camera);
 		physics = new Physics(engine.entityManager);
@@ -77,7 +80,12 @@ class Game extends GameLoop {
 			exits.handleExits(player1, player2);
 
 			if (exits.player1Exited && exits.player2Exited) {
-				transition.startTransition(() -> performLevelChange(engine));
+				transition.startTransition(new Runnable() {
+					@Override
+					public void run() {
+						performLevelChange(engine);
+					}
+				});
 			}
 		}
 
@@ -87,27 +95,34 @@ class Game extends GameLoop {
 
 	private void performLevelChange (Engine engine) {
 		levels.currentLevelIndex++;
+
 		if (levels.currentLevelIndex > Levels.LEVEL_COUNT) {
 			System.out.println("You won!");
 			System.exit(0);
 		}
+
 		Level level = levels.currentLevel();
+
 		Vector3f pos1 = engine.entityManager.getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = engine.entityManager.getComponent(player2.id(), PositionComponent.class).position();
 		pos1.set(levels.currentLevel().player1Spawn(), 0f);
 		pos2.set(levels.currentLevel().player2Spawn(), 0f);
+
 		DeathsComponent deaths1 = engine.entityManager.getComponent(player1.id(), DeathsComponent.class);
 		DeathsComponent deaths2 = engine.entityManager.getComponent(player2.id(), DeathsComponent.class);
 		deaths1.nextLevel();
 		deaths2.nextLevel();
+
 		Set<Integer> entityIds = engine.entityManager.entities;
 		for (Integer entityId : entityIds) {
 			if (entityId == player1.id() || entityId == player2.id() || entityId == camera.id())
 				continue;
 			engine.entityManager.removeEntity(entityId);
 		}
+
 		for (AbstractEntityFactory entityFactory : level.entityFactories())
 			engine.entityManager.buildEntity(entityFactory);
+
 		engine.entityManager.removeComponent(player1.id(), DisabledComponent.class);
 		engine.entityManager.removeComponent(player2.id(), DisabledComponent.class);
 		exits.refresh();
@@ -116,6 +131,7 @@ class Game extends GameLoop {
 	private void handlePlayerMovement(Engine engine, Entity player, float speed, int leftKey, int rightKey, int jumpKey) {
 		if (isDisabled(engine, player))
 			return;
+		
 		boolean leftPressed = engine.keyHandler.isKeyHeld(leftKey);
 		boolean rightPressed = engine.keyHandler.isKeyHeld(rightKey);
 
