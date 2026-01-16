@@ -25,11 +25,11 @@ import com.lucaslng.engine.systems.Exits;
 import com.lucaslng.engine.systems.LevelTransition;
 import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
+import com.lucaslng.engine.ui.UIElement;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.entities.CameraEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
-import com.lucaslng.entities.TexturedCubeEntityFactory;
 
 class Game extends GameLoop {
 	private Entity player1, player2, camera;
@@ -57,6 +57,8 @@ class Game extends GameLoop {
 		exits = new Exits(engine.entityManager);
 		deaths = new Deaths(engine.entityManager, player1, player2, exits);
 		transition = new LevelTransition();
+
+		engine.uiManager.elements.add(new UIElement(0.1f, 0.1f, 0.1f, 0.1f));
 	}
 
 	@Override

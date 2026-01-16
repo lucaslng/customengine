@@ -63,6 +63,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.ui.UIElement;
 import com.lucaslng.engine.ui.UIManager;
 
 public final class Renderer {
@@ -71,6 +72,7 @@ public final class Renderer {
 	private final UIManager uiManager;
 	private ShaderProgram shader, uiShader;
 	private HashMap<String, Material> materials;
+	private final FontAtlas fontAtlas;
 	private final Matrix4f projectionMatrix;
 	private final Camera camera;
 	private float aspectRatio;
@@ -90,6 +92,7 @@ public final class Renderer {
 		this.height = engineSettings.windowSize.height;
 		projectionMatrix = new Matrix4f();
 		camera = new Camera();
+		fontAtlas = new FontAtlas(1000, 200);
 		isRendering = false;
 		initWindow();
 	}
@@ -189,6 +192,15 @@ public final class Renderer {
 	private void renderUI() {
 		glDisable(GL_DEPTH_TEST);
 		uiShader.bind();
+		uiShader.setUniformMatrix4v("ortho", false, ortho);
+		uiShader.setUniform1i("uUseTexture", 0);
+		uiShader.setUniform4f("uColor", 1f, 0f, 0f, 1f);
+
+		for (UIElement element : uiManager.elements) {
+			element.vao.bind();
+			glDrawElements(GL_TRIANGLES, UIElement.indexCount, GL_UNSIGNED_INT, 0);
+			element.vao.unbind();
+		}
 
 		uiShader.unbind();
 	}
@@ -196,6 +208,17 @@ public final class Renderer {
 	private void renderGame() {
 		glEnable(GL_DEPTH_TEST);
 		shader.bind();
+
+		shader.setUniformMatrix4v("projection", false,
+				projectionMatrix.get(new float[16]));
+		shader.setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
+		if (entityManager.entityExists(camera.entityId())) {
+			Vector3f cameraPos = entityManager.getComponent(camera.entityId(), PositionComponent.class).position();
+			shader.setUniform3f("lightPos", cameraPos);
+		} else {
+			shader.setUniform3f("lightPos", new Vector3f());
+		}
+
 		for (int entityId : entityManager.getEntitiesWith(MeshComponent.class,
 				PositionComponent.class)) {
 
@@ -209,16 +232,7 @@ public final class Renderer {
 				model.rotateXYZ(rotation);
 			}
 
-			shader.setUniformMatrix4v("projection", false,
-					projectionMatrix.get(new float[16]));
-			shader.setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
 			shader.setUniformMatrix4v("model", false, model.get(new float[16]));
-			if (entityManager.entityExists(camera.entityId())) {
-				Vector3f cameraPos = entityManager.getComponent(camera.entityId(), PositionComponent.class).position();
-				shader.setUniform3f("lightPos", cameraPos);
-			} else {
-				shader.setUniform3f("lightPos", new Vector3f());
-			}
 
 			MeshComponent meshComponent = entityManager.getComponent(entityId, MeshComponent.class);
 			for (SubMesh subMesh : meshComponent.subMeshes()) {
@@ -235,6 +249,7 @@ public final class Renderer {
 				subMesh.vao.bind();
 				glDrawElements(GL_TRIANGLES, subMesh.indexCount, GL_UNSIGNED_INT, 0);
 				subMesh.vao.unbind();
+				Texture.unbind();
 			}
 		}
 		shader.unbind();

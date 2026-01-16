@@ -9,5 +9,10 @@ public final class FloatBuffer extends Buffer {
 		super(target);
 		glBufferData(target, data, GL_STATIC_DRAW);
 	}
-	
+
+	public FloatBuffer(int target, float[] data, int usage) {
+		super(target);
+		glBufferData(target, data, usage);
+	}
+
 }
