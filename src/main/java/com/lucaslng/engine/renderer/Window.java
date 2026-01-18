@@ -2,6 +2,7 @@ package com.lucaslng.engine.renderer;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
+import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 
 import com.lucaslng.engine.EngineSettings;
@@ -24,6 +25,10 @@ public class Window {
 	public Window(EngineSettings engineSettings) {
 		framebufferSizeCallbacks = new ArrayList<>();
 
+		if (System.getProperty("os.name").startsWith("Mac")) {
+			Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
+		}
+
 		GLFWErrorCallback.createPrint(System.err).set();
 		if (!glfwInit()) {
 			throw new IllegalStateException("Unable to initialize GLFW");
@@ -40,7 +45,8 @@ public class Window {
 		glfwWindowHint(GLFW_SAMPLES, 4);
 
 		// create window
-		window = glfwCreateWindow(engineSettings.referenceDimension.width, engineSettings.referenceDimension.height, engineSettings.title,
+		window = glfwCreateWindow(engineSettings.referenceDimension.width, engineSettings.referenceDimension.height,
+				engineSettings.title,
 				NULL, NULL);
 		if (window == NULL) {
 			throw new RuntimeException("Failed to create the GLFW window");
@@ -95,7 +101,7 @@ public class Window {
 	public int w() {
 		return w;
 	}
-	
+
 	public int h() {
 		return h;
 	}
@@ -103,7 +109,7 @@ public class Window {
 	public boolean focused() {
 		return focused;
 	}
-	
+
 	public float scaleX() {
 		return scaleX;
 	}

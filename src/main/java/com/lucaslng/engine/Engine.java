@@ -4,7 +4,9 @@ import org.joml.Vector3f;
 import static org.lwjgl.glfw.GLFW.*;
 
 import java.awt.Font;
+import java.util.HashMap;
 
+import com.lucaslng.GameStates;
 import com.lucaslng.engine.components.HeadRotationComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.entities.Entity;
@@ -14,6 +16,7 @@ import com.lucaslng.engine.renderer.Window;
 import com.lucaslng.engine.ui.UIManager;
 
 public final class Engine {
+	
 	public final Renderer renderer;
 	public final Window window;
 	public final EngineSettings settings;
@@ -22,19 +25,21 @@ public final class Engine {
 	public final UIManager uiManager;
 	public final InputHandler inputHandler;
 
+	public GameStates gameState;
+
 	public Engine() {
 		System.out.println("Initializing engine...");
 		entityManager = new EntityManager();
 		settings = new EngineSettings();
+
 		fontAtlas = new FontAtlas();
 		fontAtlas.addFont(new Font("Arial", Font.PLAIN, 50));
 		fontAtlas.dispose();
+
 		window = new Window(settings);
 		inputHandler = new InputHandler(window);
 		uiManager = new UIManager(window, inputHandler);
 		renderer = new Renderer(settings, window, entityManager, uiManager, fontAtlas);
-		
-
 		
 		System.out.println("Engine initialized.");
 	}
@@ -62,9 +67,14 @@ public final class Engine {
 		setCamera(entityManager.getComponent(entity.id(), PositionComponent.class).position(),
 				entityManager.getComponent(entity.id(), HeadRotationComponent.class).rotation(), entity.id());
 	}
-	public void start(GameLoop gameLoop) {
-		gameLoop.init(this);
-		gameLoop.execute();
+	public void start(HashMap<GameStates, GameState> gameStates, GameStates startingGameState) {
+		gameState = startingGameState;
+		while (true) {
+			if (!gameStates.containsKey(gameState))
+				break;
+			gameStates.get(gameState).init(this);
+			gameState = gameStates.get(gameState).loop();
+		}
 	}
 
 	public void doLoop() {

@@ -1,16 +1,19 @@
 package com.lucaslng;
 
 import com.lucaslng.engine.Engine;
-import org.lwjgl.system.Configuration;
+import com.lucaslng.engine.GameState;
+
+import java.util.HashMap;
 
 public class App {
 	public static void main(String[] args) {
 
-        if (System.getProperty("os.name").startsWith("Mac")) {
-            Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
-        }
-
 		Engine engine = new Engine();
-		engine.start(new Game(engine));
+
+		HashMap<GameStates, GameState> gameStates = new HashMap<>();
+		gameStates.put(GameStates.PLAYING, new PlayingState(engine));
+		gameStates.put(GameStates.MAIN_MENU, new PlayingState(engine));
+
+		engine.start(gameStates, GameStates.PLAYING);
 	}
 }

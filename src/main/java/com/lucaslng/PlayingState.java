@@ -11,7 +11,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
 
 import com.lucaslng.engine.Engine;
-import com.lucaslng.engine.GameLoop;
+import com.lucaslng.engine.GameState;
 import com.lucaslng.engine.components.DeathsComponent;
 import com.lucaslng.engine.components.DisabledComponent;
 import com.lucaslng.engine.components.GroundedComponent;
@@ -32,7 +32,7 @@ import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.entities.CameraEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
 
-class Game extends GameLoop {
+class PlayingState extends GameState {
 	private Entity player1, player2, camera;
 	private Physics physics;
 	private Levels levels;
@@ -40,7 +40,7 @@ class Game extends GameLoop {
 	private Deaths deaths;
 	private LevelTransition transition;
 
-	public Game(Engine engine) {
+	public PlayingState(Engine engine) {
 		super(engine);
 	}
 
@@ -66,7 +66,7 @@ class Game extends GameLoop {
 	}
 
 	@Override
-	public void doLoop(Engine engine, double dt) {
+	public GameStates doLoop(Engine engine, double dt) {
 		float baseSpeed = 6f;
 		float speed = baseSpeed * (float) dt;
 
@@ -92,6 +92,8 @@ class Game extends GameLoop {
 
 		updateCamera(engine);
 		engine.renderer.setFadeAlpha(transition.getFadeAlpha());
+		
+		return GameStates.PLAYING;
 	}
 
 	private void performLevelChange (Engine engine) {
