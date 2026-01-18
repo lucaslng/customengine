@@ -12,4 +12,6 @@ public class EngineSettings {
 
 	public float sensitivity = 0.01f;
 
+	public boolean showFPS = true;
+
 }

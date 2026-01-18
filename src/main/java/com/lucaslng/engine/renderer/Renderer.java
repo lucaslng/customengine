@@ -118,7 +118,7 @@ public final class Renderer {
 		float[] uiOrtho = new Matrix4f().ortho(0f, window.w(), window.h(), 0f, -1f, 1f).get(new float[16]);
 
 		for (UIElement element : uiManager.elements) {
-			if (element instanceof Text text) {
+			if (element instanceof Text text && element.visible) {
 				float x = text.x * window.uiScale();
 				float y = text.y * window.uiScale();
 				// float width = text.width * window.uiScale();
@@ -154,7 +154,7 @@ public final class Renderer {
 		uiShader.setUniform4f("uColor", 1f, 0f, 0f, 1f);
 
 		for (UIElement element : uiManager.elements) {
-			if (element instanceof RectElement rectElement) {
+			if (element instanceof RectElement rectElement && element.visible) {
 				float x = rectElement.x * window.uiScale();
 				float y = rectElement.y * window.uiScale();
 				float width = rectElement.width * window.uiScale();

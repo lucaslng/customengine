@@ -5,9 +5,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class UIElement {
 
 	private static final AtomicInteger ID_GENERATOR = new AtomicInteger(0);
-	public float x, y, width, height;
 	public final XAlignment xAlignment;
 	public final YAlignment yAlignment;
+
+	public float x, y, width, height;
+	public boolean visible;
 
 	private final int id;
 
@@ -18,6 +20,7 @@ public class UIElement {
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		visible = true;
 		this.xAlignment = xAlignment;
 		this.yAlignment = yAlignment;
 	}
