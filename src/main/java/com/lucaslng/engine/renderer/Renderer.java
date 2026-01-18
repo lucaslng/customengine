@@ -17,23 +17,29 @@ import com.lucaslng.engine.ui.UIManager;
 import com.lucaslng.engine.utils.FileReader;
 
 public final class Renderer {
+	
+	private final static float[] defaultMatrix = new Matrix4f().get(new float[16]);
+	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
+
 	private final EngineSettings engineSettings;
 	private final EntityManager entityManager;
 	private final UIManager uiManager;
 	private final Window window;
-	private ShaderProgram shader, uiShader;
-	private HashMap<String, Material> materials;
+
 	private final Matrix4f projectionMatrix;
 	private final Camera camera;
-	private TextRenderer textRenderer;
-	private boolean isRendering;
-	private float fadeAlpha = 0f;
+
+	private final ShaderProgram shader, uiShader;
+	private final HashMap<String, Material> materials;
 	private final UIElement background;
 	private final Texture backgroundTexture;
-	private float[] matBuf = new float[16];
-	private final static float[] defaultMatrix = new Matrix4f().get(new float[16]);
+	
+	private final TextRenderer textRenderer;
 
-	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
+	private boolean isRendering;
+	private float fadeAlpha = 0f;
+	private float[] matBuf = new float[16];
+	
 
 	public Renderer(EngineSettings engineSettings, Window window, EntityManager entityManager, UIManager uiManager, FontAtlas fontAtlas) {
 		projectionMatrix = new Matrix4f();
