@@ -184,14 +184,14 @@ public final class Renderer {
 		float x = 100f * uiScale;
 		float y = 100f * uiScale;
 
-		float fontSize = 10f;
+		float fontSize = 8f;
 
 		Matrix4f model = new Matrix4f()
 					.translate(x, y, 0)
 					.scale(uiScale * fontSize, uiScale * fontSize, 1f);
 			model.get(matBuf);
 
-		textRenderer.renderText("Arial", "Hello World", uiOrtho, matBuf, new Vector4f());
+		textRenderer.renderText("Arial", "fgreathIIJq", uiOrtho, matBuf, new Vector4f());
 	}
 
 	private void renderUI() {
