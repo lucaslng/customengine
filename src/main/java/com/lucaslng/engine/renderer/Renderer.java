@@ -40,7 +40,7 @@ public final class Renderer {
 		this.engineSettings = engineSettings;
 		this.window = window;
 		window.addFramebufferSizeCallback((_window, w,  h) -> {
-				projectionMatrix.setPerspective(engineSettings.FOV, (float) w / h, 0.1f, engineSettings.Z_FAR);
+				frameBufferSizeCallback(_window, w, h);
 			}
 		);
 		this.entityManager = entityManager;
@@ -115,20 +115,17 @@ public final class Renderer {
 
 	private void renderText() {
 		glDisable(GL_DEPTH_TEST);
-		float scaleX = (float) window.w() / engineSettings.referenceDimension.width;
-		float scaleY = (float) window.h() / engineSettings.referenceDimension.height;
-		float uiScale = Math.min(scaleX, scaleY);
 
 		float[] uiOrtho = new Matrix4f().ortho(0f, window.w(), window.h(), 0f, -1f, 1f).get(new float[16]);
 
-		float x = 100f * uiScale;
-		float y = 100f * uiScale;
+		float x = 100f * window.uiScale();
+		float y = 100f * window.uiScale();
 
 		float fontSize = 8f;
 
 		Matrix4f model = new Matrix4f()
 					.translate(x, y, 0)
-					.scale(uiScale * fontSize, uiScale * fontSize, 1f);
+					.scale(window.uiScale() * fontSize, window.uiScale() * fontSize, 1f);
 			model.get(matBuf);
 
 		textRenderer.renderText("Arial", "fgreathIIJq", uiOrtho, matBuf, new Vector4f());
@@ -136,10 +133,6 @@ public final class Renderer {
 
 	private void renderUI() {
 		glDisable(GL_DEPTH_TEST);
-
-		float scaleX = (float) window.w() / engineSettings.referenceDimension.width;
-		float scaleY = (float) window.h() / engineSettings.referenceDimension.height;
-		float uiScale = Math.min(scaleX, scaleY);
 
 		uiShader.bind();
 
@@ -149,10 +142,10 @@ public final class Renderer {
 		uiShader.setUniform4f("uColor", 1f, 0f, 0f, 1f);
 
 		for (UIElement element : uiManager.elements) {
-			float x = element.x * uiScale;
-			float y = element.y * uiScale;
-			float width = element.width * uiScale;
-			float height = element.height * uiScale;
+			float x = element.x * window.uiScale();
+			float y = element.y * window.uiScale();
+			float width = element.width * window.uiScale();
+			float height = element.height * window.uiScale();
 			if (element.xAlignRight)
 				x = window.w() - width - x;
 			if (element.yAlignBottom)
@@ -243,6 +236,10 @@ public final class Renderer {
 		glDrawElements(GL_TRIANGLES, overlay.indexCount, GL_UNSIGNED_INT, 0);
 		overlay.vao.unbind();
 		uiShader.unbind();
+	}
+
+	public void frameBufferSizeCallback(long window, int w, int h) {
+		projectionMatrix.setPerspective(engineSettings.FOV, (float) w / h, 0.1f, engineSettings.Z_FAR);
 	}
 
 	public void setFadeAlpha(float alpha) {

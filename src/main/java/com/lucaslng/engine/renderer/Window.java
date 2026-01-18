@@ -16,6 +16,7 @@ public class Window {
 
 	public final long window;
 	private int w, h;
+	private float uiScale;
 	private final ArrayList<FramebufferSizeCallback> framebufferSizeCallbacks;
 
 	public Window(EngineSettings engineSettings) {
@@ -50,6 +51,9 @@ public class Window {
 			for (FramebufferSizeCallback callback : framebufferSizeCallbacks) {
 				callback.execute(window, w, h);
 			}
+			float scaleX = (float) w / engineSettings.referenceDimension.width;
+			float scaleY = (float) h / engineSettings.referenceDimension.height;
+			uiScale = Math.min(scaleX, scaleY);
 		});
 
 		glfwMakeContextCurrent(window);
@@ -64,6 +68,9 @@ public class Window {
 			this.w = w.get(0);
 			this.h = h.get(0);
 		}
+		float scaleX = (float) w / engineSettings.referenceDimension.width;
+		float scaleY = (float) h / engineSettings.referenceDimension.height;
+		uiScale = Math.min(scaleX, scaleY);
 
 	}
 
@@ -90,5 +97,9 @@ public class Window {
 	
 	public int h() {
 		return h;
+	}
+
+	public float uiScale() {
+		return uiScale;
 	}
 }
