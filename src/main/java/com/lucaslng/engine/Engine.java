@@ -10,10 +10,12 @@ import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.renderer.FontAtlas;
 import com.lucaslng.engine.renderer.Renderer;
+import com.lucaslng.engine.renderer.Window;
 import com.lucaslng.engine.ui.UIManager;
 
 public final class Engine {
 	public final Renderer renderer;
+	public final Window window;
 	public final EngineSettings settings;
 	public final EntityManager entityManager;
 	public final FontAtlas fontAtlas;
@@ -23,13 +25,15 @@ public final class Engine {
 	public Engine() {
 		System.out.println("Initializing engine...");
 		entityManager = new EntityManager();
-		uiManager = new UIManager();
 		settings = new EngineSettings();
 		fontAtlas = new FontAtlas();
 		fontAtlas.addFont(new Font("Arial", Font.PLAIN, 50));
 		fontAtlas.dispose();
-		renderer = new Renderer(settings, entityManager, uiManager, fontAtlas);
-		keyHandler = new KeyHandler(renderer.getWindow());
+		window = new Window(settings);
+		uiManager = new UIManager(window);
+		renderer = new Renderer(settings, window, entityManager, uiManager, fontAtlas);
+		keyHandler = new KeyHandler(window.window);
+
 		
 		System.out.println("Engine initialized.");
 	}
@@ -43,7 +47,7 @@ public final class Engine {
 		mouseHandler.setRotation(rotation);
 		
 		// Setup mouse callback
-		glfwSetCursorPosCallback(renderer.getWindow(), (window, xpos, ypos) -> {
+		glfwSetCursorPosCallback(window.window, (window, xpos, ypos) -> {
 			mouseHandler.mouseMoved(xpos, ypos);
 		});
 	}
@@ -68,15 +72,15 @@ public final class Engine {
 		}
 	}
 
-	public int width() {
-		return renderer.getFramebufferWidth();
+	public int w() {
+		return window.w();
 	}
 
-	public int height() {
-		return renderer.getFramebufferHeight();
+	public int h() {
+		return window.h();
 	}
 
 	public boolean shouldClose() {
-		return renderer.shouldClose();
+		return window.shouldClose();
 	}
 }

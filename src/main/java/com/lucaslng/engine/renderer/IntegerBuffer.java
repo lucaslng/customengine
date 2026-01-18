@@ -9,13 +9,17 @@ import java.nio.IntBuffer;
 public final class IntegerBuffer extends Buffer {
 
 	public IntegerBuffer(int target, int[] data) {
-		super(target);
-		glBufferData(target, data, GL_STATIC_DRAW);
+		this(target, data, GL_STATIC_DRAW);
 	}
 
 	public IntegerBuffer(int target, int[] data, int usage) {
 		super(target);
 		glBufferData(target, data, usage);
+	}
+
+	public IntegerBuffer(int target, long size, int usage) {
+		super(target);
+		glBufferData(target, size, usage);
 	}
 	
 	public void updateData(int[] data) {

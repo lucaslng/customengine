@@ -1,6 +1,5 @@
 package com.lucaslng.engine.renderer;
 
-import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
@@ -8,13 +7,8 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
-import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11C.*;
-import org.lwjgl.system.MemoryStack;
-import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.MemoryUtil.NULL;
-
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.*;
@@ -26,16 +20,13 @@ public final class Renderer {
 	private final EngineSettings engineSettings;
 	private final EntityManager entityManager;
 	private final UIManager uiManager;
+	private final Window window;
 	private ShaderProgram shader, uiShader;
 	private HashMap<String, Material> materials;
 	private final Matrix4f projectionMatrix;
 	private final Camera camera;
 	private TextRenderer textRenderer;
-	private final FontAtlas fontAtlas;
-	private float aspectRatio;
 	private boolean isRendering;
-	private long window;
-	private int framebufferWidth, framebufferHeight;
 	private float fadeAlpha = 0f;
 	private final UIElement background;
 	private final Texture backgroundTexture;
@@ -44,112 +35,61 @@ public final class Renderer {
 
 	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
 
-	public Renderer(EngineSettings engineSettings, EntityManager entityManager, UIManager uiManager, FontAtlas fontAtlas) {
+	public Renderer(EngineSettings engineSettings, Window window, EntityManager entityManager, UIManager uiManager, FontAtlas fontAtlas) {
+		projectionMatrix = new Matrix4f();
 		this.engineSettings = engineSettings;
+		this.window = window;
+		window.addFramebufferSizeCallback((_window, w,  h) -> {
+				projectionMatrix.setPerspective(engineSettings.FOV, (float) w / h, 0.1f, engineSettings.Z_FAR);
+			}
+		);
 		this.entityManager = entityManager;
 		this.uiManager = uiManager;
-		this.fontAtlas = fontAtlas;
-		projectionMatrix = new Matrix4f();
+		
 		camera = new Camera();
 		isRendering = false;
-		initWindow();
-		background = new UIElement(0f, 0f, 1f, 1f, false, false);
-		backgroundTexture = new Texture(FileReader.readImage("background.jpg"));
-	}
 
-	private void initWindow() {
-		GLFWErrorCallback.createPrint(System.err).set();
-
-		if (!glfwInit()) {
-			throw new IllegalStateException("Unable to initialize GLFW");
-		}
-
-		// configure GLFW
-		glfwDefaultWindowHints();
-		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-		glfwWindowHint(GLFW_SAMPLES, 4);
-
-		// create window
-		window = glfwCreateWindow(engineSettings.referenceDimension.width, engineSettings.referenceDimension.height, engineSettings.title,
-				NULL, NULL);
-		if (window == NULL) {
-			throw new RuntimeException("Failed to create the GLFW window");
-		}
-		System.out.println("GLFW window created successfully");
-
-		glfwSetFramebufferSizeCallback(window, (window, w, h) -> {
-			framebufferWidth = w;
-			framebufferHeight = h;
-			setAspectRatio();
-		});
-
-		glfwMakeContextCurrent(window);
-		glfwSwapInterval(1); // vsync
-		glfwShowWindow(window); // makes window visible
-		initGL();
-	}
-
-	public void initGL() {
 		System.out.println("Initializing OpenGL...");
 		GL.createCapabilities();
 
-		String vendor = glGetString(GL_VENDOR);
-		String renderer = glGetString(GL_RENDERER);
-		String version = glGetString(GL_VERSION);
-
-		System.out.println("OpenGL Vendor  : " + vendor);
-		System.out.println("OpenGL Renderer: " + renderer);
-		System.out.println("OpenGL Version : " + version);
-
-		// get initial framebuffer size
-		try (MemoryStack stack = stackPush()) {
-			IntBuffer w = stack.mallocInt(1);
-			IntBuffer h = stack.mallocInt(1);
-			glfwGetFramebufferSize(window, w, h);
-			framebufferWidth = w.get(0);
-			framebufferHeight = h.get(0);
-		}
-
-		shader = new ShaderProgram("vertex.glsl", "fragment.glsl");
-		shader.compileShader();
-		uiShader = new ShaderProgram("ui-vertex.glsl", "ui-fragment.glsl");
-		uiShader.compileShader();
-
-		materials = Materials.createMaterials();
-
-		textRenderer = new TextRenderer(fontAtlas);
+		System.out.println("OpenGL Vendor  : " + glGetString(GL_VENDOR));
+		System.out.println("OpenGL Renderer: " + glGetString(GL_RENDERER));
+		System.out.println("OpenGL Version : " + glGetString(GL_VERSION));
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClearColor(0.8f, 0.7f, 0.6f, 1.0f);
 
-		setAspectRatio();
 		checkErrors();
 		System.out.println("OpenGL initialized successfully.");
+
+		projectionMatrix.setPerspective(engineSettings.FOV, (float) window.w() / window.h(), 0.1f, engineSettings.Z_FAR);
+		background = new UIElement(0f, 0f, 1f, 1f, false, false);
+		backgroundTexture = new Texture(FileReader.readImage("background.jpg"));
+		shader = new ShaderProgram("vertex.glsl", "fragment.glsl");
+		shader.compileShader();
+		uiShader = new ShaderProgram("ui-vertex.glsl", "ui-fragment.glsl");
+		uiShader.compileShader();
+		materials = Materials.createMaterials();
+		textRenderer = new TextRenderer(fontAtlas);
 	}
 
 	public void render() {
 		isRendering = true;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glViewport(0, 0, framebufferWidth, framebufferHeight);
+		glViewport(0, 0, window.w(), window.h());
 
 		renderBackground();
 		renderGame();
 
-		if (fadeAlpha > 0f) {
+		if (fadeAlpha > 0f)
 			renderFadeOverlay();
-		}
 
 		renderUI();
 
 		renderText();
 
-		glfwSwapBuffers(window);
+		window.swapBuffers();
 		glfwPollEvents();
 		isRendering = false;
 	}
@@ -175,11 +115,11 @@ public final class Renderer {
 
 	private void renderText() {
 		glDisable(GL_DEPTH_TEST);
-		float scaleX = (float) framebufferWidth / engineSettings.referenceDimension.width;
-		float scaleY = (float) framebufferHeight / engineSettings.referenceDimension.height;
+		float scaleX = (float) window.w() / engineSettings.referenceDimension.width;
+		float scaleY = (float) window.h() / engineSettings.referenceDimension.height;
 		float uiScale = Math.min(scaleX, scaleY);
 
-		float[] uiOrtho = new Matrix4f().ortho(0f, framebufferWidth, framebufferHeight, 0f, -1f, 1f).get(new float[16]);
+		float[] uiOrtho = new Matrix4f().ortho(0f, window.w(), window.h(), 0f, -1f, 1f).get(new float[16]);
 
 		float x = 100f * uiScale;
 		float y = 100f * uiScale;
@@ -197,13 +137,13 @@ public final class Renderer {
 	private void renderUI() {
 		glDisable(GL_DEPTH_TEST);
 
-		float scaleX = (float) framebufferWidth / engineSettings.referenceDimension.width;
-		float scaleY = (float) framebufferHeight / engineSettings.referenceDimension.height;
+		float scaleX = (float) window.w() / engineSettings.referenceDimension.width;
+		float scaleY = (float) window.h() / engineSettings.referenceDimension.height;
 		float uiScale = Math.min(scaleX, scaleY);
 
 		uiShader.bind();
 
-		float[] uiOrtho = new Matrix4f().ortho(0f, framebufferWidth, framebufferHeight, 0f, -1f, 1f).get(new float[16]);
+		float[] uiOrtho = new Matrix4f().ortho(0f, window.w(), window.h(), 0f, -1f, 1f).get(new float[16]);
 		uiShader.setUniformMatrix4v("ortho", false, uiOrtho);
 		uiShader.setUniform1i("uUseTexture", 0);
 		uiShader.setUniform4f("uColor", 1f, 0f, 0f, 1f);
@@ -214,9 +154,9 @@ public final class Renderer {
 			float width = element.width * uiScale;
 			float height = element.height * uiScale;
 			if (element.xAlignRight)
-				x = framebufferWidth - width - x;
+				x = window.w() - width - x;
 			if (element.yAlignBottom)
-				y = framebufferHeight - height - y;
+				y = window.h() - height - y;
 			Matrix4f model = new Matrix4f()
 					.translate(x, y, 0)
 					.scale(width, height, 1f);
@@ -325,11 +265,6 @@ public final class Renderer {
 		return glGetInteger(GL_POLYGON_MODE) == GL_LINE;
 	}
 
-	private void setAspectRatio() {
-		aspectRatio = (float) framebufferWidth / framebufferHeight;
-		projectionMatrix.setPerspective(engineSettings.FOV, aspectRatio, 0.1f, engineSettings.Z_FAR);
-	}
-
 	protected static void checkErrors() {
 		int error;
 		boolean errored = false;
@@ -342,21 +277,5 @@ public final class Renderer {
 
 	public boolean isRendering() {
 		return isRendering;
-	}
-
-	public long getWindow() {
-		return window;
-	}
-
-	public int getFramebufferWidth() {
-		return framebufferWidth;
-	}
-
-	public int getFramebufferHeight() {
-		return framebufferHeight;
-	}
-
-	public boolean shouldClose() {
-		return glfwWindowShouldClose(window);
 	}
 }
