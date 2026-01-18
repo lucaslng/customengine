@@ -1,9 +1,7 @@
 package com.lucaslng.engine.renderer;
 
 import static org.lwjgl.opengl.GL11C.GL_ZERO;
-import static org.lwjgl.opengl.GL15C.glBindBuffer;
-import static org.lwjgl.opengl.GL15C.glDeleteBuffers;
-import static org.lwjgl.opengl.GL15C.glGenBuffers;
+import static org.lwjgl.opengl.GL15C.*;
 
 abstract class Buffer {
 

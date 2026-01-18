@@ -3,9 +3,12 @@ package com.lucaslng.engine;
 import org.joml.Vector3f;
 import static org.lwjgl.glfw.GLFW.*;
 
+import java.awt.Font;
+
 import com.lucaslng.engine.components.HeadRotationComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.entities.Entity;
+import com.lucaslng.engine.renderer.FontAtlas;
 import com.lucaslng.engine.renderer.Renderer;
 import com.lucaslng.engine.ui.UIManager;
 
@@ -13,6 +16,7 @@ public final class Engine {
 	public final Renderer renderer;
 	public final EngineSettings settings;
 	public final EntityManager entityManager;
+	public final FontAtlas fontAtlas;
 	public final UIManager uiManager;
 	public final KeyHandler keyHandler;
 
@@ -21,7 +25,10 @@ public final class Engine {
 		entityManager = new EntityManager();
 		uiManager = new UIManager();
 		settings = new EngineSettings();
-		renderer = new Renderer(settings, entityManager, uiManager);
+		fontAtlas = new FontAtlas();
+		fontAtlas.addFont(new Font("Arial", Font.PLAIN, 30));
+		fontAtlas.dispose();
+		renderer = new Renderer(settings, entityManager, uiManager, fontAtlas);
 		keyHandler = new KeyHandler(renderer.getWindow());
 		
 		System.out.println("Engine initialized.");
@@ -62,11 +69,11 @@ public final class Engine {
 	}
 
 	public int width() {
-		return renderer.getWidth();
+		return renderer.getFramebufferWidth();
 	}
 
 	public int height() {
-		return renderer.getHeight();
+		return renderer.getFramebufferHeight();
 	}
 
 	public boolean shouldClose() {

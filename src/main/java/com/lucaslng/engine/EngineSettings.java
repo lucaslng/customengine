@@ -4,7 +4,7 @@ import java.awt.Dimension;
 
 public class EngineSettings {
 	public String title = "Custom Engine";
-	public Dimension windowSize = new Dimension(800, 600);
+	public Dimension referenceDimension = new Dimension(1920, 1080);
 
 	public float FOV = (float) Math.toRadians(90.0f);
 

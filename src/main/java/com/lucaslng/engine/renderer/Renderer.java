@@ -1,61 +1,18 @@
 package com.lucaslng.engine.renderer;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MAJOR;
-import static org.lwjgl.glfw.GLFW.GLFW_CONTEXT_VERSION_MINOR;
-import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_CORE_PROFILE;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_FORWARD_COMPAT;
-import static org.lwjgl.glfw.GLFW.GLFW_OPENGL_PROFILE;
-import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
-import static org.lwjgl.glfw.GLFW.GLFW_SAMPLES;
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
-import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
-import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
-import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
-import static org.lwjgl.glfw.GLFW.glfwGetFramebufferSize;
-import static org.lwjgl.glfw.GLFW.glfwInit;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSetFramebufferSizeCallback;
-import static org.lwjgl.glfw.GLFW.glfwShowWindow;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
-import static org.lwjgl.glfw.GLFW.glfwWindowHint;
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import org.joml.Vector4f;
+
+import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-import static org.lwjgl.opengl.GL11C.GL_BLEND;
-import static org.lwjgl.opengl.GL11C.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11C.GL_FILL;
-import static org.lwjgl.opengl.GL11C.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11C.GL_LINE;
-import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11C.GL_POLYGON_MODE;
-import static org.lwjgl.opengl.GL11C.GL_RENDERER;
-import static org.lwjgl.opengl.GL11C.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11C.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11C.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11C.GL_VENDOR;
-import static org.lwjgl.opengl.GL11C.GL_VERSION;
-import static org.lwjgl.opengl.GL11C.GL_ZERO;
-import static org.lwjgl.opengl.GL11C.glBlendFunc;
-import static org.lwjgl.opengl.GL11C.glClear;
-import static org.lwjgl.opengl.GL11C.glClearColor;
-import static org.lwjgl.opengl.GL11C.glDisable;
-import static org.lwjgl.opengl.GL11C.glDrawElements;
-import static org.lwjgl.opengl.GL11C.glEnable;
-import static org.lwjgl.opengl.GL11C.glGetError;
-import static org.lwjgl.opengl.GL11C.glGetInteger;
-import static org.lwjgl.opengl.GL11C.glGetString;
-import static org.lwjgl.opengl.GL11C.glPolygonMode;
-import static org.lwjgl.opengl.GL11C.glViewport;
+import static org.lwjgl.opengl.GL11C.*;
 import org.lwjgl.system.MemoryStack;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -74,21 +31,22 @@ public final class Renderer {
 	private HashMap<String, Material> materials;
 	private final Matrix4f projectionMatrix;
 	private final Camera camera;
+	private TextRenderer textRenderer;
+	private final FontAtlas fontAtlas;
 	private float aspectRatio;
 	private boolean isRendering;
 	private long window;
-	private int width, height;
 	private int framebufferWidth, framebufferHeight;
 	private float fadeAlpha = 0f;
+	private float[] matBuf = new float[16];
 
 	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
 
-	public Renderer(EngineSettings engineSettings, EntityManager entityManager, UIManager uiManager) {
+	public Renderer(EngineSettings engineSettings, EntityManager entityManager, UIManager uiManager, FontAtlas fontAtlas) {
 		this.engineSettings = engineSettings;
 		this.entityManager = entityManager;
 		this.uiManager = uiManager;
-		this.width = engineSettings.windowSize.width;
-		this.height = engineSettings.windowSize.height;
+		this.fontAtlas = fontAtlas;
 		projectionMatrix = new Matrix4f();
 		camera = new Camera();
 		isRendering = false;
@@ -113,7 +71,8 @@ public final class Renderer {
 		glfwWindowHint(GLFW_SAMPLES, 4);
 
 		// create window
-		window = glfwCreateWindow(width, height, engineSettings.title, NULL, NULL);
+		window = glfwCreateWindow(engineSettings.referenceDimension.width, engineSettings.referenceDimension.height, engineSettings.title,
+				NULL, NULL);
 		if (window == NULL) {
 			throw new RuntimeException("Failed to create the GLFW window");
 		}
@@ -159,6 +118,8 @@ public final class Renderer {
 
 		materials = Materials.createMaterials();
 
+		textRenderer = new TextRenderer(fontAtlas);
+
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClearColor(0.8f, 0.7f, 0.6f, 1.0f);
@@ -182,19 +143,60 @@ public final class Renderer {
 
 		renderUI();
 
+		renderText();
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		isRendering = false;
 	}
 
+	private void renderText() {
+		glDisable(GL_DEPTH_TEST);
+		float scaleX = (float) framebufferWidth / engineSettings.referenceDimension.width;
+		float scaleY = (float) framebufferHeight / engineSettings.referenceDimension.height;
+		float uiScale = Math.min(scaleX, scaleY);
+
+		float[] uiOrtho = new Matrix4f().ortho(0f, framebufferWidth, framebufferHeight, 0f, -1f, 1f).get(new float[16]);
+
+		float x = 100f * uiScale;
+		float y = 100f * uiScale;
+
+		Matrix4f model = new Matrix4f()
+					.translate(x, y, 0)
+					.scale(uiScale * 10f, uiScale * 10f, 1f);
+			model.get(matBuf);
+
+		textRenderer.renderText("Arial", "Hello World", uiOrtho, matBuf, new Vector4f());
+	}
+
 	private void renderUI() {
 		glDisable(GL_DEPTH_TEST);
+
+		float scaleX = (float) framebufferWidth / engineSettings.referenceDimension.width;
+		float scaleY = (float) framebufferHeight / engineSettings.referenceDimension.height;
+		float uiScale = Math.min(scaleX, scaleY);
+
 		uiShader.bind();
-		uiShader.setUniformMatrix4v("ortho", false, ortho);
+
+		float[] uiOrtho = new Matrix4f().ortho(0f, framebufferWidth, framebufferHeight, 0f, -1f, 1f).get(new float[16]);
+		uiShader.setUniformMatrix4v("ortho", false, uiOrtho);
 		uiShader.setUniform1i("uUseTexture", 0);
 		uiShader.setUniform4f("uColor", 1f, 0f, 0f, 1f);
 
 		for (UIElement element : uiManager.elements) {
+			float x = element.x * uiScale;
+			float y = element.y * uiScale;
+			float width = element.width * uiScale;
+			float height = element.height * uiScale;
+			if (element.xAlignRight)
+				x = framebufferWidth - width - x;
+			if (element.yAlignBottom)
+				y = framebufferHeight - height - y;
+			Matrix4f model = new Matrix4f()
+					.translate(x, y, 0)
+					.scale(width, height, 1f);
+			model.get(matBuf);
+			uiShader.setUniformMatrix4v("model", false, model.get(matBuf));
 			element.vao.bind();
 			glDrawElements(GL_TRIANGLES, UIElement.indexCount, GL_UNSIGNED_INT, 0);
 			element.vao.unbind();
@@ -207,9 +209,11 @@ public final class Renderer {
 		glEnable(GL_DEPTH_TEST);
 		shader.bind();
 
+		projectionMatrix.get(matBuf);
 		shader.setUniformMatrix4v("projection", false,
-				projectionMatrix.get(new float[16]));
-		shader.setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
+				matBuf);
+		camera.matrix().get(matBuf);
+		shader.setUniformMatrix4v("view", false, matBuf);
 		if (entityManager.entityExists(camera.entityId())) {
 			Vector3f cameraPos = entityManager.getComponent(camera.entityId(), PositionComponent.class).position();
 			shader.setUniform3f("lightPos", cameraPos);
@@ -230,7 +234,8 @@ public final class Renderer {
 				model.rotateXYZ(rotation);
 			}
 
-			shader.setUniformMatrix4v("model", false, model.get(new float[16]));
+			model.get(matBuf);
+			shader.setUniformMatrix4v("model", false, matBuf);
 
 			MeshComponent meshComponent = entityManager.getComponent(entityId, MeshComponent.class);
 			for (SubMesh subMesh : meshComponent.subMeshes()) {
@@ -304,7 +309,7 @@ public final class Renderer {
 		int error;
 		boolean errored = false;
 		while ((error = glGetError()) != GL_ZERO) {
-			System.err.println("OpenGL error: " + error);
+			System.err.println("OpenGL ERROR: " + error);
 			errored = true;
 		}
 		assert !errored;
@@ -316,14 +321,6 @@ public final class Renderer {
 
 	public long getWindow() {
 		return window;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
 	}
 
 	public int getFramebufferWidth() {

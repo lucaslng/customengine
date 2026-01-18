@@ -10,5 +10,5 @@ out vec2 vUV;
 
 void main() {
   gl_Position = ortho * model * vec4(aPos, 0.0, 1.0);
-	vUV = aUV;
+	vUV = aUV / vec2(2000, 200);
 }

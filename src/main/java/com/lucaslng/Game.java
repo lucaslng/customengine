@@ -58,7 +58,7 @@ class Game extends GameLoop {
 		deaths = new Deaths(engine.entityManager, player1, player2, exits);
 		transition = new LevelTransition();
 
-		engine.uiManager.elements.add(new UIElement(0.1f, 0.1f, 0.1f, 0.1f));
+		engine.uiManager.elements.add(new UIElement(10f, 10f, 200f, 300f, true, true));
 	}
 
 	@Override

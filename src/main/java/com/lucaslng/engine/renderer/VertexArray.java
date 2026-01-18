@@ -20,8 +20,6 @@ public class VertexArray {
 	}
 
 	public void addBuffer(Buffer vb, BufferLayout layout) {
-		bind();
-		vb.bind();
 		ArrayList<VertexBufferElement> elements = layout.elements();
 		int offset = 0;
 		for (int j=i;j<i+elements.size();j++) {
@@ -34,8 +32,6 @@ public class VertexArray {
 	}
 
 	public void addBuffer(Buffer vb, VertexBufferElement element) {
-		bind();
-		vb.bind();
 		glEnableVertexAttribArray(i);
 		glVertexAttribPointer(i, element.count(), element.type(), element.normalized(), element.size() * element.count(), 0);
 		i++;
