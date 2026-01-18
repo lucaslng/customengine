@@ -43,18 +43,4 @@ public class FileReader {
 		}
 	}
 
-	public static List<String> readLines(String path) {
-		List<String> lines = Collections.emptyList();
-
-		try {
-			lines = Files.readAllLines(
-					Paths.get("src/main/resources/" + path),
-					StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to load file: " + path, e);
-		}
-
-		return lines;
-	}
-
 }

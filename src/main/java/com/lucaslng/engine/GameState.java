@@ -23,7 +23,7 @@ public abstract class GameState {
 	// constructor executes only once, when the entire game initializes
 	public GameState(Engine engine) {
 		this.engine = engine;
-		uiManager = new UIManager(engine.window, engine.inputHandler);
+		uiManager = new UIManager(engine.settings, engine.window, engine.inputHandler);
 		entityManager = new EntityManager();
 		System.out.println("Starting game loop...");
 		lastFpsTime = System.currentTimeMillis();

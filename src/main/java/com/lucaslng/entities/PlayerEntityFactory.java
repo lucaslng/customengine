@@ -6,13 +6,12 @@ import org.joml.Vector3f;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.renderer.*;
-import com.lucaslng.engine.utils.FileReader;
 
 public class PlayerEntityFactory implements AbstractEntityFactory {
 
 	private final Vector3f position;
 	private static final ParsedObj parsedObject = ModelParser
-			.parseObj(FileReader.readLines("models/model.obj"));
+			.parseObj("model");
 	private final MeshComponent meshComponent;
 
 	public PlayerEntityFactory(Vector2f xy) {

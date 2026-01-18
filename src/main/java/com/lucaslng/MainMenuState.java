@@ -17,8 +17,12 @@ public class MainMenuState extends GameState {
 		switchGameState = GameStates.MAIN_MENU;
 
 		// x ignored due to center alignment
-		playButton = new Button(0, 300f, 600f, 250f, XAlignment.RIGHT, YAlignment.TOP);
-		playButton.addOperation(() -> switchGameState = GameStates.PLAYING);
+		playButton = new Button(0, 300f, 600f, 250f, XAlignment.CENTER, YAlignment.TOP);
+		playButton.addOperation(() -> {
+			engine.soundHandler.play("click");
+			 switchGameState = GameStates.PLAYING;
+			}
+			);
 		uiManager.elements.add(playButton);
 
 	}

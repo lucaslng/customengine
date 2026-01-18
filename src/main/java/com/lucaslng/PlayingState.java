@@ -20,8 +20,6 @@ import com.lucaslng.engine.systems.Exits;
 import com.lucaslng.engine.systems.LevelTransition;
 import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
-import com.lucaslng.engine.ui.Button;
-import com.lucaslng.engine.ui.XAlignment;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.entities.CameraEntityFactory;
