@@ -16,7 +16,7 @@ import com.lucaslng.engine.ui.*;
 import com.lucaslng.engine.utils.FileReader;
 
 public final class Renderer {
-	
+
 	private final static float[] defaultMatrix = new Matrix4f().get(new float[16]);
 	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
 
@@ -28,25 +28,23 @@ public final class Renderer {
 
 	private final ShaderProgram shader, uiShader;
 	private final HashMap<String, Material> materials;
-	private final UIElement background;
+	private final RectElement background;
 	private final Texture backgroundTexture;
-	
+
 	private final TextRenderer textRenderer;
 
 	private boolean isRendering;
 	private float fadeAlpha = 0f;
 	private float[] matBuf = new float[16];
-	
 
 	public Renderer(EngineSettings engineSettings, Window window, FontAtlas fontAtlas) {
 		projectionMatrix = new Matrix4f();
 		this.engineSettings = engineSettings;
 		this.window = window;
-		window.addFramebufferSizeCallback((_window, w,  h) -> {
-				frameBufferSizeCallback(_window, w, h);
-			}
-		);
-		
+		window.addFramebufferSizeCallback((_window, w, h) -> {
+			frameBufferSizeCallback(_window, w, h);
+		});
+
 		camera = new Camera();
 		isRendering = false;
 
@@ -65,7 +63,7 @@ public final class Renderer {
 		System.out.println("OpenGL initialized successfully.");
 
 		projectionMatrix.setPerspective(engineSettings.FOV, (float) window.w() / window.h(), 0.1f, engineSettings.Z_FAR);
-		background = new UIElement(0f, 0f, 1f, 1f, XAlignment.LEFT, YAlignment.TOP);
+		background = new RectElement(0f, 0f, 1f, 1f, XAlignment.LEFT, YAlignment.TOP);
 		backgroundTexture = new Texture(FileReader.readImage("background.jpg"));
 		shader = new ShaderProgram("vertex.glsl", "fragment.glsl");
 		shader.compileShader();
@@ -88,7 +86,7 @@ public final class Renderer {
 
 		renderUI(uiManager);
 
-		renderText();
+		renderText(uiManager);
 
 		window.swapBuffers();
 		glfwPollEvents();
@@ -106,7 +104,7 @@ public final class Renderer {
 		backgroundTexture.bind(0);
 
 		background.vao.bind();
-		glDrawElements(GL_TRIANGLES, UIElement.indexCount, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, RectElement.indexCount, GL_UNSIGNED_INT, 0);
 		background.vao.unbind();
 		Texture.unbind();
 
@@ -114,22 +112,35 @@ public final class Renderer {
 		glDepthMask(true);
 	}
 
-	private void renderText() {
+	private void renderText(UIManager uiManager) {
 		glDisable(GL_DEPTH_TEST);
 
 		float[] uiOrtho = new Matrix4f().ortho(0f, window.w(), window.h(), 0f, -1f, 1f).get(new float[16]);
 
-		float x = 100f * window.uiScale();
-		float y = 100f * window.uiScale();
+		for (UIElement element : uiManager.elements) {
+			if (element instanceof Text text) {
+				float x = text.x * window.uiScale();
+				float y = text.y * window.uiScale();
+				// float width = text.width * window.uiScale();
+				// float height = text.height * window.uiScale();
+				if (text.xAlignment == XAlignment.CENTER)
+					x += window.w() / 2; // - width / 2f;
+				else if (text.xAlignment == XAlignment.RIGHT)
+					x = window.w() - x; // - width
+				if (text.yAlignment == YAlignment.CENTER)
+					y += window.h() / 2; // - height / 2f;
+				else if (text.yAlignment == YAlignment.BOTTOM)
+					y = window.h() - y; // - height
 
-		float fontSize = 8f;
+				Matrix4f model = new Matrix4f()
+						.translate(x, y, 0)
+						.scale(window.uiScale() * text.textStyle.fontSize, window.uiScale() * text.textStyle.fontSize, 1f);
+				model.get(matBuf);
 
-		Matrix4f model = new Matrix4f()
-					.translate(x, y, 0)
-					.scale(window.uiScale() * fontSize, window.uiScale() * fontSize, 1f);
-			model.get(matBuf);
+				textRenderer.renderText(text.textStyle.family, text.text, uiOrtho, matBuf, new Vector4f());
+			}
+		}
 
-		textRenderer.renderText("Arial", "fgreathIIJq", uiOrtho, matBuf, new Vector4f());
 	}
 
 	private void renderUI(UIManager uiManager) {
@@ -143,26 +154,28 @@ public final class Renderer {
 		uiShader.setUniform4f("uColor", 1f, 0f, 0f, 1f);
 
 		for (UIElement element : uiManager.elements) {
-			float x = element.x * window.uiScale();
-			float y = element.y * window.uiScale();
-			float width = element.width * window.uiScale();
-			float height = element.height * window.uiScale();
-			if (element.xAlignment == XAlignment.CENTER)
-				x = window.w() / 2 - width / 2f;
-			else if (element.xAlignment == XAlignment.RIGHT)
-				x = window.w() - width - x;
-			if (element.yAlignment == YAlignment.CENTER)
-				y = window.h() / 2 - height / 2f;
-			else if (element.yAlignment == YAlignment.BOTTOM)
-				y = window.h() - height - y;
-			Matrix4f model = new Matrix4f()
-					.translate(x, y, 0)
-					.scale(width, height, 1f);
-			model.get(matBuf);
-			uiShader.setUniformMatrix4v("model", false, model.get(matBuf));
-			element.vao.bind();
-			glDrawElements(GL_TRIANGLES, UIElement.indexCount, GL_UNSIGNED_INT, 0);
-			element.vao.unbind();
+			if (element instanceof RectElement rectElement) {
+				float x = rectElement.x * window.uiScale();
+				float y = rectElement.y * window.uiScale();
+				float width = rectElement.width * window.uiScale();
+				float height = rectElement.height * window.uiScale();
+				if (rectElement.xAlignment == XAlignment.CENTER)
+					x += window.w() / 2 - width / 2f;
+				else if (rectElement.xAlignment == XAlignment.RIGHT)
+					x = window.w() - width - x;
+				if (rectElement.yAlignment == YAlignment.CENTER)
+					y += window.h() / 2 - height / 2f;
+				else if (rectElement.yAlignment == YAlignment.BOTTOM)
+					y = window.h() - height - y;
+				Matrix4f model = new Matrix4f()
+						.translate(x, y, 0)
+						.scale(width, height, 1f);
+				model.get(matBuf);
+				uiShader.setUniformMatrix4v("model", false, model.get(matBuf));
+				rectElement.vao.bind();
+				glDrawElements(GL_TRIANGLES, RectElement.indexCount, GL_UNSIGNED_INT, 0);
+				rectElement.vao.unbind();
+			}
 		}
 
 		uiShader.unbind();

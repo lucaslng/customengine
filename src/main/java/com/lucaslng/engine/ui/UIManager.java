@@ -33,12 +33,12 @@ public class UIManager {
 				float x = button.x;
 				float y = button.y;
 				if (button.xAlignment == XAlignment.CENTER)
-					x = engineSettings.referenceDimension.width / 2 - button.width / 2f;
+					x += engineSettings.referenceDimension.width / 2 - button.width / 2f;
 				else if (button.xAlignment == XAlignment.RIGHT) {
 					x = engineSettings.referenceDimension.width - x - button.width;
 				}
 				if (button.yAlignment == YAlignment.CENTER)
-					y = engineSettings.referenceDimension.height / 2 - button.height / 2f;
+					y += engineSettings.referenceDimension.height / 2 - button.height / 2f;
 				else if (button.yAlignment == YAlignment.BOTTOM) {
 					y = engineSettings.referenceDimension.height - y - button.height;
 				}

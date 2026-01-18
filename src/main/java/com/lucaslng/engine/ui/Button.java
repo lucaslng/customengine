@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.lucaslng.engine.utils.Operation;
 
-public class Button extends UIElement {
+public class Button extends RectElement {
 
 	private final ArrayList<Operation> operations;
 
