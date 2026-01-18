@@ -25,6 +25,7 @@ import com.lucaslng.engine.systems.Exits;
 import com.lucaslng.engine.systems.LevelTransition;
 import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
+import com.lucaslng.engine.ui.Button;
 import com.lucaslng.engine.ui.UIElement;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
@@ -61,7 +62,7 @@ class Game extends GameLoop {
 		deaths = new Deaths(engine.entityManager, player1, player2, exits);
 		transition = new LevelTransition();
 
-		engine.uiManager.elements.add(new UIElement(10f, 10f, 200f, 300f, true, true));
+		engine.uiManager.elements.add(new Button(1720f, 880f, 200f, 200f, false, false));
 	}
 
 	@Override
@@ -132,8 +133,8 @@ class Game extends GameLoop {
 		if (isDisabled(engine, player))
 			return;
 		
-		boolean leftPressed = engine.keyHandler.isKeyHeld(leftKey);
-		boolean rightPressed = engine.keyHandler.isKeyHeld(rightKey);
+		boolean leftPressed = engine.inputHandler.isKeyHeld(leftKey);
+		boolean rightPressed = engine.inputHandler.isKeyHeld(rightKey);
 
 		Vector3f position = engine.entityManager.getComponent(player.id(), PositionComponent.class).position();
 		Vector3f rotation = engine.entityManager.getComponent(player.id(), RotationComponent.class).rotation();
@@ -148,7 +149,7 @@ class Game extends GameLoop {
 		}
 
 		// jumping
-		if (engine.keyHandler.isKeyHeld(jumpKey)) {
+		if (engine.inputHandler.isKeyHeld(jumpKey)) {
 			GroundedComponent grounded = engine.entityManager.getComponent(player.id(), GroundedComponent.class);
 			if (grounded.isGrounded) {
 				Vector3f velocity = engine.entityManager.getComponent(player.id(), VelocityComponent.class).velocity();

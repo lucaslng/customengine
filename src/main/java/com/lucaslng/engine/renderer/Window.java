@@ -1,6 +1,7 @@
 package com.lucaslng.engine.renderer;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
 import org.lwjgl.system.MemoryStack;
 
 import com.lucaslng.engine.EngineSettings;
@@ -16,8 +17,9 @@ public class Window {
 
 	public final long window;
 	private int w, h;
-	private float uiScale;
-	private final ArrayList<FramebufferSizeCallback> framebufferSizeCallbacks;
+	private boolean focused;
+	private float scaleX, scaleY, uiScale;
+	private final ArrayList<GLFWFramebufferSizeCallbackI> framebufferSizeCallbacks;
 
 	public Window(EngineSettings engineSettings) {
 		framebufferSizeCallbacks = new ArrayList<>();
@@ -48,12 +50,16 @@ public class Window {
 		glfwSetFramebufferSizeCallback(window, (window, w, h) -> {
 			this.w = w;
 			this.h = h;
-			for (FramebufferSizeCallback callback : framebufferSizeCallbacks) {
-				callback.execute(window, w, h);
+			for (GLFWFramebufferSizeCallbackI callback : framebufferSizeCallbacks) {
+				callback.invoke(window, w, h);
 			}
-			float scaleX = (float) w / engineSettings.referenceDimension.width;
-			float scaleY = (float) h / engineSettings.referenceDimension.height;
+			scaleX = (float) w / engineSettings.referenceDimension.width;
+			scaleY = (float) h / engineSettings.referenceDimension.height;
 			uiScale = Math.min(scaleX, scaleY);
+		});
+
+		glfwSetWindowFocusCallback(window, (window, focused) -> {
+			this.focused = focused;
 		});
 
 		glfwMakeContextCurrent(window);
@@ -68,19 +74,14 @@ public class Window {
 			this.w = w.get(0);
 			this.h = h.get(0);
 		}
-		float scaleX = (float) w / engineSettings.referenceDimension.width;
-		float scaleY = (float) h / engineSettings.referenceDimension.height;
+		scaleX = (float) w / engineSettings.referenceDimension.width;
+		scaleY = (float) h / engineSettings.referenceDimension.height;
 		uiScale = Math.min(scaleX, scaleY);
 
 	}
 
-	public void addFramebufferSizeCallback(FramebufferSizeCallback framebufferSizeCallback) {
+	public void addFramebufferSizeCallback(GLFWFramebufferSizeCallbackI framebufferSizeCallback) {
 		framebufferSizeCallbacks.add(framebufferSizeCallback);
-	}
-
-	@FunctionalInterface
-	public static interface FramebufferSizeCallback {
-		void execute(long window, int w, int h);
 	}
 
 	public void swapBuffers() {
@@ -97,6 +98,18 @@ public class Window {
 	
 	public int h() {
 		return h;
+	}
+
+	public boolean focused() {
+		return focused;
+	}
+	
+	public float scaleX() {
+		return scaleX;
+	}
+
+	public float scaleY() {
+		return scaleY;
 	}
 
 	public float uiScale() {

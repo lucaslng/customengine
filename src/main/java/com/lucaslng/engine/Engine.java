@@ -20,7 +20,7 @@ public final class Engine {
 	public final EntityManager entityManager;
 	public final FontAtlas fontAtlas;
 	public final UIManager uiManager;
-	public final KeyHandler keyHandler;
+	public final InputHandler inputHandler;
 
 	public Engine() {
 		System.out.println("Initializing engine...");
@@ -30,9 +30,10 @@ public final class Engine {
 		fontAtlas.addFont(new Font("Arial", Font.PLAIN, 50));
 		fontAtlas.dispose();
 		window = new Window(settings);
-		uiManager = new UIManager(window);
+		inputHandler = new InputHandler(window);
+		uiManager = new UIManager(window, inputHandler);
 		renderer = new Renderer(settings, window, entityManager, uiManager, fontAtlas);
-		keyHandler = new KeyHandler(window.window);
+		
 
 		
 		System.out.println("Engine initialized.");
