@@ -8,10 +8,12 @@ public abstract class GameState {
 	private int frameCount;
 	private double dt;
 
+	// init method executes everytime the gameState changes to this one
 	abstract public void init(Engine engine);
 
 	abstract public GameStates doLoop(Engine engine, double dt);
 
+	// constructor executes only once, when the entire game initializes
 	public GameState(Engine engine) {
 		this.engine = engine;
 		System.out.println("Starting game loop...");
