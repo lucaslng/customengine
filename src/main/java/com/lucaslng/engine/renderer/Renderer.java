@@ -12,8 +12,7 @@ import static org.lwjgl.opengl.GL11C.*;
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.*;
-import com.lucaslng.engine.ui.UIElement;
-import com.lucaslng.engine.ui.UIManager;
+import com.lucaslng.engine.ui.*;
 import com.lucaslng.engine.utils.FileReader;
 
 public final class Renderer {
@@ -66,7 +65,7 @@ public final class Renderer {
 		System.out.println("OpenGL initialized successfully.");
 
 		projectionMatrix.setPerspective(engineSettings.FOV, (float) window.w() / window.h(), 0.1f, engineSettings.Z_FAR);
-		background = new UIElement(0f, 0f, 1f, 1f, false, false);
+		background = new UIElement(0f, 0f, 1f, 1f, XAlignment.LEFT, YAlignment.TOP);
 		backgroundTexture = new Texture(FileReader.readImage("background.jpg"));
 		shader = new ShaderProgram("vertex.glsl", "fragment.glsl");
 		shader.compileShader();
@@ -148,9 +147,13 @@ public final class Renderer {
 			float y = element.y * window.uiScale();
 			float width = element.width * window.uiScale();
 			float height = element.height * window.uiScale();
-			if (element.xAlignRight)
+			if (element.xAlignment == XAlignment.CENTER)
+				x = window.w() / 2 - width / 2f;
+			else if (element.xAlignment == XAlignment.RIGHT)
 				x = window.w() - width - x;
-			if (element.yAlignBottom)
+			if (element.yAlignment == YAlignment.CENTER)
+				y = window.h() / 2 - height / 2f;
+			else if (element.yAlignment == YAlignment.BOTTOM)
 				y = window.h() - height - y;
 			Matrix4f model = new Matrix4f()
 					.translate(x, y, 0)

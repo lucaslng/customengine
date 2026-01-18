@@ -21,6 +21,7 @@ import com.lucaslng.engine.systems.LevelTransition;
 import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
 import com.lucaslng.engine.ui.Button;
+import com.lucaslng.engine.ui.XAlignment;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.entities.CameraEntityFactory;
@@ -52,8 +53,6 @@ class PlayingState extends GameState {
 		exits = new Exits(entityManager);
 		deaths = new Deaths(entityManager, player1, player2, exits);
 		transition = new LevelTransition();
-
-		uiManager.elements.add(new Button(1720f, 880f, 200f, 200f, false, false));
 	}
 
 	@Override

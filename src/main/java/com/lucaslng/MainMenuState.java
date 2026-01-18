@@ -3,6 +3,8 @@ package com.lucaslng;
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameState;
 import com.lucaslng.engine.ui.Button;
+import com.lucaslng.engine.ui.XAlignment;
+import com.lucaslng.engine.ui.YAlignment;
 
 public class MainMenuState extends GameState {
 
@@ -14,7 +16,7 @@ public class MainMenuState extends GameState {
 		super(engine);
 		switchGameState = GameStates.MAIN_MENU;
 
-		playButton = new Button(660f, 300f, 600f, 250f, false, false);
+		playButton = new Button(660f, 300f, 600f, 250f, XAlignment.CENTER, YAlignment.TOP);
 		playButton.addOperation(() -> switchGameState = GameStates.PLAYING);
 		uiManager.elements.add(playButton);
 

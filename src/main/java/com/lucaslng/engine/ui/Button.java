@@ -8,8 +8,8 @@ public class Button extends UIElement {
 
 	private final ArrayList<Operation> operations;
 
-	public Button(float x, float y, float width, float height, boolean xAlignRight, boolean yAlignBottom) {
-		super(x, y, width, height, xAlignRight, yAlignBottom);
+	public Button(float x, float y, float width, float height, XAlignment xAlignment, YAlignment yAlignment) {
+		super(x, y, width, height, xAlignment, yAlignment);
 		operations = new ArrayList<>();
 	}
 
@@ -21,9 +21,5 @@ public class Button extends UIElement {
 		for (Operation operation : operations) {
 			operation.execute();
 		}
-	}
-
-	private void updateHovered() {
-		
 	}
 }

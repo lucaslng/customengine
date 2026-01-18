@@ -12,7 +12,8 @@ public class UIElement {
 
 	private static final AtomicInteger ID_GENERATOR = new AtomicInteger(0);
 	public float x, y, width, height;
-	public final boolean xAlignRight, yAlignBottom;
+	public final XAlignment xAlignment;
+	public final YAlignment yAlignment;
 	public final VertexArray vao;
 	private final int id;
 
@@ -28,14 +29,14 @@ public class UIElement {
 	public static final int indexCount = indices.length;
 
 	// all parameters should be between 0f and 1f because they are percentages
-	public UIElement(float x, float y, float width, float height, boolean xAlignRight, boolean yAlignBottom) {
+	public UIElement(float x, float y, float width, float height, XAlignment xAlignment, YAlignment yAlignment) {
 		this.id = ID_GENERATOR.getAndIncrement();
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		this.xAlignRight = xAlignRight;
-		this.yAlignBottom = yAlignBottom;
+		this.xAlignment = xAlignment;
+		this.yAlignment = yAlignment;
 
 		this.vao = new VertexArray();
 		vao.bind();
