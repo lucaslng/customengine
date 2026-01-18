@@ -17,7 +17,7 @@ public class Button extends UIElement {
 		operations.add(operation);
 	}
 
-	private void onPressed() {
+	public void onPressed() {
 		for (Operation operation : operations) {
 			operation.execute();
 		}

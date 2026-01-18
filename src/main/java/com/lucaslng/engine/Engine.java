@@ -59,7 +59,6 @@ public final class Engine {
 				break;
 			gameStates.get(gameState).init();
 			gameState = gameStates.get(gameState).loop();
-			System.out.println(gameState);
 		}
 	}
 

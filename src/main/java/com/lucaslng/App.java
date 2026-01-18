@@ -14,6 +14,6 @@ public class App {
 		gameStates.put(GameStates.PLAYING, new PlayingState(engine));
 		gameStates.put(GameStates.MAIN_MENU, new MainMenuState(engine));
 
-		engine.start(GameStates.PLAYING);
+		engine.start(GameStates.MAIN_MENU);
 	}
 }

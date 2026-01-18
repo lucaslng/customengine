@@ -28,7 +28,7 @@ public class UIManager {
 		for (UIElement element : elements) {
 			if (element instanceof Button button) {
 				if (mouseX >= button.x && mouseX <= button.x + button.width && mouseY >= button.y && mouseY <= button.y + button.height) {
-					System.out.println("HIT");
+					button.onPressed();
 				}
 			}
 		}

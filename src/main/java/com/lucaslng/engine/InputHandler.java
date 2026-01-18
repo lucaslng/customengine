@@ -9,9 +9,11 @@ import static org.lwjgl.glfw.GLFW.*;
 public class InputHandler {
 
 	private final HashSet<Integer> heldKeys;
-	private double mouseX, mouseY;
+	private double realMouseX, realMouseY;
+	private final Window window;
 
 	public InputHandler(Window window) {
+		this.window = window;
 		heldKeys = new HashSet<>();
 		glfwSetKeyCallback(window.window, (window_, key, scancode, action, mods) -> {
 			if (action == GLFW_PRESS) {
@@ -21,8 +23,8 @@ public class InputHandler {
 			}
 		});
 		glfwSetCursorPosCallback(window.window, (_window, xpos, ypos) -> {
-			mouseX = xpos;
-			mouseY = ypos;
+			realMouseX = xpos;
+			realMouseY = ypos;
 		});
 	}
 
@@ -39,10 +41,10 @@ public class InputHandler {
 	}
 
 	public double mouseX() {
-		return mouseX;
+		return 2 * realMouseX / window.uiScale();
 	}
 
 	public double mouseY() {
-		return mouseY;
+		return 2 * realMouseY / window.uiScale();
 	}
 }

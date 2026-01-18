@@ -6,12 +6,18 @@ import com.lucaslng.engine.ui.Button;
 
 public class MainMenuState extends GameState {
 
-	Button b;
+	Button playButton;
+
+	GameStates switchGameState;
 
 	public MainMenuState(Engine engine) {
 		super(engine);
-		b = new Button(0f, 0f, 400f, 400f, false, false);
-		uiManager.elements.add(b);
+		switchGameState = GameStates.MAIN_MENU;
+
+		playButton = new Button(660f, 300f, 600f, 250f, false, false);
+		playButton.addOperation(() -> switchGameState = GameStates.PLAYING);
+		uiManager.elements.add(playButton);
+
 	}
 
 	@Override
@@ -21,7 +27,8 @@ public class MainMenuState extends GameState {
 
 	@Override
 	public GameStates doLoop(double dt) {
-		return GameStates.MAIN_MENU;
+		
+		return switchGameState;
 	}
 
 	@Override
