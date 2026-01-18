@@ -6,16 +6,7 @@ import static org.lwjgl.opengl.GL11C.glDrawArrays;
 import static org.lwjgl.opengl.GL15C.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15C.GL_DYNAMIC_DRAW;
 
-import java.awt.Font;
-import java.awt.font.LineMetrics;
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-
-import javax.imageio.ImageIO;
-
 import org.joml.Vector4f;
-import org.joml.Vector2f;
 
 public class TextRenderer {
 
@@ -27,11 +18,13 @@ public class TextRenderer {
 
 	public TextRenderer(FontAtlas fontAtlas) {
 		this.fontAtlas = fontAtlas;
-		File outputfile = new File("image.jpg");
-		try {
-			ImageIO.write(fontAtlas.atlas, "jpg", outputfile);
-		} catch (IOException e) {
-		}
+		// test font atlas:
+		// File outputfile = new File("image.jpg");
+		// try {
+		// 	ImageIO.write(fontAtlas.atlas, "jpg", outputfile);
+		// } catch (IOException e) {
+		// }
+
 		texture = new Texture(fontAtlas.atlas);
 
 		shader = new ShaderProgram("text-vertex.glsl", "text-fragment.glsl");
@@ -118,8 +111,6 @@ public class TextRenderer {
 
 			x0 = x1;
 		}
-		System.out.println(Arrays.toString(buffer));
-		System.out.println("hi");
 		return buffer;
 	}
 }
