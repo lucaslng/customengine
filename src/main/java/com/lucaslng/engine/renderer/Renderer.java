@@ -1,7 +1,5 @@
 package com.lucaslng.engine.renderer;
 
-import java.awt.Color;
-import java.awt.Font;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 
@@ -22,6 +20,7 @@ import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.ui.UIElement;
 import com.lucaslng.engine.ui.UIManager;
+import com.lucaslng.engine.utils.FileReader;
 
 public final class Renderer {
 	private final EngineSettings engineSettings;
@@ -38,6 +37,8 @@ public final class Renderer {
 	private long window;
 	private int framebufferWidth, framebufferHeight;
 	private float fadeAlpha = 0f;
+	private final UIElement background;
+	private final Texture backgroundTexture;
 	private float[] matBuf = new float[16];
 
 	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
@@ -51,6 +52,8 @@ public final class Renderer {
 		camera = new Camera();
 		isRendering = false;
 		initWindow();
+		background = new UIElement(0f, 0f, 1f, 1f, false, false);
+		backgroundTexture = new Texture(FileReader.readImage("background.jpg"));
 	}
 
 	private void initWindow() {
@@ -134,9 +137,9 @@ public final class Renderer {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, framebufferWidth, framebufferHeight);
 
+		renderBackground();
 		renderGame();
 
-		// Render fade overlay if needed
 		if (fadeAlpha > 0f) {
 			renderFadeOverlay();
 		}
@@ -148,6 +151,24 @@ public final class Renderer {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		isRendering = false;
+	}
+
+	private void renderBackground() {
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(false);
+		uiShader.bind();
+		uiShader.setUniformMatrix4v("ortho", false, ortho);
+		uiShader.setUniform1i("uTexture", 0);
+		uiShader.setUniform1i("uUseTexture", 1);
+		backgroundTexture.bind(0);
+
+		background.vao.bind();
+		glDrawElements(GL_TRIANGLES, UIElement.indexCount, GL_UNSIGNED_INT, 0);
+		background.vao.unbind();
+		Texture.unbind();
+
+		uiShader.unbind();
+		glDepthMask(true);
 	}
 
 	private void renderText() {
