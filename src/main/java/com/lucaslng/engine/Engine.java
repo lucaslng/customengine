@@ -7,29 +7,24 @@ import java.awt.Font;
 import java.util.HashMap;
 
 import com.lucaslng.GameStates;
-import com.lucaslng.engine.components.HeadRotationComponent;
-import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.renderer.FontAtlas;
 import com.lucaslng.engine.renderer.Renderer;
 import com.lucaslng.engine.renderer.Window;
-import com.lucaslng.engine.ui.UIManager;
 
 public final class Engine {
-	
+
 	public final Renderer renderer;
 	public final Window window;
 	public final EngineSettings settings;
-	public final EntityManager entityManager;
 	public final FontAtlas fontAtlas;
-	public final UIManager uiManager;
 	public final InputHandler inputHandler;
+	private final HashMap<GameStates, GameState> gameStates;
 
 	public GameStates gameState;
 
-	public Engine() {
+	public Engine(HashMap<GameStates, GameState> gameStates) {
 		System.out.println("Initializing engine...");
-		entityManager = new EntityManager();
+		this.gameStates = gameStates;
 		settings = new EngineSettings();
 
 		fontAtlas = new FontAtlas();
@@ -38,9 +33,8 @@ public final class Engine {
 
 		window = new Window(settings);
 		inputHandler = new InputHandler(window);
-		uiManager = new UIManager(window, inputHandler);
-		renderer = new Renderer(settings, window, entityManager, uiManager, fontAtlas);
-		
+		renderer = new Renderer(settings, window, fontAtlas);
+
 		System.out.println("Engine initialized.");
 	}
 
@@ -51,35 +45,27 @@ public final class Engine {
 	public void linkMouseToRotation(Vector3f rotation) {
 		MouseMotionToRotationListener mouseHandler = new MouseMotionToRotationListener(this);
 		mouseHandler.setRotation(rotation);
-		
+
 		// Setup mouse callback
 		glfwSetCursorPosCallback(window.window, (window, xpos, ypos) -> {
 			mouseHandler.mouseMoved(xpos, ypos);
 		});
 	}
 
-	public void setCamera(Entity entity) {
-		if (!entityManager.hasComponent(entity.id(), PositionComponent.class)
-				|| !entityManager.hasComponent(entity.id(), HeadRotationComponent.class)) {
-			throw new IllegalArgumentException(
-					"Entity passed into setCamera() does not have position component or head rotation component.");
-		}
-		setCamera(entityManager.getComponent(entity.id(), PositionComponent.class).position(),
-				entityManager.getComponent(entity.id(), HeadRotationComponent.class).rotation(), entity.id());
-	}
-	public void start(HashMap<GameStates, GameState> gameStates, GameStates startingGameState) {
+	public void start(GameStates startingGameState) {
 		gameState = startingGameState;
 		while (true) {
 			if (!gameStates.containsKey(gameState))
 				break;
-			gameStates.get(gameState).init(this);
+			gameStates.get(gameState).init();
 			gameState = gameStates.get(gameState).loop();
+			System.out.println(gameState);
 		}
 	}
 
 	public void doLoop() {
 		if (!renderer.isRendering()) {
-			renderer.render();
+			renderer.render(gameStates.get(gameState).entityManager, gameStates.get(gameState).uiManager);
 		}
 	}
 

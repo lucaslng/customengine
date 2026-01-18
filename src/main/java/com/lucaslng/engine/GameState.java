@@ -1,21 +1,30 @@
 package com.lucaslng.engine;
 
 import com.lucaslng.GameStates;
+import com.lucaslng.engine.ui.UIManager;
 
 public abstract class GameState {
-	private final Engine engine;
+  protected final Engine engine;
+	protected final UIManager uiManager;
+	protected final EntityManager entityManager;
 	private long lastTick, lastFpsTime;
 	private int frameCount;
 	private double dt;
 
 	// init method executes everytime the gameState changes to this one
-	abstract public void init(Engine engine);
+	abstract public void init();
 
-	abstract public GameStates doLoop(Engine engine, double dt);
+	// we only want doLoop to have access to dt
+	abstract public GameStates doLoop(double dt);
+
+	// called when switching to a different state
+	abstract public void dispose();
 
 	// constructor executes only once, when the entire game initializes
 	public GameState(Engine engine) {
 		this.engine = engine;
+		uiManager = new UIManager(engine.window, engine.inputHandler);
+		entityManager = new EntityManager();
 		System.out.println("Starting game loop...");
 		lastFpsTime = System.currentTimeMillis();
 		lastTick = System.nanoTime();
@@ -31,11 +40,13 @@ public abstract class GameState {
 			dt = (frameStart - lastTick) / 1_000_000_000.0;
 			lastTick = frameStart;
 
-			GameStates gameState = doLoop(engine, dt);
+			GameStates gameState = doLoop(dt);
 			engine.doLoop();
 
-			if (gameState != engine.gameState)
+			if (gameState != engine.gameState) {
+				dispose();
 				return gameState;
+			}
 
 			// FPS tracking
 			frameCount++;

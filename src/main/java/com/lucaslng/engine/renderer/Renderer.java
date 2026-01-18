@@ -22,8 +22,6 @@ public final class Renderer {
 	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
 
 	private final EngineSettings engineSettings;
-	private final EntityManager entityManager;
-	private final UIManager uiManager;
 	private final Window window;
 
 	private final Matrix4f projectionMatrix;
@@ -41,7 +39,7 @@ public final class Renderer {
 	private float[] matBuf = new float[16];
 	
 
-	public Renderer(EngineSettings engineSettings, Window window, EntityManager entityManager, UIManager uiManager, FontAtlas fontAtlas) {
+	public Renderer(EngineSettings engineSettings, Window window, FontAtlas fontAtlas) {
 		projectionMatrix = new Matrix4f();
 		this.engineSettings = engineSettings;
 		this.window = window;
@@ -49,8 +47,6 @@ public final class Renderer {
 				frameBufferSizeCallback(_window, w, h);
 			}
 		);
-		this.entityManager = entityManager;
-		this.uiManager = uiManager;
 		
 		camera = new Camera();
 		isRendering = false;
@@ -80,18 +76,18 @@ public final class Renderer {
 		textRenderer = new TextRenderer(fontAtlas);
 	}
 
-	public void render() {
+	public void render(EntityManager entityManager, UIManager uiManager) {
 		isRendering = true;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, window.w(), window.h());
 
 		renderBackground();
-		renderGame();
+		renderGame(entityManager);
 
 		if (fadeAlpha > 0f)
 			renderFadeOverlay();
 
-		renderUI();
+		renderUI(uiManager);
 
 		renderText();
 
@@ -137,7 +133,7 @@ public final class Renderer {
 		textRenderer.renderText("Arial", "fgreathIIJq", uiOrtho, matBuf, new Vector4f());
 	}
 
-	private void renderUI() {
+	private void renderUI(UIManager uiManager) {
 		glDisable(GL_DEPTH_TEST);
 
 		uiShader.bind();
@@ -169,7 +165,7 @@ public final class Renderer {
 		uiShader.unbind();
 	}
 
-	private void renderGame() {
+	private void renderGame(EntityManager entityManager) {
 		glEnable(GL_DEPTH_TEST);
 		shader.bind();
 

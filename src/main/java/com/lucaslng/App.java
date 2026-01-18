@@ -8,12 +8,12 @@ import java.util.HashMap;
 public class App {
 	public static void main(String[] args) {
 
-		Engine engine = new Engine();
-
 		HashMap<GameStates, GameState> gameStates = new HashMap<>();
-		gameStates.put(GameStates.PLAYING, new PlayingState(engine));
-		gameStates.put(GameStates.MAIN_MENU, new PlayingState(engine));
+		Engine engine = new Engine(gameStates);
 
-		engine.start(gameStates, GameStates.PLAYING);
+		gameStates.put(GameStates.PLAYING, new PlayingState(engine));
+		gameStates.put(GameStates.MAIN_MENU, new MainMenuState(engine));
+
+		engine.start(GameStates.PLAYING);
 	}
 }

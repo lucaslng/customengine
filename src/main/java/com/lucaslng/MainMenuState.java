@@ -2,19 +2,30 @@ package com.lucaslng;
 
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameState;
+import com.lucaslng.engine.ui.Button;
 
 public class MainMenuState extends GameState {
 
-	@Override
-	public void init(Engine engine) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'init'");
+	Button b;
+
+	public MainMenuState(Engine engine) {
+		super(engine);
+		b = new Button(0f, 0f, 400f, 400f, false, false);
+		uiManager.elements.add(b);
 	}
 
 	@Override
-	public GameStates doLoop(Engine engine, double dt) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'doLoop'");
+	public void init() {
+		
+	}
+
+	@Override
+	public GameStates doLoop(double dt) {
+		return GameStates.MAIN_MENU;
+	}
+
+	@Override
+	public void dispose() {
 	}
 	
 }
