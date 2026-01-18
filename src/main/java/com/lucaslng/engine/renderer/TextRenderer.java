@@ -29,6 +29,8 @@ public class TextRenderer {
 
 		shader = new ShaderProgram("text-vertex.glsl", "text-fragment.glsl");
 		shader.compileShader();
+		shader.bind();
+		shader.setUniform2f("atlasSize", FontAtlas.WIDTH, FontAtlas.HEIGHT);
 
 		vao = new VertexArray();
 		vao.bind();

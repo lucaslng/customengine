@@ -40,6 +40,7 @@ public final class Renderer {
 	private final UIElement background;
 	private final Texture backgroundTexture;
 	private float[] matBuf = new float[16];
+	private final static float[] defaultMatrix = new Matrix4f().get(new float[16]);
 
 	private static final float[] ortho = new Matrix4f().setOrtho(0, 1, 0, 1, -1, 1).get(new float[16]);
 
@@ -158,6 +159,7 @@ public final class Renderer {
 		glDepthMask(false);
 		uiShader.bind();
 		uiShader.setUniformMatrix4v("ortho", false, ortho);
+		uiShader.setUniformMatrix4v("model", false, defaultMatrix);
 		uiShader.setUniform1i("uTexture", 0);
 		uiShader.setUniform1i("uUseTexture", 1);
 		backgroundTexture.bind(0);
@@ -182,9 +184,11 @@ public final class Renderer {
 		float x = 100f * uiScale;
 		float y = 100f * uiScale;
 
+		float fontSize = 10f;
+
 		Matrix4f model = new Matrix4f()
 					.translate(x, y, 0)
-					.scale(uiScale * 10f, uiScale * 10f, 1f);
+					.scale(uiScale * fontSize, uiScale * fontSize, 1f);
 			model.get(matBuf);
 
 		textRenderer.renderText("Arial", "Hello World", uiOrtho, matBuf, new Vector4f());

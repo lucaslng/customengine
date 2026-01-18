@@ -13,7 +13,7 @@ public class FontAtlas {
 			chars[c - START] = c;
 		}
 	}
-	public static final int WIDTH = 2000, HEIGHT = 200;
+	public static final int WIDTH = 4000, HEIGHT = 200;
 	private final Graphics2D g;
 	protected final BufferedImage atlas;
 	protected final ArrayList<int[]> fontStarts;

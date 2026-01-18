@@ -26,7 +26,7 @@ public final class Engine {
 		uiManager = new UIManager();
 		settings = new EngineSettings();
 		fontAtlas = new FontAtlas();
-		fontAtlas.addFont(new Font("Arial", Font.PLAIN, 30));
+		fontAtlas.addFont(new Font("Arial", Font.PLAIN, 50));
 		fontAtlas.dispose();
 		renderer = new Renderer(settings, entityManager, uiManager, fontAtlas);
 		keyHandler = new KeyHandler(renderer.getWindow());
