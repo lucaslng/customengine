@@ -290,12 +290,18 @@ public final class Renderer {
 	}
 
 	private float[] buildRopeVertices() {
-		Vector3f mid = new Vector3f(ropeStart).add(ropeEnd).mul(0.5f);
 		Vector3f viewDir = new Vector3f(0f, 0f, 1f);
+		Vector3f cameraPos = null;
 
 		if (activeEntityManager != null && activeEntityManager.entityExists(camera.entityId())) {
-			Vector3f cameraPos = activeEntityManager.getComponent(camera.entityId(), PositionComponent.class).position();
-			viewDir = cameraPos.sub(mid, new Vector3f()).normalize();
+			cameraPos = activeEntityManager.getComponent(camera.entityId(), PositionComponent.class).position();
+			Vector3f midpoint = new Vector3f(ropeStart).add(ropeEnd).mul(0.5f);
+			viewDir = new Vector3f(cameraPos).sub(midpoint);
+			if (viewDir.lengthSquared() > 0.0001f) {
+				viewDir.normalize();
+			} else {
+				viewDir.set(0f, 0f, 1f);
+			}
 		}
 
 		Vector3f ropeDir = new Vector3f(ropeEnd).sub(ropeStart);
@@ -305,20 +311,25 @@ public final class Renderer {
 			ropeDir.normalize();
 		}
 
-		Vector3f side = ropeDir.cross(viewDir, new Vector3f());
-		if (side.lengthSquared() < 0.0001f) {
-			side.set(0f, 1f, 0f);
-		} else {
-			side.normalize();
+		Vector3f sideStart = new Vector3f(viewDir).sub(new Vector3f(ropeDir).mul(viewDir.dot(ropeDir)));
+		if (sideStart.lengthSquared() < 0.0001f) {
+			Vector3f up = new Vector3f(0f, 1f, 0f);
+			sideStart.set(up).sub(new Vector3f(ropeDir).mul(up.dot(ropeDir)));
+			if (sideStart.lengthSquared() < 0.0001f) {
+				sideStart.set(1f, 0f, 0f);
+			}
 		}
+		sideStart.normalize();
+		Vector3f sideEnd = new Vector3f(sideStart);
 
 		float halfWidth = 0.33f;
-		side.mul(halfWidth);
+		sideStart.mul(halfWidth);
+		sideEnd.mul(halfWidth);
 
-		Vector3f startLeft = new Vector3f(ropeStart).sub(side);
-		Vector3f startRight = new Vector3f(ropeStart).add(side);
-		Vector3f endLeft = new Vector3f(ropeEnd).sub(side);
-		Vector3f endRight = new Vector3f(ropeEnd).add(side);
+		Vector3f startLeft = new Vector3f(ropeStart).sub(sideStart);
+		Vector3f startRight = new Vector3f(ropeStart).add(sideStart);
+		Vector3f endLeft = new Vector3f(ropeEnd).sub(sideEnd);
+		Vector3f endRight = new Vector3f(ropeEnd).add(sideEnd);
 
 		return new float[] {
 				startLeft.x(), startLeft.y(), startLeft.z(), 0f, 0f, 1f, 0f, 0f,
