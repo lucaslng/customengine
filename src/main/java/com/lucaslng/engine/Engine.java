@@ -59,6 +59,7 @@ public final class Engine {
 		while (true) {
 			if (!gameStates.containsKey(gameState))
 				break;
+			System.out.println("Switching state to " + gameState.toString());
 			gameStates.get(gameState).init();
 			gameState = gameStates.get(gameState).loop();
 		}

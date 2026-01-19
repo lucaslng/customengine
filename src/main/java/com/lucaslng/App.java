@@ -13,6 +13,7 @@ public class App {
 
 		gameStates.put(GameStates.PLAYING, new PlayingState(engine));
 		gameStates.put(GameStates.MAIN_MENU, new MainMenuState(engine));
+		gameStates.put(GameStates.OPTIONS, new OptionsState(engine));
 
 		engine.start(GameStates.MAIN_MENU);
 	}
