@@ -6,6 +6,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 import com.lucaslng.engine.renderer.Window;
+import com.lucaslng.engine.ui.KeyListener;
 
 public class InputHandler {
 
@@ -13,6 +14,7 @@ public class InputHandler {
 	private double realMouseX, realMouseY;
 	private final Window window;
 	private final boolean isMac;
+	private KeyListener keyListener;
 
 	public InputHandler(Window window) {
 		this.window = window;
@@ -40,7 +42,15 @@ public class InputHandler {
 	}
 
 	public void keyReleased(int keyCode) {
+		if (keyListener != null) {
+			keyListener.onKey(keyCode);
+			keyListener = null;
+		}
 		heldKeys.remove(keyCode);
+	}
+
+	public void setKeyListener(KeyListener keyListener) {
+		this.keyListener = keyListener;
 	}
 
 	public double scaleMousePos(double pos) {

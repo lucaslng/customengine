@@ -16,12 +16,12 @@ public class EngineSettings {
 
 	public boolean showFPS = true;
 
-	public int player1Left = GLFW_KEY_A;
-	public int player1Right = GLFW_KEY_D;
-	public int player1Jump = GLFW_KEY_SPACE;
+	public KeyBind player1Left = new KeyBind(GLFW_KEY_A);
+	public KeyBind player1Right = new KeyBind(GLFW_KEY_D);
+	public KeyBind player1Jump = new KeyBind(GLFW_KEY_SPACE);
 	
-	public int player2Left = GLFW_KEY_LEFT;
-	public int player2Right = GLFW_KEY_RIGHT;
-	public int player2Jump = GLFW_KEY_UP;
+	public KeyBind player2Left = new KeyBind(GLFW_KEY_LEFT);
+	public KeyBind player2Right = new KeyBind(GLFW_KEY_RIGHT);
+	public KeyBind player2Jump = new KeyBind(GLFW_KEY_UP);
 
 }

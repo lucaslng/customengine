@@ -16,7 +16,6 @@ public final class Engine {
 	public final Renderer renderer;
 	public final Window window;
 	public final EngineSettings settings;
-	public final SoundHandler soundHandler;
 	public final FontAtlas fontAtlas;
 	public final InputHandler inputHandler;
 	private final HashMap<GameStates, GameState> gameStates;
@@ -27,7 +26,6 @@ public final class Engine {
 		System.out.println("Initializing engine...");
 		this.gameStates = gameStates;
 		settings = new EngineSettings();
-		soundHandler = new SoundHandler();
 		
 		fontAtlas = new FontAtlas();
 		fontAtlas.addFont("Arial", Font.PLAIN);

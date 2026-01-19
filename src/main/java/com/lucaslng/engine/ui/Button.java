@@ -3,6 +3,7 @@ package com.lucaslng.engine.ui;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import com.lucaslng.engine.SoundHandler;
 import com.lucaslng.engine.utils.Operation;
 
 public class Button extends ColoredRectElement {
@@ -29,6 +30,7 @@ public class Button extends ColoredRectElement {
 	}
 
 	public void onPressed() {
+		SoundHandler.play("click");
 		for (Operation operation : operations) {
 			operation.execute();
 		}

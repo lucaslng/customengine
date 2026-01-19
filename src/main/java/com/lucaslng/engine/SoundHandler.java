@@ -8,9 +8,9 @@ import javax.sound.sampled.*;
 
 public class SoundHandler {
 
-	private HashMap<String, Clip> clipMap;
+	static final private HashMap<String, Clip> clipMap;
 
-	public SoundHandler() {
+	static {
 		clipMap = new HashMap<>();
 		try {
 			Files.walk(Paths.get("assets/sounds")).filter(Files::isRegularFile).forEach((p) -> {
@@ -28,29 +28,29 @@ public class SoundHandler {
 		}
 	}
 
-	public void start(String audio) {
+	public static void start(String audio) {
 		clipMap.get(audio).start();
 	}
 
-	public void setFramePosition(String audio, int frames) {
+	public static void setFramePosition(String audio, int frames) {
 		clipMap.get(audio).setFramePosition(frames);
 	}
 
-	public void reset(String audio) {
+	public static void reset(String audio) {
 		setFramePosition(audio, 0);
 	}
 
-	public void play(String audio) {
+	public static void play(String audio) {
 		reset(audio);
 		start(audio);
 	}
 
-	public void loop(String audio) {
+	public static void loop(String audio) {
 		reset(audio);
 		clipMap.get(audio).loop(Clip.LOOP_CONTINUOUSLY);
 	}
 
-	public void stop(String audio) {
+	public static void stop(String audio) {
 		clipMap.get(audio).stop();
 	}
 

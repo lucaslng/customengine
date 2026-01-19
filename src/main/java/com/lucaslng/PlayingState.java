@@ -54,8 +54,8 @@ class PlayingState extends GameState {
 		transition.update((float) dt);
 
 		if (!transition.isTransitioning()) {
-			handlePlayerMovement(engine, player1, speed, engine.settings.player1Left, engine.settings.player1Right, engine.settings.player1Jump);
-			handlePlayerMovement(engine, player2, speed, engine.settings.player2Left, engine.settings.player2Right, engine.settings.player2Jump);
+			handlePlayerMovement(engine, player1, speed, engine.settings.player1Left.key, engine.settings.player1Right.key, engine.settings.player1Jump.key);
+			handlePlayerMovement(engine, player2, speed, engine.settings.player2Left.key, engine.settings.player2Right.key, engine.settings.player2Jump.key);
 
 			physics.step(dt);
 			deaths.checkDeaths(levels.currentLevel());
