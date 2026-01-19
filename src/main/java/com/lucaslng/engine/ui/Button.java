@@ -1,9 +1,15 @@
 package com.lucaslng.engine.ui;
 
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_CAPTURED;
+import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
+import static org.lwjgl.glfw.GLFW.glfwSetCursor;
+import static org.lwjgl.system.MemoryUtil.NULL;
+
 import java.awt.Color;
 import java.util.ArrayList;
 
 import com.lucaslng.engine.SoundHandler;
+import com.lucaslng.engine.renderer.Window;
 import com.lucaslng.engine.utils.Operation;
 
 public class Button extends ColoredRectElement {
@@ -36,8 +42,9 @@ public class Button extends ColoredRectElement {
 		}
 	}
 
-	public void onHovered() {
+	public void onHovered(Window window) {
 		if (!hovered) {
+			glfwSetCursor(window.window, window.pointingHandCursor);
 			hovered = true;
 			width *= hoverScale;
 			height *= hoverScale;
@@ -48,8 +55,9 @@ public class Button extends ColoredRectElement {
 		}
 	}
 	
-	public void onNotHovered() {
+	public void onNotHovered(Window window) {
 		if (hovered) {
+			glfwSetCursor(window.window, NULL);
 			hovered = false;
 			x = initX;
 			y = initY;

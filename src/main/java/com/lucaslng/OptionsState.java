@@ -19,6 +19,7 @@ public class OptionsState extends GameState {
 		uiManager.elements.add(new Text(174f, 66f, 0f, 0f, XAlignment.RIGHT, YAlignment.TOP, "x",
 				new TextStyle("Pixeled", 10f, Color.BLACK)));
 
+		// Background rect
 		uiManager.elements.add(
 				new ColoredRectElement(0, 0, 1400f, 1000f, XAlignment.CENTER, YAlignment.CENTER, new Color(240, 240, 240)));
 

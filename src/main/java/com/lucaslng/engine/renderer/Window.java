@@ -23,6 +23,7 @@ public class Window {
 	private final ArrayList<GLFWMouseButtonCallbackI> mouseButtonCallbacks;
 	private final ArrayList<GLFWCursorPosCallbackI> cursorPosCallbacks;
 	private final ArrayList<GLFWKeyCallbackI> keyCallbacks;
+	public final long pointingHandCursor;
 
 	public Window(EngineSettings engineSettings) {
 		framebufferSizeCallbacks = new ArrayList<>();
@@ -103,6 +104,7 @@ public class Window {
 		scaleY = (float) h / engineSettings.referenceDimension.height;
 		uiScale = Math.min(scaleX, scaleY);
 
+		pointingHandCursor = glfwCreateStandardCursor(GLFW_POINTING_HAND_CURSOR);
 	}
 
 	public void addFramebufferSizeCallback(GLFWFramebufferSizeCallbackI framebufferSizeCallback) {

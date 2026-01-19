@@ -12,11 +12,13 @@ public class UIManager {
 
 	public final HashSet<UIElement> elements;
 	private final EngineSettings engineSettings;
+	private final Window window;
 	public boolean active;
 
 	public UIManager(EngineSettings engineSettings, Window window, InputHandler inputHandler) {
 		elements = new HashSet<>();
 		this.engineSettings = engineSettings;
+		this.window = window;
 		active = false;
 
 		window.addCursorPosCallback((_window, posx, posy) -> {
@@ -53,9 +55,9 @@ public class UIManager {
 					y = engineSettings.referenceDimension.height - y - button.height;
 				}
 				if (mouseX >= x && mouseX <= x + button.width && mouseY >= y && mouseY <= y + button.height) {
-					button.onHovered();
+					button.onHovered(window);
 				} else {
-					button.onNotHovered();
+					button.onNotHovered(window);
 				}
 			}
 		}
