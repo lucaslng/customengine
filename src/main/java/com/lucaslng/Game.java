@@ -16,6 +16,7 @@ import com.lucaslng.engine.components.DeathsComponent;
 import com.lucaslng.engine.components.DisabledComponent;
 import com.lucaslng.engine.components.GroundedComponent;
 import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.RigidBodyComponent;
 import com.lucaslng.engine.components.RotationComponent;
 import com.lucaslng.engine.components.VelocityComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
@@ -32,6 +33,9 @@ import com.lucaslng.entities.CameraEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
 
 class Game extends GameLoop {
+	private static final float ROPE_MAX_DISTANCE = 10f;
+	private static final float ROPE_STIFFNESS = 25f;
+	private static final float ROPE_DAMPING = 6f;
 	private Entity player1, player2, camera;
 	private Physics physics;
 	private Levels levels;
@@ -75,6 +79,8 @@ class Game extends GameLoop {
 			handlePlayerMovement(engine, player1, speed, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE);
 			handlePlayerMovement(engine, player2, speed, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP);
 
+			applyRopeTension(engine, player1, player2, (float) dt);
+
 			physics.step(dt);
 			deaths.checkDeaths(levels.currentLevel());
 			exits.handleExits(player1, player2);
@@ -90,6 +96,7 @@ class Game extends GameLoop {
 		}
 
 		updateCamera(engine);
+		updateRopeRender(engine);
 		engine.renderer.setFadeAlpha(transition.getFadeAlpha());
 	}
 
@@ -159,6 +166,131 @@ class Game extends GameLoop {
 
 	private boolean isDisabled(Engine engine, Entity entity) {
 		return engine.entityManager.hasComponent(entity.id(), DisabledComponent.class);
+	}
+
+	private void updateRopeRender(Engine engine) {
+		boolean enabled = !isDisabled(engine, player1) && !isDisabled(engine, player2);
+		engine.renderer.setRopeEnabled(enabled);
+		if (!enabled) {
+			return;
+		}
+		Vector3f pos1 = engine.entityManager.getComponent(player1.id(), PositionComponent.class).position();
+		Vector3f pos2 = engine.entityManager.getComponent(player2.id(), PositionComponent.class).position();
+		engine.renderer.setRopeEndpoints(pos1, pos2);
+		float distance = pos1.distance(pos2);
+		float stretch = Math.max(0f, distance - ROPE_MAX_DISTANCE);
+		float tension = Math.min(stretch / ROPE_MAX_DISTANCE, 1f);
+		engine.renderer.setRopeTension(tension);
+	}
+
+	private void applyRopeTension(Engine engine, Entity a, Entity b, float dt) {
+		if (isDisabled(engine, a) || isDisabled(engine, b)) {
+			return;
+		}
+		
+		Vector3f posA = engine.entityManager.getComponent(a.id(), PositionComponent.class).position();
+		Vector3f posB = engine.entityManager.getComponent(b.id(), PositionComponent.class).position();
+		Vector3f delta = new Vector3f(posB).sub(posA);
+		float distance = delta.length();
+		
+		// avoid division by zero
+		if (distance < 0.0001f) {
+			return;
+		}
+
+		Vector3f dir = delta.div(distance);
+
+		Vector3f velA = engine.entityManager.getComponent(a.id(), VelocityComponent.class).velocity();
+		Vector3f velB = engine.entityManager.getComponent(b.id(), VelocityComponent.class).velocity();
+		
+		float relVelAlongRope = new Vector3f(velB).sub(velA).dot(dir);	
+		float stretch = distance - ROPE_MAX_DISTANCE;
+		float SOFT_STOP_BUFFER = 1.5f;
+		
+		float massA = engine.entityManager.getComponent(a.id(), RigidBodyComponent.class).mass();
+		float massB = engine.entityManager.getComponent(b.id(), RigidBodyComponent.class).mass();
+		float invMassA = 1f / massA;
+		float invMassB = 1f / massB;
+		float invMassSum = invMassA + invMassB;
+		
+		if (stretch <= 0f) {
+			Vector3f horizontalDir = new Vector3f(dir.x, 0f, dir.z);
+			float horizontalLength = horizontalDir.length();
+
+			if (horizontalLength < 0.0001f) {
+				return;
+			}
+			
+			horizontalDir.div(horizontalLength);
+
+			float velAAlongRope = velA.dot(horizontalDir);
+			float velBAlongRope = velB.dot(horizontalDir);
+			float relVelAlongRopeHorizontal = velBAlongRope - velAAlongRope;
+
+			float horizontalDistance = horizontalLength;
+	
+			if (relVelAlongRopeHorizontal > 0f) {
+				float projectedDistance = horizontalDistance + relVelAlongRopeHorizontal * dt;
+				if (projectedDistance > ROPE_MAX_DISTANCE) {
+					float maxAllowedRelVel = (ROPE_MAX_DISTANCE - horizontalDistance) / dt;
+					float excessVel = relVelAlongRopeHorizontal - maxAllowedRelVel;
+					float correctionImpulse = excessVel / invMassSum;
+					
+					velA.add(new Vector3f(horizontalDir).mul(correctionImpulse * invMassA));
+					velB.sub(new Vector3f(horizontalDir).mul(correctionImpulse * invMassB));
+				}
+			}
+
+			if (velAAlongRope > 0f) {
+				velA.sub(new Vector3f(horizontalDir).mul(velAAlongRope));
+			}
+			if (velBAlongRope < 0f) {
+				velB.sub(new Vector3f(horizontalDir).mul(velBAlongRope));
+			}
+			
+			return;
+		}
+
+		float totalForce = 0f;
+		float stretchRatio = Math.min(stretch / ROPE_MAX_DISTANCE, 1f);
+		float softFactor = stretchRatio * stretchRatio;
+		float springForce = ROPE_STIFFNESS * stretch * softFactor;
+		
+		float dampingForce = ROPE_DAMPING * relVelAlongRope;
+		totalForce = springForce + dampingForce;
+
+		if (totalForce < 0f) {
+			totalForce = 0f;
+		}
+
+		if (stretch < SOFT_STOP_BUFFER && relVelAlongRope < 0f) {
+			float softStopRatio = stretch / SOFT_STOP_BUFFER;
+			totalForce *= softStopRatio;
+		}
+
+		if (relVelAlongRope < 0f && dt > 0f) {
+			float maxClosingSpeed = stretch / dt;
+			float maxAllowedRelVel = -maxClosingSpeed;
+			
+			if (relVelAlongRope < maxAllowedRelVel) {
+				totalForce = 0f;
+			} else {
+				float maxForce = (relVelAlongRope - maxAllowedRelVel) / (dt * invMassSum);
+				if (totalForce > maxForce) {
+					totalForce = maxForce;
+				}
+			}
+		}
+		
+		// hehehe F = ma
+		float accelA = totalForce * invMassA;
+		float accelB = totalForce * invMassB;
+
+		Vector3f impulseA = new Vector3f(dir).mul(accelA * dt);
+		Vector3f impulseB = new Vector3f(dir).mul(accelB * dt);
+		
+		velA.add(impulseA);
+		velB.sub(impulseB);
 	}
 
 	private void updateCamera(Engine engine) {

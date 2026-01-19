@@ -35,6 +35,7 @@ import static org.lwjgl.opengl.GL11C.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11C.GL_FILL;
 import static org.lwjgl.opengl.GL11C.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11C.GL_FLOAT;
 import static org.lwjgl.opengl.GL11C.GL_LINE;
 import static org.lwjgl.opengl.GL11C.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11C.GL_POLYGON_MODE;
@@ -50,13 +51,16 @@ import static org.lwjgl.opengl.GL11C.glClear;
 import static org.lwjgl.opengl.GL11C.glClearColor;
 import static org.lwjgl.opengl.GL11C.glDepthMask;
 import static org.lwjgl.opengl.GL11C.glDisable;
+import static org.lwjgl.opengl.GL11C.glDrawArrays;
 import static org.lwjgl.opengl.GL11C.glDrawElements;
 import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL11C.glGetError;
 import static org.lwjgl.opengl.GL11C.glGetInteger;
 import static org.lwjgl.opengl.GL11C.glGetString;
+import static org.lwjgl.opengl.GL11C.glLineWidth;
 import static org.lwjgl.opengl.GL11C.glPolygonMode;
 import static org.lwjgl.opengl.GL11C.glViewport;
+import static org.lwjgl.opengl.GL15C.GL_ARRAY_BUFFER;
 import org.lwjgl.system.MemoryStack;
 import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -82,6 +86,12 @@ public final class Renderer {
 	private int width, height;
 	private int framebufferWidth, framebufferHeight;
 	private float fadeAlpha = 0f;
+	private boolean ropeEnabled = false;
+	private Vector3f ropeStart = new Vector3f();
+	private Vector3f ropeEnd = new Vector3f();
+	private float ropeTension = 0f;
+	private VertexArray ropeVao;
+	private DynamicFloatBuffer ropeVbo;
 	private final UIElement background;
 	private final Texture backgroundTexture;
 
@@ -164,6 +174,7 @@ public final class Renderer {
 		uiShader.compileShader();
 
 		materials = Materials.createMaterials();
+		initRope();
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -230,6 +241,8 @@ public final class Renderer {
 	private void renderGame() {
 		glEnable(GL_DEPTH_TEST);
 		shader.bind();
+		shader.setUniform1i("uDebugNormals", 0);
+		shader.setUniform1i("uUnlit", 0);
 
 		shader.setUniformMatrix4v("projection", false,
 				projectionMatrix.get(new float[16]));
@@ -274,7 +287,101 @@ public final class Renderer {
 				Texture.unbind();
 			}
 		}
+		renderRope();
 		shader.unbind();
+	}
+
+	private void initRope() {
+		ropeVao = new VertexArray();
+		ropeVao.bind();
+		ropeVbo = new DynamicFloatBuffer(GL_ARRAY_BUFFER, buildRopeVertices());
+
+		BufferLayout layout = new BufferLayout();
+
+		layout.add(GL_FLOAT, 3, false);
+		layout.add(GL_FLOAT, 3, true);
+		layout.add(GL_FLOAT, 2, true);
+
+		ropeVao.addBuffer(ropeVbo, layout);
+		ropeVao.unbind();
+	}
+
+	private void renderRope() {
+		if (!ropeEnabled) {
+			return;
+		}
+
+		ropeVbo.update(buildRopeVertices());
+		shader.setUniformMatrix4v("projection", false, projectionMatrix.get(new float[16]));
+		shader.setUniformMatrix4v("view", false, camera.matrix().get(new float[16]));
+		shader.setUniformMatrix4v("model", false, new Matrix4f().get(new float[16]));
+		shader.setUniform1i("uUseTexture", 0);
+		Vector3f ropeColor = ropeColorFromTension();
+		shader.setUniform4f("uColor", ropeColor.x(), ropeColor.y(), ropeColor.z(), 1.0f);
+		shader.setUniform1i("uUnlit", 1);
+
+		ropeVao.bind();
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		ropeVao.unbind();
+
+		shader.setUniform1i("uUnlit", 0);
+	}
+
+	private float[] buildRopeVertices() {
+		Vector3f mid = new Vector3f(ropeStart).add(ropeEnd).mul(0.5f);
+		Vector3f viewDir = new Vector3f(0f, 0f, 1f);
+
+		if (entityManager.entityExists(camera.entityId())) {
+			Vector3f cameraPos = entityManager.getComponent(camera.entityId(), PositionComponent.class).position();
+			viewDir = cameraPos.sub(mid, new Vector3f()).normalize();
+		}
+
+		Vector3f ropeDir = new Vector3f(ropeEnd).sub(ropeStart);
+		if (ropeDir.lengthSquared() < 0.0001f) {
+			ropeDir.set(1f, 0f, 0f);
+		} else {
+			ropeDir.normalize();
+		}
+
+		Vector3f side = ropeDir.cross(viewDir, new Vector3f());
+		if (side.lengthSquared() < 0.0001f) {
+			side.set(0f, 1f, 0f);
+		} else {
+			side.normalize();
+		}
+
+		float halfWidth = 0.33f;
+		side.mul(halfWidth);
+
+		Vector3f startLeft = new Vector3f(ropeStart).sub(side);
+		Vector3f startRight = new Vector3f(ropeStart).add(side);
+		Vector3f endLeft = new Vector3f(ropeEnd).sub(side);
+		Vector3f endRight = new Vector3f(ropeEnd).add(side);
+
+		return new float[] {
+				startLeft.x(), startLeft.y(), startLeft.z(), 0f, 0f, 1f, 0f, 0f,
+				endLeft.x(), endLeft.y(), endLeft.z(), 0f, 0f, 1f, 0f, 1f,
+				endRight.x(), endRight.y(), endRight.z(), 0f, 0f, 1f, 1f, 1f,
+
+				startLeft.x(), startLeft.y(), startLeft.z(), 0f, 0f, 1f, 0f, 0f,
+				endRight.x(), endRight.y(), endRight.z(), 0f, 0f, 1f, 1f, 1f,
+				startRight.x(), startRight.y(), startRight.z(), 0f, 0f, 1f, 1f, 0f
+		};
+	}
+
+	private Vector3f ropeColorFromTension() {
+		Vector3f green = new Vector3f(0.2f, 0.85f, 0.2f);
+		Vector3f yellow = new Vector3f(0.95f, 0.85f, 0.2f);
+		Vector3f red = new Vector3f(0.9f, 0.2f, 0.2f);
+
+		if (ropeTension <= 0f) {
+			return green;
+		}
+		if (ropeTension >= 1f) {
+			return red;
+		}
+		
+		return yellow;
 	}
 
 	private void renderFadeOverlay() {
@@ -305,6 +412,25 @@ public final class Renderer {
 
 	public void setCamera(Vector3f position, Vector3f rotation, int entityId) {
 		camera.setCamera(position, rotation, entityId);
+	}
+
+	public void setRopeEnabled(boolean ropeEnabled) {
+		this.ropeEnabled = ropeEnabled;
+	}
+
+	public void setRopeEndpoints(Vector3f start, Vector3f end) {
+		this.ropeStart.set(start);
+		this.ropeEnd.set(end);
+	}
+
+	public void setRopeTension(float tension) {
+		if (tension < 0f) {
+			ropeTension = 0f;
+		} else if (tension > 1f) {
+			ropeTension = 1f;
+		} else {
+			ropeTension = tension;
+		}
 	}
 
 	public void toggleDebugLines() {

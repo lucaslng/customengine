@@ -30,8 +30,8 @@ abstract class Buffer {
 	public final int id() {
 		return id;
 	}
-	
-	public final int target() {
+
+	protected final int target() {
 		return target;
 	}
 }
