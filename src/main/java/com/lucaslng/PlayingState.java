@@ -136,7 +136,7 @@ class PlayingState extends GameState {
 			GroundedComponent grounded = entityManager.getComponent(player.id(), GroundedComponent.class);
 			if (grounded.isGrounded) {
 				Vector3f velocity = entityManager.getComponent(player.id(), VelocityComponent.class).velocity();
-				velocity.y = 10f;
+				velocity.y = 23;
 			}
 		}
 	}

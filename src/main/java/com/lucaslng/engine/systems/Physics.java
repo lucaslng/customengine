@@ -16,7 +16,7 @@ public class Physics {
 
 	private final EntityManager entityManager;
 
-	public static final float G = 13f;
+	public static final float G = 60f;
 	private static final float PENETRATION_ALLOWANCE = 0.005f;
 	private static final float PENETRATION_CORRECTION = 1.0f;
 	private static final float MAX_VELOCITY = 50f;
