@@ -18,7 +18,7 @@ public class EngineSettings {
 
 	public KeyBind player1Left = new KeyBind(GLFW_KEY_A);
 	public KeyBind player1Right = new KeyBind(GLFW_KEY_D);
-	public KeyBind player1Jump = new KeyBind(GLFW_KEY_W);
+	public KeyBind player1Jump = new KeyBind(GLFW_KEY_SPACE);
 	
 	public KeyBind player2Left = new KeyBind(GLFW_KEY_LEFT);
 	public KeyBind player2Right = new KeyBind(GLFW_KEY_RIGHT);

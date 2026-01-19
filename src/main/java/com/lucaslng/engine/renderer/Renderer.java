@@ -58,9 +58,9 @@ public final class Renderer {
 
 		System.out.println("Initializing OpenGL...");
 		GL.createCapabilities();
-		System.out.println("OpenGL Vendor  : " + glGetString(GL_VENDOR));
-		System.out.println("OpenGL Renderer: " + glGetString(GL_RENDERER));
-		System.out.println("OpenGL Version : " + glGetString(GL_VERSION));
+		// System.out.println("OpenGL Vendor  : " + glGetString(GL_VENDOR));
+		// System.out.println("OpenGL Renderer: " + glGetString(GL_RENDERER));
+		// System.out.println("OpenGL Version : " + glGetString(GL_VERSION));
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
