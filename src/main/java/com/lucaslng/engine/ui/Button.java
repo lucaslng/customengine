@@ -1,15 +1,16 @@
 package com.lucaslng.engine.ui;
 
+import java.awt.Color;
 import java.util.ArrayList;
 
 import com.lucaslng.engine.utils.Operation;
 
-public class Button extends RectElement {
+public class Button extends ColoredRectElement {
 
 	private final ArrayList<Operation> operations;
 
-	public Button(float x, float y, float width, float height, XAlignment xAlignment, YAlignment yAlignment) {
-		super(x, y, width, height, xAlignment, yAlignment);
+	public Button(float x, float y, float width, float height, XAlignment xAlignment, YAlignment yAlignment, Color color) {
+		super(x, y, width, height, xAlignment, yAlignment, color);
 		operations = new ArrayList<>();
 	}
 

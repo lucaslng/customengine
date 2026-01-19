@@ -16,7 +16,7 @@ public class MainMenuState extends GameState {
 		super(engine);
 
 		// x ignored due to center alignment
-		playButton = new Button(0f, 300f, 600f, 250f, XAlignment.CENTER, YAlignment.TOP);
+		playButton = new Button(0f, 300f, 600f, 250f, XAlignment.CENTER, YAlignment.TOP, new Color(0, 186, 237));
 		playButton.addOperation(() -> {
 			engine.soundHandler.play("click");
 			System.out.println("play");
@@ -26,7 +26,7 @@ public class MainMenuState extends GameState {
 		uiManager.elements.add(new Text(-120f, 360f, 0f, 0f, XAlignment.CENTER, YAlignment.TOP, "PLAY",
 				new TextStyle("Arial", 15f, Color.BLACK)));
 
-		optionsButton = new Button(0f, 700f, 600f, 250f, XAlignment.CENTER, YAlignment.TOP);
+		optionsButton = new Button(0f, 700f, 600f, 250f, XAlignment.CENTER, YAlignment.TOP, new Color(225, 120, 26));
 		optionsButton.addOperation(() -> {
 			engine.soundHandler.play("click");
 			System.out.println("options");
