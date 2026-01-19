@@ -20,8 +20,9 @@ import com.lucaslng.entities.PlayerEntityFactory;
 
 class PlayingState extends GameState {
 	private static final float ROPE_MAX_DISTANCE = 10f;
-	private static final float ROPE_STIFFNESS = 25f;
-	private static final float ROPE_DAMPING = 6f;
+	private static final float ROPE_STIFFNESS = 27f;
+	private static final float ROPE_DAMPING = 2.5f;
+
 	private final Entity player1, player2, camera;
 	private final Physics physics;
 	private final Levels levels;
@@ -153,12 +154,15 @@ class PlayingState extends GameState {
 	private void updateRopeRender() {
 		boolean enabled = !isDisabled(engine, player1) && !isDisabled(engine, player2);
 		engine.renderer.setRopeEnabled(enabled);
+
 		if (!enabled) {
 			return;
 		}
+
 		Vector3f pos1 = entityManager.getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = entityManager.getComponent(player2.id(), PositionComponent.class).position();
 		engine.renderer.setRopeEndpoints(pos1, pos2);
+
 		float distance = pos1.distance(pos2);
 		float stretch = Math.max(0f, distance - ROPE_MAX_DISTANCE);
 		float tension = Math.min(stretch / ROPE_MAX_DISTANCE, 1f);
@@ -233,13 +237,12 @@ class PlayingState extends GameState {
 			return;
 		}
 
-		float totalForce = 0f;
 		float stretchRatio = Math.min(stretch / ROPE_MAX_DISTANCE, 1f);
 		float softFactor = stretchRatio * stretchRatio;
 		float springForce = ROPE_STIFFNESS * stretch * softFactor;
 
 		float dampingForce = ROPE_DAMPING * relVelAlongRope;
-		totalForce = springForce + dampingForce;
+		float totalForce = springForce + dampingForce;
 
 		if (totalForce < 0f) {
 			totalForce = 0f;
