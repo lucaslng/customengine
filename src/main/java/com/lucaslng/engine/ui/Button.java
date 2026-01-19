@@ -1,7 +1,5 @@
 package com.lucaslng.engine.ui;
 
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_CAPTURED;
-import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
 import static org.lwjgl.glfw.GLFW.glfwSetCursor;
 import static org.lwjgl.system.MemoryUtil.NULL;
 

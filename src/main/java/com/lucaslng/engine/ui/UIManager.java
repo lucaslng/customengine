@@ -2,21 +2,21 @@ package com.lucaslng.engine.ui;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import java.util.HashSet;
 
+import java.util.ArrayList;
 import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.InputHandler;
 import com.lucaslng.engine.renderer.Window;
 
 public class UIManager {
 
-	public final HashSet<UIElement> elements;
+	public final ArrayList<UIElement> elements;
 	private final EngineSettings engineSettings;
 	private final Window window;
 	public boolean active;
 
 	public UIManager(EngineSettings engineSettings, Window window, InputHandler inputHandler) {
-		elements = new HashSet<>();
+		elements = new ArrayList<>();
 		this.engineSettings = engineSettings;
 		this.window = window;
 		active = false;
