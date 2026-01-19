@@ -3,13 +3,6 @@ package com.lucaslng;
 import java.util.Set;
 
 import org.joml.Vector3f;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
-
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameState;
 import com.lucaslng.engine.components.*;
@@ -66,8 +59,8 @@ class PlayingState extends GameState {
 		transition.update((float) dt);
 
 		if (!transition.isTransitioning()) {
-			handlePlayerMovement(engine, player1, speed, GLFW_KEY_A, GLFW_KEY_D, GLFW_KEY_SPACE);
-			handlePlayerMovement(engine, player2, speed, GLFW_KEY_LEFT, GLFW_KEY_RIGHT, GLFW_KEY_UP);
+			handlePlayerMovement(engine, player1, speed, engine.settings.player1Left, engine.settings.player1Right, engine.settings.player1Jump);
+			handlePlayerMovement(engine, player2, speed, engine.settings.player2Left, engine.settings.player2Right, engine.settings.player2Jump);
 
 			physics.step(dt);
 			deaths.checkDeaths(levels.currentLevel());
