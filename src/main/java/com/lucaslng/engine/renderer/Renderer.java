@@ -13,6 +13,7 @@ import com.lucaslng.engine.EngineSettings;
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.ui.*;
+import com.lucaslng.engine.utils.ColorUtils;
 import com.lucaslng.engine.utils.FileReader;
 
 public final class Renderer {
@@ -151,10 +152,9 @@ public final class Renderer {
 		float[] uiOrtho = new Matrix4f().ortho(0f, window.w(), window.h(), 0f, -1f, 1f).get(new float[16]);
 		uiShader.setUniformMatrix4v("ortho", false, uiOrtho);
 		uiShader.setUniform1i("uUseTexture", 0);
-		uiShader.setUniform4f("uColor", 1f, 0f, 0f, 1f);
 
 		for (UIElement element : uiManager.elements) {
-			if (element instanceof RectElement rectElement && element.visible) {
+			if (element.visible && element instanceof RectElement rectElement) {
 				float x = rectElement.x * window.uiScale();
 				float y = rectElement.y * window.uiScale();
 				float width = rectElement.width * window.uiScale();
@@ -172,6 +172,11 @@ public final class Renderer {
 						.scale(width, height, 1f);
 				model.get(matBuf);
 				uiShader.setUniformMatrix4v("model", false, model.get(matBuf));
+				if (rectElement instanceof ColoredRectElement coloredRectElement)
+					uiShader.setUniform4f("uColor", new Vector4f(ColorUtils.color2Vec(coloredRectElement.color), 1.0f));
+				else
+					uiShader.setUniform4f("uColor", 1f, 0f, 0f, 1f);
+
 				rectElement.vao.bind();
 				glDrawElements(GL_TRIANGLES, RectElement.indexCount, GL_UNSIGNED_INT, 0);
 				rectElement.vao.unbind();

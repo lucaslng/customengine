@@ -16,7 +16,7 @@ public class OptionsState extends GameState {
 		super(engine);
 
 		// x ignored due to center alignment
-		backButton = new Button(0f, 80f, 600f, 200f, XAlignment.CENTER, YAlignment.BOTTOM);
+		backButton = new Button(0f, 80f, 600f, 200f, XAlignment.CENTER, YAlignment.BOTTOM, new Color(225, 150, 150));
 		backButton.addOperation(() -> {
 			engine.soundHandler.play("click");
 			switchGameState = GameStates.MAIN_MENU;
