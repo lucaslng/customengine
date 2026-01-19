@@ -15,6 +15,12 @@ public class MainMenuState extends GameState {
 	public MainMenuState(Engine engine) {
 		super(engine);
 
+		Button exitButton = new Button(100f, 100f, 100f, 100f, XAlignment.RIGHT, YAlignment.TOP, new Color(225, 150, 150));
+		exitButton.addOperation(() -> System.exit(0));
+		uiManager.elements.add(exitButton);
+		uiManager.elements.add(new Text(174f, 66f, 0f, 0f, XAlignment.RIGHT, YAlignment.TOP, "x",
+				new TextStyle("Pixeled", 10f, Color.BLACK)));
+
 		// x ignored due to center alignment
 		playButton = new Button(0f, 440f, 550f, 160f, XAlignment.CENTER, YAlignment.TOP, new Color(0, 186, 237));
 		playButton.addOperation(() -> switchGameState = GameStates.PLAYING);

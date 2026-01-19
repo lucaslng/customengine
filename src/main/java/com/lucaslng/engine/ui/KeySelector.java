@@ -6,7 +6,6 @@ import java.awt.Color;
 
 import com.lucaslng.engine.InputHandler;
 import com.lucaslng.engine.KeyBind;
-import com.lucaslng.engine.SoundHandler;
 
 public class KeySelector extends Button {
 

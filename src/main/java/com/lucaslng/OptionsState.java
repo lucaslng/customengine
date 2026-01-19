@@ -13,6 +13,12 @@ public class OptionsState extends GameState {
 	public OptionsState(Engine engine) {
 		super(engine);
 
+		Button exitButton = new Button(100f, 100f, 100f, 100f, XAlignment.RIGHT, YAlignment.TOP, new Color(225, 150, 150));
+		exitButton.addOperation(() -> System.exit(0));
+		uiManager.elements.add(exitButton);
+		uiManager.elements.add(new Text(174f, 66f, 0f, 0f, XAlignment.RIGHT, YAlignment.TOP, "x",
+				new TextStyle("Pixeled", 10f, Color.BLACK)));
+
 		uiManager.elements.add(
 				new ColoredRectElement(0, 0, 1400f, 1000f, XAlignment.CENTER, YAlignment.CENTER, new Color(240, 240, 240)));
 
