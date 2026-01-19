@@ -2,6 +2,7 @@ package com.lucaslng.engine;
 
 import java.util.HashSet;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
@@ -43,6 +44,7 @@ public class InputHandler {
 
 	public void keyReleased(int keyCode) {
 		if (keyListener != null) {
+			SoundHandler.play("click");
 			keyListener.onKey(keyCode);
 			keyListener = null;
 		}
@@ -50,7 +52,15 @@ public class InputHandler {
 	}
 
 	public void setKeyListener(KeyListener keyListener) {
+		// if there already a keyListener, deactivate it and replace it
+		if (this.keyListener != null) {
+			this.keyListener.onKey(GLFW_KEY_ESCAPE);
+		}
 		this.keyListener = keyListener;
+	}
+
+	public void removeKeyListener() {
+		keyListener = null;
 	}
 
 	public double scaleMousePos(double pos) {

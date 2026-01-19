@@ -1,5 +1,7 @@
 package com.lucaslng.engine.ui;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+
 import java.awt.Color;
 
 import com.lucaslng.engine.InputHandler;
@@ -17,14 +19,21 @@ public class KeySelector extends Button {
 		this.keyBind = keyBind;
 		waiting = false;
 		addOperation(() -> {
-			waiting = true;
-			text.text = "...";
-			inputHandler.setKeyListener((keyCode) -> {
-				keyBind.key = keyCode;
+			if (waiting) {
 				waiting = false;
-				SoundHandler.play("click");
+				inputHandler.removeKeyListener();
 				text.text = keyBind.name();
-			});
+			} else {
+				waiting = true;
+				text.text = "...";
+				inputHandler.setKeyListener((keyCode) -> {
+					if (keyCode != GLFW_KEY_ESCAPE) {
+						keyBind.key = keyCode;
+					}
+					waiting = false;
+					text.text = keyBind.name();
+				});
+			}
 		});
 	}
 
