@@ -2,9 +2,12 @@ package com.lucaslng.engine;
 
 import java.util.HashSet;
 
-import com.lucaslng.engine.renderer.Window;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 
-import static org.lwjgl.glfw.GLFW.*;
+import com.lucaslng.engine.renderer.Window;
 
 public class InputHandler {
 
@@ -41,10 +44,18 @@ public class InputHandler {
 	}
 
 	public double mouseX() {
-		return 2 * realMouseX / window.uiScale();
+		if (System.getProperty("os.name").startsWith("Mac")) {
+			return 2 * realMouseX / window.uiScale();
+		} else {
+			return realMouseX / window.uiScale();
+		}
 	}
 
 	public double mouseY() {
-		return 2 * realMouseY / window.uiScale();
+		if (System.getProperty("os.name").startsWith("Mac")) {
+			return 2 * realMouseY / window.uiScale();
+		} else {
+			return realMouseY / window.uiScale();
+		}
 	}
 }
