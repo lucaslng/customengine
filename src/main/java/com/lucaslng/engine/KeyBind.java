@@ -1,6 +1,7 @@
 package com.lucaslng.engine;
 
 import static org.lwjgl.glfw.GLFW.glfwGetKeyName;
+import static org.lwjgl.glfw.GLFW.glfwGetKeyScancode;
 
 public class KeyBind {
 
@@ -19,7 +20,7 @@ public class KeyBind {
 	public String name() {
 		String name = glfwGetKeyName(key, 0);
 		if (name == null)
-			return "???";
+			return glfwGetKeyScancode(key) + "";
 		return name;
 	}
 }
