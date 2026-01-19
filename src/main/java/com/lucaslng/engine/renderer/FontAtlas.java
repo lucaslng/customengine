@@ -47,7 +47,12 @@ public class FontAtlas {
 	}
 
 	public void addFont(String family, int style) {
-		addFont(new Font(family, style, 50));
+		Font font = new Font(family, style, 50);
+		addFont(font);
+		Integer index = fontIndexes.get(font.getFamily());
+		if (index != null && !fontIndexes.containsKey(family)) {
+			fontIndexes.put(family, index);
+		}
 	}
 
 	private void addFont(Font font) {
