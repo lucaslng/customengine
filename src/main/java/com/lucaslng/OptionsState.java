@@ -73,7 +73,7 @@ public class OptionsState extends GameState {
 				new TextStyle("Pixeled", 9f, Color.BLACK)));
 
 		Text player2LeftKeyText = new Text(330f, 0f, 0f, 0f, XAlignment.CENTER, YAlignment.CENTER,
-				engine.settings.player1Left.name(),
+				engine.settings.player2Left.name(),
 				new TextStyle("Pixeled", 9f, Color.BLACK));
 		KeySelector player2LeftKeySelector = new KeySelector(350f, 70f, 300f, 100f, XAlignment.CENTER, YAlignment.CENTER,
 				new Color(100, 100, 100), engine.inputHandler, engine.settings.player2Left, player2LeftKeyText);
