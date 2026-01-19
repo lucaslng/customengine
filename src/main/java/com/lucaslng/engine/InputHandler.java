@@ -14,9 +14,11 @@ public class InputHandler {
 	private final HashSet<Integer> heldKeys;
 	private double realMouseX, realMouseY;
 	private final Window window;
+	private final boolean isMac;
 
 	public InputHandler(Window window) {
 		this.window = window;
+		isMac = System.getProperty("os.name").startsWith("Mac");
 		heldKeys = new HashSet<>();
 		glfwSetKeyCallback(window.window, (window_, key, scancode, action, mods) -> {
 			if (action == GLFW_PRESS) {
@@ -25,7 +27,7 @@ public class InputHandler {
 				keyReleased(key);
 			}
 		});
-		glfwSetCursorPosCallback(window.window, (_window, xpos, ypos) -> {
+		window.addCursorPosCallback((_window, xpos, ypos) -> {
 			realMouseX = xpos;
 			realMouseY = ypos;
 		});
@@ -43,19 +45,19 @@ public class InputHandler {
 		heldKeys.remove(keyCode);
 	}
 
-	public double mouseX() {
-		if (System.getProperty("os.name").startsWith("Mac")) {
-			return 2 * realMouseX / window.uiScale();
+	public double scaleMousePos(double pos) {
+		if (isMac) {
+			return 2 * pos / window.uiScale();
 		} else {
-			return realMouseX / window.uiScale();
+			return pos / window.uiScale();
 		}
 	}
 
+	public double mouseX() {
+		return scaleMousePos(realMouseX);
+	}
+
 	public double mouseY() {
-		if (System.getProperty("os.name").startsWith("Mac")) {
-			return 2 * realMouseY / window.uiScale();
-		} else {
-			return realMouseY / window.uiScale();
-		}
+		return scaleMousePos(realMouseY);
 	}
 }
