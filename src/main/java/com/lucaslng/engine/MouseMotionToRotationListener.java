@@ -15,11 +15,11 @@ class MouseMotionToRotationListener {
 	public MouseMotionToRotationListener(Engine engine) {
 		this.engine = engine;
 		rotation = null;
-		lastX = engine.width() / 2.0;
-		lastY = engine.height() / 2.0;
+		lastX = engine.w() / 2.0;
+		lastY = engine.h() / 2.0;
 		
 		// Hide and capture cursor
-		glfwSetInputMode(engine.renderer.getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		glfwSetInputMode(engine.window.window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
 	public void setRotation(Vector3f rotation) {

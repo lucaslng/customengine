@@ -1,5 +1,7 @@
 package com.lucaslng.engine.renderer;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 
 import org.joml.Vector2f;
@@ -9,7 +11,7 @@ public class ModelParser {
 
 	private static final int STRIDE = 8;
 
-	public static ParsedObj parseObj(List<String> lines) {
+	public static ParsedObj parseObj(String fileName) {
 
 		ArrayList<Vector3f> positions = new ArrayList<>();
 		ArrayList<Vector2f> uvs = new ArrayList<>();
@@ -19,7 +21,15 @@ public class ModelParser {
 		HashMap<String, ArrayList<Integer>> indices = new HashMap<>();
 		String material = "Fallback";
 
-		for (String line : lines) {
+		
+		Scanner in;
+		try {
+			in = new Scanner(new File("assets/models/" + fileName + ".obj"));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Failed to read model file.");
+		}
+		while (in.hasNextLine()) {
+			String line = in.nextLine();
 			String[] tokens = line.split(" ");
 			switch (tokens[0]) {
 				case "v" -> { // position
@@ -67,6 +77,7 @@ public class ModelParser {
 				}
 			}
 		}
+		in.close();
 
 		Vector3f min = new Vector3f(Float.POSITIVE_INFINITY);
 		Vector3f max = new Vector3f(Float.NEGATIVE_INFINITY);
@@ -113,10 +124,17 @@ public class ModelParser {
 
 	}
 
-	public static HashMap<String, Material> parseMtl(List<String> lines) {
+	public static HashMap<String, Material> parseMtl(String fileName) {
 		HashMap<String, Material> materials = new HashMap<>();
 		String material = "";
-		for (String line : lines) {
+		Scanner in;
+		try {
+			in = new Scanner(new File("assets/materials/" + fileName + ".mtl"));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Failed to read material file.");
+		}
+		while (in.hasNextLine()) {
+			String line = in.nextLine();
 			String[] tokens = line.split(" ");
 			switch (tokens[0]) {
 				case "newmtl" -> {
@@ -130,6 +148,7 @@ public class ModelParser {
 				}
 			}
 		}
+		in.close();
 		return materials;
 	}
 }

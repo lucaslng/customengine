@@ -3,27 +3,41 @@ package com.lucaslng.engine;
 import org.joml.Vector3f;
 import static org.lwjgl.glfw.GLFW.*;
 
-import com.lucaslng.engine.components.HeadRotationComponent;
-import com.lucaslng.engine.components.PositionComponent;
-import com.lucaslng.engine.entities.Entity;
+import java.awt.Font;
+import java.util.HashMap;
+
+import com.lucaslng.GameStates;
+import com.lucaslng.engine.renderer.FontAtlas;
 import com.lucaslng.engine.renderer.Renderer;
-import com.lucaslng.engine.ui.UIManager;
+import com.lucaslng.engine.renderer.Window;
 
 public final class Engine {
-	public final Renderer renderer;
-	public final EngineSettings settings;
-	public final EntityManager entityManager;
-	public final UIManager uiManager;
-	public final KeyHandler keyHandler;
 
-	public Engine() {
+	public final Renderer renderer;
+	public final Window window;
+	public final EngineSettings settings;
+	public final SoundHandler soundHandler;
+	public final FontAtlas fontAtlas;
+	public final InputHandler inputHandler;
+	private final HashMap<GameStates, GameState> gameStates;
+
+	public GameStates gameState;
+
+	public Engine(HashMap<GameStates, GameState> gameStates) {
 		System.out.println("Initializing engine...");
-		entityManager = new EntityManager();
-		uiManager = new UIManager();
+		this.gameStates = gameStates;
 		settings = new EngineSettings();
-		renderer = new Renderer(settings, entityManager, uiManager);
-		keyHandler = new KeyHandler(renderer.getWindow());
+		soundHandler = new SoundHandler();
 		
+		fontAtlas = new FontAtlas();
+		fontAtlas.addFont("Arial", Font.PLAIN);
+		fontAtlas.addFontFromTTF("Pixeled", Font.PLAIN);
+		fontAtlas.dispose();
+
+		window = new Window(settings);
+		inputHandler = new InputHandler(window);
+		renderer = new Renderer(settings, window, fontAtlas);
+
 		System.out.println("Engine initialized.");
 	}
 
@@ -34,42 +48,39 @@ public final class Engine {
 	public void linkMouseToRotation(Vector3f rotation) {
 		MouseMotionToRotationListener mouseHandler = new MouseMotionToRotationListener(this);
 		mouseHandler.setRotation(rotation);
-		
+
 		// Setup mouse callback
-		glfwSetCursorPosCallback(renderer.getWindow(), (window, xpos, ypos) -> {
+		glfwSetCursorPosCallback(window.window, (window, xpos, ypos) -> {
 			mouseHandler.mouseMoved(xpos, ypos);
 		});
 	}
 
-	public void setCamera(Entity entity) {
-		if (!entityManager.hasComponent(entity.id(), PositionComponent.class)
-				|| !entityManager.hasComponent(entity.id(), HeadRotationComponent.class)) {
-			throw new IllegalArgumentException(
-					"Entity passed into setCamera() does not have position component or head rotation component.");
+	public void start(GameStates startingGameState) {
+		gameState = startingGameState;
+		while (true) {
+			if (!gameStates.containsKey(gameState))
+				break;
+			System.out.println("Switching state to " + gameState.toString());
+			gameStates.get(gameState).init();
+			gameState = gameStates.get(gameState).loop();
 		}
-		setCamera(entityManager.getComponent(entity.id(), PositionComponent.class).position(),
-				entityManager.getComponent(entity.id(), HeadRotationComponent.class).rotation(), entity.id());
-	}
-	public void start(GameLoop gameLoop) {
-		gameLoop.init(this);
-		gameLoop.execute();
 	}
 
 	public void doLoop() {
 		if (!renderer.isRendering()) {
-			renderer.render();
+			renderer.render(gameStates.get(gameState).entityManager, gameStates.get(gameState).uiManager);
 		}
 	}
 
-	public int width() {
-		return renderer.getWidth();
+	public int w() {
+		return window.w();
 	}
 
-	public int height() {
-		return renderer.getHeight();
+	public int h() {
+		return window.h();
 	}
 
 	public boolean shouldClose() {
-		return renderer.shouldClose();
+		return window.shouldClose();
 	}
 }

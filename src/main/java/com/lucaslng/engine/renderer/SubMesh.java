@@ -16,6 +16,7 @@ public final class SubMesh {
 
 		// vertex buffer object
 		FloatBuffer vbo = new FloatBuffer(GL_ARRAY_BUFFER, vertices);
+		vbo.bind();
 		BufferLayout layout = new BufferLayout();
 		layout.add(GL_FLOAT, 3, false); // position
 		layout.add(GL_FLOAT, 3, true); // normal
@@ -27,5 +28,6 @@ public final class SubMesh {
 		this.indexCount = indices.length;
 
 		vao.unbind();
+		vbo.unbind();
 	}
 }

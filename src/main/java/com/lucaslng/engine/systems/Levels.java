@@ -2,12 +2,13 @@ package com.lucaslng.engine.systems;
 
 import static java.lang.Float.parseFloat;
 
-import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 import org.joml.Vector2f;
 
 import com.lucaslng.engine.entities.AbstractEntityFactory;
-import com.lucaslng.engine.utils.FileReader;
 import com.lucaslng.entities.BoxEntityFactory;
 import com.lucaslng.entities.ExitEntityFactory;
 
@@ -25,17 +26,27 @@ public class Levels {
 	private static Level[] readLevels() {
 		Level[] levels = new Level[LEVEL_COUNT];
 		for (int i = 1; i <= LEVEL_COUNT; i++) {
-			levels[i - 1] = parseLevel(FileReader.readLines("levels/" + i));
+			levels[i - 1] = parseLevel(i);
 		}
 		return levels;
 	}
 
-	private static Level parseLevel(List<String> lines) {
-		assert lines.size() > 0;
-		AbstractEntityFactory[] entities = new AbstractEntityFactory[lines.size() - 1]; // ignore first line
-		String[] tokens;
+	private static Level parseLevel(int level) {
+		Scanner in;
+		try {
+			in = new Scanner(new File("assets/levels/" + level));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Failed to read level file.");
+		}
+		String[] tokens = in.nextLine().split(" ");
+		assert tokens.length == 4;
+		Vector2f player1Spawn = new Vector2f(parseFloat(tokens[0]), parseFloat(tokens[1]));
+		Vector2f player2Spawn = new Vector2f(parseFloat(tokens[2]), parseFloat(tokens[3]));
+
+		AbstractEntityFactory[] entities = new AbstractEntityFactory[Integer.parseInt(in.nextLine())];
+
 		for (int i = 0; i < entities.length; i++) {
-			tokens = lines.get(i + 1).split(" ");
+			tokens = in.nextLine().split(" ");
 			switch (tokens[0]) {
 				case "platform" -> {
 					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,
@@ -48,10 +59,8 @@ public class Levels {
 				}
 			}
 		}
-		tokens = lines.get(0).split(" ");
-		assert tokens.length == 4;
-		return new Level(new Vector2f(parseFloat(tokens[0]), parseFloat(tokens[1])),
-				new Vector2f(parseFloat(tokens[2]), parseFloat(tokens[3])), entities);
+		in.close();
+		return new Level(player1Spawn, player2Spawn, entities);
 	}
 
 	public Level currentLevel() {

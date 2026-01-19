@@ -8,7 +8,7 @@ public class Entity {
 	private final int id;
 
 	public Entity() {
-		this.id = ID_GENERATOR.incrementAndGet();
+		this.id = ID_GENERATOR.getAndIncrement();
 	}
 
 	public int id() {

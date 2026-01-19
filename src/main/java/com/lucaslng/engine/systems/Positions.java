@@ -2,6 +2,7 @@ package com.lucaslng.engine.systems;
 
 import org.joml.Vector3f;
 
+// for 3D movement
 public class Positions {
 
 	public static void moveForward(Vector3f position, Vector3f rotation, float speed) {
