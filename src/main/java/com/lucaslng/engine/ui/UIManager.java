@@ -2,8 +2,6 @@ package com.lucaslng.engine.ui;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
-
 import java.util.HashSet;
 
 import com.lucaslng.engine.EngineSettings;
@@ -14,11 +12,13 @@ public class UIManager {
 	
 	public final HashSet<UIElement> elements;
 	private final EngineSettings engineSettings;
+	public boolean active;
 	public UIManager(EngineSettings engineSettings, Window window, InputHandler inputHandler) {
 		elements = new HashSet<>();
 		this.engineSettings = engineSettings;
-		glfwSetMouseButtonCallback(window.window, (_window, button, action, mods) -> {
-			if (window.focused()) {
+		active = false;
+		window.addMouseButtonCallback((_window, button, action, mods) -> {
+			if (active && window.focused()) {
 				if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
 					checkButtons(inputHandler.mouseX(), inputHandler.mouseY());
 				}

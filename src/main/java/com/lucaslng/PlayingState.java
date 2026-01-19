@@ -47,11 +47,6 @@ class PlayingState extends GameState {
 	}
 
 	@Override
-	public void init() {
-		
-	}
-
-	@Override
 	public GameStates doLoop(double dt) {
 		float baseSpeed = 6f;
 		float speed = baseSpeed * (float) dt;
@@ -169,11 +164,6 @@ class PlayingState extends GameState {
 		cameraPos.set(midpoint.x, midpoint.y + 2f, midpoint.z + cameraDistance);
 
 		setCamera();
-	}
-
-	@Override
-	public void dispose() {
-
 	}
 
 	private void setCamera() {

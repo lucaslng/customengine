@@ -2,6 +2,7 @@ package com.lucaslng.engine.renderer;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWFramebufferSizeCallbackI;
+import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
 import org.lwjgl.system.Configuration;
 import org.lwjgl.system.MemoryStack;
 
@@ -21,9 +22,11 @@ public class Window {
 	private boolean focused;
 	private float scaleX, scaleY, uiScale;
 	private final ArrayList<GLFWFramebufferSizeCallbackI> framebufferSizeCallbacks;
+	private final ArrayList<GLFWMouseButtonCallbackI> mouseButtonCallbacks;
 
 	public Window(EngineSettings engineSettings) {
 		framebufferSizeCallbacks = new ArrayList<>();
+		mouseButtonCallbacks = new ArrayList<>();
 
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
@@ -56,12 +59,16 @@ public class Window {
 		glfwSetFramebufferSizeCallback(window, (window, w, h) -> {
 			this.w = w;
 			this.h = h;
-			for (GLFWFramebufferSizeCallbackI callback : framebufferSizeCallbacks) {
+			for (GLFWFramebufferSizeCallbackI callback : framebufferSizeCallbacks)
 				callback.invoke(window, w, h);
-			}
 			scaleX = (float) w / engineSettings.referenceDimension.width;
 			scaleY = (float) h / engineSettings.referenceDimension.height;
 			uiScale = Math.min(scaleX, scaleY);
+		});
+
+		glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
+			for (GLFWMouseButtonCallbackI callback : mouseButtonCallbacks)
+				callback.invoke(window, button, action, mods);
 		});
 
 		glfwSetWindowFocusCallback(window, (window, focused) -> {
@@ -88,6 +95,10 @@ public class Window {
 
 	public void addFramebufferSizeCallback(GLFWFramebufferSizeCallbackI framebufferSizeCallback) {
 		framebufferSizeCallbacks.add(framebufferSizeCallback);
+	}
+
+	public void addMouseButtonCallback(GLFWMouseButtonCallbackI mouseButtonCallback) {
+		mouseButtonCallbacks.add(mouseButtonCallback);
 	}
 
 	public void swapBuffers() {

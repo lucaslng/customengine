@@ -14,7 +14,6 @@ public class MainMenuState extends GameState {
 
 	public MainMenuState(Engine engine) {
 		super(engine);
-		switchGameState = GameStates.MAIN_MENU;
 
 		// x ignored due to center alignment
 		playButton = new Button(0f, 300f, 600f, 250f, XAlignment.CENTER, YAlignment.TOP);
@@ -41,16 +40,13 @@ public class MainMenuState extends GameState {
 
 	@Override
 	public void init() {
-
+		super.init();
+		switchGameState = GameStates.MAIN_MENU;
 	}
 
 	@Override
 	public GameStates doLoop(double dt) {
 		return switchGameState;
-	}
-
-	@Override
-	public void dispose() {
 	}
 
 }

@@ -6,7 +6,7 @@ import com.lucaslng.GameStates;
 import com.lucaslng.engine.ui.*;
 
 public abstract class GameState {
-  protected final Engine engine;
+	protected final Engine engine;
 	protected final UIManager uiManager;
 	protected final EntityManager entityManager;
 	private long lastTick, lastFpsTime;
@@ -14,14 +14,8 @@ public abstract class GameState {
 	private double dt;
 	private final Text fpsText;
 
-	// init method executes everytime the gameState changes to this one
-	abstract public void init();
-
 	// we only want doLoop to have access to dt
 	abstract public GameStates doLoop(double dt);
-
-	// called when switching to a different state
-	abstract public void dispose();
 
 	// constructor executes only once, when the entire game initializes
 	public GameState(Engine engine) {
@@ -33,9 +27,20 @@ public abstract class GameState {
 		lastTick = System.nanoTime();
 		frameCount = 0;
 		dt = 0d;
-		fpsText = new Text(10f, 10f, 0f, 0f, XAlignment.LEFT, YAlignment.TOP, "FPS: ", new TextStyle("Arial", 6f, Color.BLACK));
+		fpsText = new Text(10f, 10f, 0f, 0f, XAlignment.LEFT, YAlignment.TOP, "FPS: ",
+				new TextStyle("Arial", 6f, Color.BLACK));
 		fpsText.visible = engine.settings.showFPS;
 		uiManager.elements.add(fpsText);
+	}
+
+	// init method executes everytime the gameState changes to this one
+	public void init() {
+		uiManager.active = true;
+	}
+
+	// called when switching to a different state
+	public void dispose() {
+		uiManager.active = false;
 	}
 
 	public GameStates loop() {
