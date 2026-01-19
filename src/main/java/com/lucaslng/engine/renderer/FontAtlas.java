@@ -2,6 +2,7 @@ package com.lucaslng.engine.renderer;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -13,7 +14,7 @@ public class FontAtlas {
 			chars[c - START] = c;
 		}
 	}
-	public static final int WIDTH = 4000, HEIGHT = 200;
+	public static final int WIDTH = 6000, HEIGHT = 1000;
 	private final Graphics2D g;
 	protected final BufferedImage atlas;
 	protected final ArrayList<int[]> fontStarts;
@@ -36,7 +37,21 @@ public class FontAtlas {
 		yy = 0;
 	}
 
-	public void addFont(Font font) {
+	public void addFontFromTTF(String fileName, int style) {
+		try {
+			Font font = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream("assets/fonts/" + fileName + ".ttf")).deriveFont(style, 50);
+			addFont(font);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to open font file.");
+		}
+	}
+
+	public void addFont(String family, int style) {
+		addFont(new Font(family, style, 50));
+	}
+
+	private void addFont(Font font) {
+		assert font.getSize() == 50;
 		if (fontIndexes.containsKey(font.getFamily())) // font already added
 			return;
 		fontIndexes.put(font.getFamily(), fontStarts.size());

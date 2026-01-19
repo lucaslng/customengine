@@ -22,11 +22,13 @@ public class Window {
 	private final ArrayList<GLFWFramebufferSizeCallbackI> framebufferSizeCallbacks;
 	private final ArrayList<GLFWMouseButtonCallbackI> mouseButtonCallbacks;
 	private final ArrayList<GLFWCursorPosCallbackI> cursorPosCallbacks;
+	private final ArrayList<GLFWKeyCallbackI> keyCallbacks;
 
 	public Window(EngineSettings engineSettings) {
 		framebufferSizeCallbacks = new ArrayList<>();
 		mouseButtonCallbacks = new ArrayList<>();
 		cursorPosCallbacks = new ArrayList<>();
+		keyCallbacks = new ArrayList<>();
 
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			Configuration.GLFW_LIBRARY_NAME.set("glfw_async");
@@ -76,6 +78,11 @@ public class Window {
 				callback.invoke(window, xpos, ypos);
 		});
 
+		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
+			for (GLFWKeyCallbackI callback : keyCallbacks)
+				callback.invoke(window, key, scancode, action, mods);
+		});
+
 		glfwSetWindowFocusCallback(window, (window, focused) -> {
 			this.focused = focused;
 		});
@@ -108,6 +115,10 @@ public class Window {
 
 	public void addCursorPosCallback(GLFWCursorPosCallbackI cursorPosCallback) {
 		cursorPosCallbacks.add(cursorPosCallback);
+	}
+
+	public void addKeyCallback(GLFWKeyCallbackI keyCallback) {
+		keyCallbacks.add(keyCallback);
 	}
 
 	public void swapBuffers() {

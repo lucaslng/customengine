@@ -4,8 +4,6 @@ import java.util.HashSet;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 
 import com.lucaslng.engine.renderer.Window;
 
@@ -20,7 +18,7 @@ public class InputHandler {
 		this.window = window;
 		isMac = System.getProperty("os.name").startsWith("Mac");
 		heldKeys = new HashSet<>();
-		glfwSetKeyCallback(window.window, (window_, key, scancode, action, mods) -> {
+		window.addKeyCallback((window_, key, scancode, action, mods) -> {
 			if (action == GLFW_PRESS) {
 				keyPressed(key);
 			} else if (action == GLFW_RELEASE) {

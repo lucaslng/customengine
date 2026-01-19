@@ -30,7 +30,8 @@ public final class Engine {
 		soundHandler = new SoundHandler();
 		
 		fontAtlas = new FontAtlas();
-		fontAtlas.addFont(new Font("Arial", Font.PLAIN, 50));
+		fontAtlas.addFont("Arial", Font.PLAIN);
+		fontAtlas.addFontFromTTF("Pixeled", Font.PLAIN);
 		fontAtlas.dispose();
 
 		window = new Window(settings);

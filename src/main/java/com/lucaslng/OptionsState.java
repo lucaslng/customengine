@@ -16,14 +16,14 @@ public class OptionsState extends GameState {
 		super(engine);
 
 		// x ignored due to center alignment
-		backButton = new Button(0f, 80f, 600f, 200f, XAlignment.CENTER, YAlignment.BOTTOM, new Color(225, 150, 150));
+		backButton = new Button(-600f, 110f, 400f, 140f, XAlignment.CENTER, YAlignment.TOP, new Color(225, 150, 150));
 		backButton.addOperation(() -> {
 			engine.soundHandler.play("click");
 			switchGameState = GameStates.MAIN_MENU;
 		});
 		uiManager.elements.add(backButton);
-		uiManager.elements.add(new Text(-120f, 200f, 0f, 0f, XAlignment.CENTER, YAlignment.BOTTOM, "BACK",
-				new TextStyle("Arial", 15f, Color.BLACK)));
+		uiManager.elements.add(new Text(-730f, 80f, 0f, 0f, XAlignment.CENTER, YAlignment.TOP, "BACK",
+				new TextStyle("Pixeled", 13f, Color.BLACK)));
 	}
 
 	@Override
