@@ -52,7 +52,7 @@ class PlayingState extends GameState {
 
 	@Override
 	public GameStates doLoop(double dt) {
-		float baseSpeed = 6f;
+		float baseSpeed = 8f;
 		float speed = baseSpeed * (float) dt;
 
 		transition.update((float) dt);
