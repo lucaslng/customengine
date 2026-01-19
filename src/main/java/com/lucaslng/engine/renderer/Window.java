@@ -48,15 +48,32 @@ public class Window {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
 		glfwWindowHint(GLFW_SAMPLES, 4);
+		glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
+
+		// windowed fullscreen
+		long primaryMonitor = glfwGetPrimaryMonitor();
+		GLFWVidMode videoMode = primaryMonitor != NULL ? glfwGetVideoMode(primaryMonitor) : null;
+		int windowWidth = engineSettings.referenceDimension.width;
+		int windowHeight = engineSettings.referenceDimension.height;
+		if (videoMode != null) {
+			windowWidth = videoMode.width();
+			windowHeight = videoMode.height();
+		}
 
 		// create window
-		window = glfwCreateWindow(engineSettings.referenceDimension.width, engineSettings.referenceDimension.height,
-				engineSettings.title,
-				NULL, NULL);
+		window = glfwCreateWindow(windowWidth, windowHeight, engineSettings.title, NULL, NULL);
 		if (window == NULL) {
 			throw new RuntimeException("Failed to create the GLFW window");
 		}
 		System.out.println("GLFW window created successfully");
+		if (videoMode != null && glfwGetPlatform() != GLFW_PLATFORM_WAYLAND) {
+			try (MemoryStack stack = stackPush()) {
+				IntBuffer monitorX = stack.mallocInt(1);
+				IntBuffer monitorY = stack.mallocInt(1);
+				glfwGetMonitorPos(primaryMonitor, monitorX, monitorY);
+				glfwSetWindowPos(window, monitorX.get(0), monitorY.get(0));
+			}
+		}
 
 		glfwSetFramebufferSizeCallback(window, (window, w, h) -> {
 			this.w = w;
