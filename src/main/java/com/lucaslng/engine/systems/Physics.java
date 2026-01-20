@@ -123,6 +123,7 @@ public class Physics {
 
 					float collisionTime = sweptAABB(startPos, endPos, halfExtents, otherPos, otherExtents);
 
+					// if there was collision
 					if (collisionTime >= 0f && collisionTime < 1f) {
 						// Collision on this axis
 						Vector3f collisionPos = new Vector3f(startPos).lerp(endPos, collisionTime);
@@ -371,14 +372,21 @@ public class Physics {
 	}
 
 	// Calculates collision time
-	private static float sweptAABB(Vector3f startPos, Vector3f endPos, Vector3f movingExtents, Vector3f otherPos,
-			Vector3f otherExtents) {
+	// startPos - center of moving box at start
+	// endPos - center of moving box at end
+	// movingExtents - half size of moving box
+	// staticPos - center of static box
+	// staticExtents - half size of static box
+	private static float sweptAABB(Vector3f startPos, Vector3f endPos, Vector3f movingExtents, Vector3f staticPos,
+			Vector3f staticExtents) {
 		Vector3f velocity = new Vector3f(endPos).sub(startPos);
-		if (velocity.lengthSquared() < 0.0001f)
-			return -1f; // no collision
+		if (velocity.lengthSquared() < 0.0001f) // exit early if no movement
+			return -1f; // return -1 if no collision
 
-		Vector3f expandedMin = new Vector3f(otherPos).sub(otherExtents).sub(movingExtents);
-		Vector3f expandedMax = new Vector3f(otherPos).add(otherExtents).add(movingExtents);
+		// expand the static box, so that instead of comparing box vs box, we are now comparing point vs box
+		// When the center of the moving object collides the expanded box, there is collision
+		Vector3f expandedMin = new Vector3f(staticPos).sub(staticExtents).sub(movingExtents);
+		Vector3f expandedMax = new Vector3f(staticPos).add(staticExtents).add(movingExtents);
 
 		float tmin = 0f;
 		float tmax = 1f;
@@ -390,28 +398,31 @@ public class Physics {
 			float min = expandedMin.get(i);
 			float max = expandedMax.get(i);
 
-			if (Math.abs(v) < 0.0001f) {
-				if (p < min || p > max)
+			if (Math.abs(v) < 0.0001f) { // if no movement along this axis
+				if (p < min || p > max) // if starts outside the slab, it will never enter
 					return -1f;
 			} else {
+				// the times when the ray hits the near and far faces of the slab
 				float t1 = (min - p) / v;
 				float t2 = (max - p) / v;
 
+				// swap order to ensure that t1 is the start and t2 is the end
 				if (t1 > t2) {
 					float temp = t1;
 					t1 = t2;
 					t2 = temp;
 				}
 
-				tmin = Math.max(tmin, t1);
-				tmax = Math.min(tmax, t2);
+				tmin = Math.max(tmin, t1); // the latest time the moving point enters all axis slabs
+				tmax = Math.min(tmax, t2); // the earliest time the moving point exits any axis slab
 
+				// point must be inside all axis slab's at once to be in the box (collision)
 				if (tmin > tmax)
 					return -1f;
 			}
 		}
 
-		return tmin;
+		return tmin; // the first time the point is inside every slab
 	}
 
 	private static Vector3f getCollisionNormal(Vector3f movingPos, Vector3f movingExtents, Vector3f staticPos,
