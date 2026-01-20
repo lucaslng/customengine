@@ -161,10 +161,8 @@ public final class Renderer {
 		float[] uiOrtho = new Matrix4f().ortho(0f, window.w(), window.h(), 0f, -1f, 1f).get(new float[16]);
 		uiShader.setUniformMatrix4v("ortho", false, uiOrtho);
 		uiShader.setUniform1i("uUseTexture", 0);
-		System.out.println("---");
 		for (UIElement element : uiManager.elements) {
 			if (element.visible && element instanceof RectElement rectElement) {
-				System.out.println("DRAW " + element.getClass().getSimpleName());
 				float x = rectElement.x * window.uiScale();
 				float y = rectElement.y * window.uiScale();
 				float width = rectElement.width * window.uiScale();

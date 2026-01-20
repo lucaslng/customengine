@@ -16,6 +16,10 @@ public final class Texture {
 	private final int id;
 
 	public Texture(BufferedImage image) {
+		this(image, GL_CLAMP_TO_BORDER);
+	}
+
+	public Texture(BufferedImage image, int wrap) {
 		
 		id = glGenTextures();
 		glBindTexture(GL_TEXTURE_2D, id);
@@ -23,8 +27,8 @@ public final class Texture {
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 		
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

@@ -27,42 +27,45 @@ public class BoxEntityFactory implements AbstractEntityFactory {
 		hx = width / 2f;
 		hy = height / 2f;
 		hz = length / 2f;
+		float tx = width / 10f;
+		float ty = height / 10f;
+		float tz = length / 10f;
 		vertices = new float[] {
 				// BACK (-Z)
 				-hx, -hy, -hz, 0, 0, -1, 0, 0,
-				hx, -hy, -hz, 0, 0, -1, 1, 0,
-				hx, hy, -hz, 0, 0, -1, 1, 1,
-				-hx, hy, -hz, 0, 0, -1, 0, 1,
+				hx, -hy, -hz, 0, 0, -1, tx, 0,
+				hx, hy, -hz, 0, 0, -1, tx, ty,
+				-hx, hy, -hz, 0, 0, -1, 0, ty,
 
 				// RIGHT (+X)
 				hx, -hy, -hz, 1, 0, 0, 0, 0,
-				hx, -hy, hz, 1, 0, 0, 1, 0,
-				hx, hy, hz, 1, 0, 0, 1, 1,
-				hx, hy, -hz, 1, 0, 0, 0, 1,
+				hx, -hy, hz, 1, 0, 0, 0, tz,
+				hx, hy, hz, 1, 0, 0, ty, tz,
+				hx, hy, -hz, 1, 0, 0, ty, 0,
 
 				// FRONT (+Z)
-				hx, -hy, hz, 0, 0, 1, 0, 0,
-				-hx, -hy, hz, 0, 0, 1, 1, 0,
-				-hx, hy, hz, 0, 0, 1, 1, 1,
-				hx, hy, hz, 0, 0, 1, 0, 1,
+				hx, -hy, hz, 0, 0, 1, tx, 0,
+				-hx, -hy, hz, 0, 0, 1, 0, 0,
+				-hx, hy, hz, 0, 0, 1, 0, ty,
+				hx, hy, hz, 0, 0, 1, tx, ty,
 
 				// LEFT (-X)
-				-hx, -hy, hz, -1, 0, 0, 0, 0,
-				-hx, -hy, -hz, -1, 0, 0, 1, 0,
-				-hx, hy, -hz, -1, 0, 0, 1, 1,
-				-hx, hy, hz, -1, 0, 0, 0, 1,
+				-hx, -hy, hz, -1, 0, 0, 0, tz,
+				-hx, -hy, -hz, -1, 0, 0, 0, 0,
+				-hx, hy, -hz, -1, 0, 0, ty, 0,
+				-hx, hy, hz, -1, 0, 0, ty, tz,
 
 				// TOP (+Y)
 				-hx, hy, -hz, 0, 1, 0, 0, 0,
-				hx, hy, -hz, 0, 1, 0, 1, 0,
-				hx, hy, hz, 0, 1, 0, 1, 1,
-				-hx, hy, hz, 0, 1, 0, 0, 1,
+				hx, hy, -hz, 0, 1, 0, tx, 0,
+				hx, hy, hz, 0, 1, 0, tx, tz,
+				-hx, hy, hz, 0, 1, 0, 0, tz,
 
 				// BOTTOM (-Y)
-				-hx, -hy, hz, 0, -1, 0, 0, 0,
-				hx, -hy, hz, 0, -1, 0, 1, 0,
-				hx, -hy, -hz, 0, -1, 0, 1, 1,
-				-hx, -hy, -hz, 0, -1, 0, 0, 1
+				-hx, -hy, hz, 0, -1, 0, 0, tz,
+				hx, -hy, hz, 0, -1, 0, tx, tz,
+				hx, -hy, -hz, 0, -1, 0, tx, 0,
+				-hx, -hy, -hz, 0, -1, 0, 0, 0
 		};
 
 	}
