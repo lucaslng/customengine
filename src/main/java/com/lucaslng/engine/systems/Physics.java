@@ -114,7 +114,7 @@ public class Physics {
 				// Check all colliders
 				for (int otherId : entityManager.getEntitiesWith(PositionComponent.class, RigidBodyComponent.class,
 						AABBComponent.class)) {
-					if (entityManager.hasComponent(entityId, DisabledComponent.class))
+					if (entityManager.hasComponent(otherId, DisabledComponent.class))
 						continue;
 					if (otherId == entityId)
 						continue;
@@ -129,7 +129,7 @@ public class Physics {
 						Vector3f collisionPos = new Vector3f(startPos).lerp(endPos, collisionTime);
 						Vector3f normal = getCollisionNormal(collisionPos, halfExtents, otherPos, otherExtents);
 
-						if (normal != null && Math.abs(normal.get(axis)) > 0.5f) {
+						if (Math.abs(normal.get(axis)) > 0.5f) { // if this is the face that is touching
 							// Push back slightly from collision point
 							float epsilon = 0.001f;
 							collisionPos.sub(new Vector3f(normal).mul(epsilon));
@@ -162,9 +162,9 @@ public class Physics {
 			if (hitFloor && entityManager.hasComponent(entityId, GroundedComponent.class)) {
 				GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
 				grounded.isGrounded = true;
-				if (DEBUG_GROUNDED) {
+
+				if (DEBUG_GROUNDED)
 					System.out.println("Entity " + entityId + " is GROUNDED via swept collision");
-				}
 			}
 		}
 
@@ -173,7 +173,6 @@ public class Physics {
 		for (int iter = 0; iter < iterations; iter++) {
 			ArrayList<Integer[]> contactIds = new ArrayList<>();
 			ArrayList<Contact> contactData = new ArrayList<>();
-
 			// Get all entities with collision components
 			ArrayList<Integer> colliders = new ArrayList<>(entityManager.getEntitiesWith(
 					PositionComponent.class, RigidBodyComponent.class, AABBComponent.class));
@@ -192,11 +191,9 @@ public class Physics {
 					if (entityManager.hasComponent(idb, DisabledComponent.class))
 						continue;
 					RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
-
 					// Skip if both are static
 					if (ra.isStatic() && rb.isStatic())
 						continue;
-
 					Vector3f pb = entityManager.getComponent(idb, PositionComponent.class).position();
 					Vector3f halfExtentsB = entityManager.getComponent(idb, AABBComponent.class).halfExtents();
 
@@ -425,16 +422,20 @@ public class Physics {
 		return tmin; // the first time the point is inside every slab
 	}
 
+	// Finds which face of the boxes is touching by seeing which axis overlaps the least
 	private static Vector3f getCollisionNormal(Vector3f movingPos, Vector3f movingExtents, Vector3f staticPos,
 			Vector3f staticExtents) {
-		Vector3f d = new Vector3f(staticPos).sub(movingPos);
+		Vector3f d = new Vector3f(staticPos).sub(movingPos); // d = staticCenter - movingCenter
+		// d.x > 0 -> static box is to the right; d.x < 0 -> to the left
 
+		// overlap depth for each axis
 		float ox = (movingExtents.x + staticExtents.x) - Math.abs(d.x);
 		float oy = (movingExtents.y + staticExtents.y) - Math.abs(d.y);
 		float oz = (movingExtents.z + staticExtents.z) - Math.abs(d.z);
 
 		Vector3f normal = new Vector3f();
 
+		// gets the least overlap
 		if (ox < oy && ox < oz) {
 			normal.x = d.x >= 0 ? 1f : -1f;
 		} else if (oy < oz) {
