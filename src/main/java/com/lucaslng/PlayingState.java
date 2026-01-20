@@ -99,6 +99,11 @@ class PlayingState extends GameState {
 		engine.renderer.setFadeAlpha(transition.getFadeAlpha());
 	}
 
+	@Override
+	public void dispose() {
+		engine.renderer.setRopeEnabled(false);
+	}
+
 	private void performLevelChange(Engine engine, int newLevel) {
 		levels.currentLevelIndex = newLevel;
 
