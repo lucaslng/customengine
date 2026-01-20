@@ -29,6 +29,7 @@ class PlayingState extends GameState {
 	private final Timers timers;
 	private final LevelTransition transition;
 	private final Buttons buttons;
+	private final ButtonPlatforms buttonPlatforms;
 
 	public PlayingState(Engine engine) {
 		super(engine);
@@ -62,6 +63,7 @@ class PlayingState extends GameState {
 		deaths = new Deaths(entityManager, player1, player2, exits);
 		transition = new LevelTransition();
 		buttons = new Buttons(entityManager, player1, player2);
+		buttonPlatforms = new ButtonPlatforms(entityManager);
 	}
 
 	@Override
@@ -89,8 +91,9 @@ class PlayingState extends GameState {
 					engine.settings.player2Jump.key);
 			applyRopeTension(player1, player2, (float) dt);
 
-			physics.step(dt);
 			buttons.update();
+			buttonPlatforms.update(dt);
+			physics.step(dt);
 			deaths.checkDeaths(levels.currentLevel(), (levelTimer) -> timers.setTimer(levelTimer));
 			exits.handleExits(player1, player2, dt);
 
@@ -186,6 +189,11 @@ class PlayingState extends GameState {
 	}
 
 	private void updateRopeRender() {
+		if (!levels.currentLevel().ropeEnabled()) {
+			engine.renderer.setRopeEnabled(false);
+			return;
+		}
+
 		boolean enabled = !isDisabled(engine, player1) && !isDisabled(engine, player2);
 		engine.renderer.setRopeEnabled(enabled);
 
@@ -204,6 +212,10 @@ class PlayingState extends GameState {
 	}
 
 	private void applyRopeTension(Entity a, Entity b, float dt) {
+		if (!levels.currentLevel().ropeEnabled()) {
+			return;
+		}
+
 		if (isDisabled(engine, a) || isDisabled(engine, b)) {
 			return;
 		}
