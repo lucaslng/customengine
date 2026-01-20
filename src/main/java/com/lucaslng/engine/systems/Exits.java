@@ -26,7 +26,7 @@ public class Exits {
 			// rotate exit
 			Vector3f rotation = entityManager.getComponent(exit, RotationComponent.class).rotation();
 			rotation.z += (float) Math.toRadians(dt * 180d);
-			System.out.println(rotation.toString());
+			// System.out.println(rotation.toString());
 			Vector3f exitPos = entityManager.getComponent(exit, PositionComponent.class).position();
 			float s = ExitEntityFactory.halfSize;
 			if (!player1Exited && pos1.x() > exitPos.x() - s && pos1.x() < exitPos.x() + s && pos1.y() > exitPos.y() - s && pos1.y() < exitPos.y() + s) {

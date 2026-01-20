@@ -11,6 +11,7 @@ import org.joml.Vector2f;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.components.LavaComponent;
 import com.lucaslng.entities.BoxEntityFactory;
+import com.lucaslng.entities.ButtonEntityFactory;
 import com.lucaslng.entities.ExitEntityFactory;
 
 public class Levels {
@@ -59,6 +60,9 @@ public class Levels {
 				}
 				case "exit" -> {
 					entities[i] = new ExitEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
+				}
+				case "button" -> {
+					entities[i] = new ButtonEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
 				}
 				default -> {
 				}
