@@ -1,5 +1,7 @@
 package com.lucaslng.entities;
 
+import java.util.Arrays;
+
 import org.joml.Vector3f;
 
 import com.lucaslng.engine.components.*;
@@ -20,10 +22,12 @@ public class BoxEntityFactory implements AbstractEntityFactory {
 	private final Vector3f position;
 	private final float hx, hy, hz;
 	private final String materialName;
+	private final Object[] extraComponents;
 
-	public BoxEntityFactory(float x, float y, float z, float width, float height, float length, String materialName) {
+	public BoxEntityFactory(float x, float y, float z, float width, float height, float length, String materialName, Object... extraComponents) {
 		position = new Vector3f(x, y, z);
 		this.materialName = materialName;
+		this.extraComponents = extraComponents == null ? new Object[0] : extraComponents;
 		hx = width / 2f;
 		hy = height / 2f;
 		hz = length / 2f;
@@ -72,8 +76,16 @@ public class BoxEntityFactory implements AbstractEntityFactory {
 
 	@Override
 	public Object[] components() {
-		return new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
+		Object[] baseComponents = new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
 				new MeshComponent(new SubMesh[] { new SubMesh(vertices, indices, materialName) }),
 				new RigidBodyComponent(0f, 1f, 1f, 1f), new AABBComponent(new Vector3f(hx, hy, hz)) };
+
+		if (extraComponents.length == 0) {
+			return baseComponents;
+		}
+		
+		Object[] components = Arrays.copyOf(baseComponents, baseComponents.length + extraComponents.length);
+		System.arraycopy(extraComponents, 0, components, baseComponents.length, extraComponents.length);
+		return components;
 	}
 }

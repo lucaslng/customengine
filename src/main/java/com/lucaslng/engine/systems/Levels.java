@@ -9,6 +9,7 @@ import java.util.Scanner;
 import org.joml.Vector2f;
 
 import com.lucaslng.engine.entities.AbstractEntityFactory;
+import com.lucaslng.engine.components.LavaComponent;
 import com.lucaslng.entities.BoxEntityFactory;
 import com.lucaslng.entities.ExitEntityFactory;
 
@@ -54,7 +55,7 @@ public class Levels {
 				}
 				case "lava" -> {
 					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,
-							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Lava");
+							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Lava", new LavaComponent());
 				}
 				case "exit" -> {
 					entities[i] = new ExitEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
