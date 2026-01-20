@@ -1,10 +1,12 @@
 package com.lucaslng;
 
+import java.awt.Color;
 import java.util.Set;
 
 import org.joml.Vector3f;
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameState;
+import com.lucaslng.engine.GameStateSwitch;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
@@ -15,6 +17,7 @@ import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
 import com.lucaslng.engine.systems.Physics;
 import com.lucaslng.engine.systems.Rotations;
+import com.lucaslng.engine.ui.*;
 import com.lucaslng.entities.CameraEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
 
@@ -32,6 +35,12 @@ class PlayingState extends GameState {
 
 	public PlayingState(Engine engine) {
 		super(engine);
+
+		Button homeButton = new Button(40f, 40f, 250f, 80f, XAlignment.RIGHT, YAlignment.TOP, ColorList.RED);
+		homeButton.addOperation(() -> gameStateSwitch = new GameStateSwitch(GameStates.MAIN_MENU, null));
+		uiManager.elements.add(homeButton);
+		uiManager.elements.add(new Text(260f, 20f, 0f, 0f, XAlignment.RIGHT, YAlignment.TOP, "Home",
+				new TextStyle("Pixeled", 8f, Color.BLACK)));
 
 		levels = new Levels();
 		Level level = levels.currentLevel();
