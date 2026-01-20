@@ -28,6 +28,8 @@ public class LevelSelectionState extends GameState {
 		uiManager.elements.add(new Text(-600f, -500f, 0f, 0f, XAlignment.CENTER, YAlignment.CENTER, "BACK",
 				new TextStyle("Pixeled", 13f, Color.BLACK)));
 
+		uiManager.elements.add(new Text(-160f, -300f, 0f, 0f, XAlignment.CENTER, YAlignment.CENTER, "Levels", new TextStyle("Pixeled", 13, Color.BLACK)));
+
 		for (int i = 1; i <= 10; i++) {
 			float x = (i - 6) * 120f + 60f;
 			Button button = new Button(x, 0f, 100f, 100f, XAlignment.CENTER, YAlignment.CENTER, ColorList.GRAY);
