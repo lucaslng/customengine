@@ -51,6 +51,15 @@ class PlayingState extends GameState {
 	}
 
 	@Override
+	public void init(Object payload) {
+		super.init(payload);
+		if (payload != null) {
+			int level = (int) payload;
+			performLevelChange(engine, level);
+		}
+	}
+
+	@Override
 	public void doLoop(double dt) {
 		float baseSpeed = 8f;
 		float speed = baseSpeed * (float) dt;
@@ -70,7 +79,7 @@ class PlayingState extends GameState {
 				transition.startTransition(new Runnable() {
 					@Override
 					public void run() {
-						performLevelChange(engine);
+						performLevelChange(engine, levels.currentLevelIndex + 1);
 					}
 				});
 			}
@@ -81,8 +90,8 @@ class PlayingState extends GameState {
 		engine.renderer.setFadeAlpha(transition.getFadeAlpha());
 	}
 
-	private void performLevelChange(Engine engine) {
-		levels.currentLevelIndex++;
+	private void performLevelChange(Engine engine, int newLevel) {
+		levels.currentLevelIndex = newLevel;
 
 		if (levels.currentLevelIndex > Levels.LEVEL_COUNT) {
 			System.out.println("You won!");
