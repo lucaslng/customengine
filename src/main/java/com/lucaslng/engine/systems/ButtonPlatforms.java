@@ -50,6 +50,7 @@ public class ButtonPlatforms {
 			float speed = Math.min(mover.speed, maxSpeed);
 			toTarget.normalize().mul(speed);
 			velocity.set(toTarget);
+			position.add(new Vector3f(velocity).mul(dtf));
 		}
 	}
 }

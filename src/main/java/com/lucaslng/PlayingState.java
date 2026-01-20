@@ -86,9 +86,9 @@ class PlayingState extends GameState {
 			handlePlayerMovement(engine, player2, speed, engine.settings.player2Left.key, engine.settings.player2Right.key, engine.settings.player2Jump.key);
 			applyRopeTension(player1, player2, (float) dt);
 
-			physics.step(dt);
 			buttons.update();
 			buttonPlatforms.update(dt);
+			physics.step(dt);
 			deaths.checkDeaths(levels.currentLevel());
 			exits.handleExits(player1, player2, dt);
 

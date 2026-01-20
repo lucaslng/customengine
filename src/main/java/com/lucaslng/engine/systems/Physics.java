@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.AABBComponent;
+import com.lucaslng.engine.components.ButtonMoveComponent;
 import com.lucaslng.engine.components.DisabledComponent;
 import com.lucaslng.engine.components.GroundedComponent;
 import com.lucaslng.engine.components.PositionComponent;
@@ -47,6 +48,8 @@ public class Physics {
 		for (int entityId : entityManager.getEntitiesWith(RigidBodyComponent.class, VelocityComponent.class)) {
 			if (entityManager.hasComponent(entityId, DisabledComponent.class))
 				continue;
+			if (entityManager.hasComponent(entityId, ButtonMoveComponent.class))
+				continue;
 			RigidBodyComponent rigidBody = entityManager.getComponent(entityId, RigidBodyComponent.class);
 			if (rigidBody.isStatic()) // static entities dont get gravity
 				continue;
@@ -57,8 +60,7 @@ public class Physics {
 
 			velocity.y -= G * rigidBody.gravityScale() * dt;
 
-			// Clamp velocity to prevent tunneling (objects moving through walls because
-			// they have too much velocity)
+			// Clamp velocity to prevent tunneling (objects moving through walls because they have too much velocity)
 			float speed = velocity.length();
 			if (speed > MAX_VELOCITY) {
 				if (DEBUG_VELOCITIES)
@@ -88,6 +90,8 @@ public class Physics {
 			}
 
 			RigidBodyComponent rb = entityManager.getComponent(entityId, RigidBodyComponent.class);
+			if (entityManager.hasComponent(entityId, ButtonMoveComponent.class))
+				continue;
 			if (rb.isStatic())
 				continue;
 			Vector3f halfExtents = entityManager.getComponent(entityId, AABBComponent.class).halfExtents();
@@ -248,6 +252,19 @@ public class Physics {
 									vb.y = va.y;
 								}
 							}
+							if (entityManager.hasComponent(ida, ButtonMoveComponent.class)
+									&& entityManager.hasComponent(ida, VelocityComponent.class)
+									&& entityManager.hasComponent(idb, VelocityComponent.class)) {
+								if (va == null) {
+									va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
+								}
+								if (vb == null) {
+									vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
+								}
+								// Carry grounded entities along moving platforms.
+								vb.x = va.x;
+								vb.z = va.z;
+							}
 
 							if (DEBUG_GROUNDED)
 								System.out.println("Entity " + idb + " is GROUNDED on entity " + ida);
@@ -291,6 +308,19 @@ public class Physics {
 									// Match the lower entity's vertical velocity when grounded.
 									va.y = vb.y;
 								}
+							}
+							if (entityManager.hasComponent(idb, ButtonMoveComponent.class)
+									&& entityManager.hasComponent(idb, VelocityComponent.class)
+									&& entityManager.hasComponent(ida, VelocityComponent.class)) {
+								if (vb == null) {
+									vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
+								}
+								if (va == null) {
+									va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
+								}
+								// Carry grounded entities along moving platforms.
+								va.x = vb.x;
+								va.z = vb.z;
 							}
 
 							if (DEBUG_GROUNDED) {
@@ -482,7 +512,7 @@ public class Physics {
 		}
 
 		// Friction
-		va.sub(vb, rv);
+		vb.sub(va, rv);
 		rvAlongNormal = rv.dot(normal);
 
 		Vector3f tangent = new Vector3f(rv).sub(new Vector3f(normal).mul(rvAlongNormal));
