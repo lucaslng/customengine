@@ -20,7 +20,7 @@ public class Physics {
 	private static final float PENETRATION_ALLOWANCE = 0.005f;
 	private static final float PENETRATION_CORRECTION = 1.0f;
 	private static final float MAX_VELOCITY = 50f;
-	
+
 	public static boolean DEBUG_COLLISIONS = false;
 	public static boolean DEBUG_VELOCITIES = false;
 	public static boolean DEBUG_GROUNDED = false;
@@ -31,126 +31,132 @@ public class Physics {
 	}
 
 	public void step(double dt) {
-		if (DEBUG_VELOCITIES) {
+		if (DEBUG_VELOCITIES)
 			System.out.println("=== Physics Step, dt=" + dt + " ===");
-		}
-		
-		// Reset grounded status
+
+		// Reset grounded status for all entities, it gets recalculated every frame
+		// Grounded status decides whether an entity is allowed to jump
 		for (int entityId : entityManager.getEntitiesWith(GroundedComponent.class)) {
-			if (entityManager.hasComponent(entityId, DisabledComponent.class)) continue;
+			if (entityManager.hasComponent(entityId, DisabledComponent.class))
+				continue;
 			GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
 			grounded.isGrounded = false;
 		}
 
 		// Apply gravity
 		for (int entityId : entityManager.getEntitiesWith(RigidBodyComponent.class, VelocityComponent.class)) {
-			if (entityManager.hasComponent(entityId, DisabledComponent.class)) continue;
+			if (entityManager.hasComponent(entityId, DisabledComponent.class))
+				continue;
 			RigidBodyComponent rigidBody = entityManager.getComponent(entityId, RigidBodyComponent.class);
-			if (rigidBody.isStatic())
+			if (rigidBody.isStatic()) // static entities dont get gravity
 				continue;
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
-			
-			if (DEBUG_VELOCITIES) {
+
+			if (DEBUG_VELOCITIES)
 				System.out.println("Entity " + entityId + " velocity before gravity: " + velocity);
-			}
-			
+
 			velocity.y -= G * rigidBody.gravityScale() * dt;
-			
-			// Clamp velocity to prevent tunneling
+
+			// Clamp velocity to prevent tunneling (objects moving through walls because
+			// they have too much velocity)
 			float speed = velocity.length();
 			if (speed > MAX_VELOCITY) {
-				if (DEBUG_VELOCITIES) {
+				if (DEBUG_VELOCITIES)
 					System.out.println("Entity " + entityId + " velocity clamped from " + speed + " to " + MAX_VELOCITY);
-				}
+
 				velocity.normalize().mul(MAX_VELOCITY);
 			}
-			
-			if (DEBUG_VELOCITIES) {
+
+			if (DEBUG_VELOCITIES)
 				System.out.println("Entity " + entityId + " velocity after gravity: " + velocity);
-			}
 		}
 
 		// Apply velocity with swept collision detection per-axis
 		for (int entityId : entityManager.getEntitiesWith(PositionComponent.class, VelocityComponent.class)) {
-			if (entityManager.hasComponent(entityId, DisabledComponent.class)) continue;
+			if (entityManager.hasComponent(entityId, DisabledComponent.class))
+				continue;
 			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
-			
-			if (!entityManager.hasComponent(entityId, RigidBodyComponent.class) || !entityManager.hasComponent(entityId, AABBComponent.class)) {
-				// No collision, just move
+
+			// If e doesn't have collision related components, just move normally without checking for collision
+			if (!entityManager.hasComponent(entityId, RigidBodyComponent.class)
+					|| !entityManager.hasComponent(entityId, AABBComponent.class)) {
 				Vector3f change = new Vector3f();
 				velocity.mul((float) dt, change);
 				position.add(change);
 				continue;
 			}
-			
+
 			RigidBodyComponent rb = entityManager.getComponent(entityId, RigidBodyComponent.class);
 			if (rb.isStatic())
 				continue;
-			
 			Vector3f halfExtents = entityManager.getComponent(entityId, AABBComponent.class).halfExtents();
-			Vector3f movement = new Vector3f(velocity).mul((float) dt);
 			
 			boolean hitFloor = false;
-			
+
+			// regular movement before collisions
+			Vector3f movement = new Vector3f(velocity).mul((float) dt);
+
 			// Move on each axis separately to prevent one axis from blocking another
-			// Order: X, Y, Z
+			// Order: X -> Y -> Z
 			for (int axis = 0; axis < 3; axis++) {
-				if (Math.abs(movement.get(axis)) < 0.0001f)
+				if (Math.abs(movement.get(axis)) < 0.0001f) // ignore tiny movement
 					continue;
-				
+
+				// calculate endPos of moving only on this axis
 				Vector3f startPos = new Vector3f(position);
 				Vector3f axisMovement = new Vector3f();
 				axisMovement.setComponent(axis, movement.get(axis));
 				Vector3f endPos = new Vector3f(position).add(axisMovement);
-				
+
 				boolean collided = false;
-				
+
 				// Check all colliders
-				for (int otherId : entityManager.getEntitiesWith(PositionComponent.class, RigidBodyComponent.class, AABBComponent.class)) {
-					if (entityManager.hasComponent(entityId, DisabledComponent.class)) continue;
+				for (int otherId : entityManager.getEntitiesWith(PositionComponent.class, RigidBodyComponent.class,
+						AABBComponent.class)) {
+					if (entityManager.hasComponent(entityId, DisabledComponent.class))
+						continue;
 					if (otherId == entityId)
 						continue;
-					
 					Vector3f otherPos = entityManager.getComponent(otherId, PositionComponent.class).position();
 					Vector3f otherExtents = entityManager.getComponent(otherId, AABBComponent.class).halfExtents();
-					
+
 					float collisionTime = sweptAABB(startPos, endPos, halfExtents, otherPos, otherExtents);
-					
+
 					if (collisionTime >= 0f && collisionTime < 1f) {
 						// Collision on this axis
 						Vector3f collisionPos = new Vector3f(startPos).lerp(endPos, collisionTime);
 						Vector3f normal = getCollisionNormal(collisionPos, halfExtents, otherPos, otherExtents);
-						
+
 						if (normal != null && Math.abs(normal.get(axis)) > 0.5f) {
 							// Push back slightly from collision point
 							float epsilon = 0.001f;
 							collisionPos.sub(new Vector3f(normal).mul(epsilon));
 							position.setComponent(axis, collisionPos.get(axis));
-							
+
 							// Stop velocity on this axis if moving into surface
 							float velOnAxis = velocity.get(axis);
 							float normalOnAxis = normal.get(axis);
 							if (velOnAxis * normalOnAxis > 0.01f) {
 								velocity.setComponent(axis, 0f);
 							}
-							
+
 							// Check if we hit a floor (Y axis, normal pointing down)
 							if (axis == 1 && normal.y < -0.7f) {
 								hitFloor = true;
 							}
-							
+
 							collided = true;
 							break;
 						}
 					}
 				}
-				
+
 				if (!collided) {
 					position.add(axisMovement);
 				}
 			}
-			
+
 			// Set grounded if we hit a floor during swept collision
 			if (hitFloor && entityManager.hasComponent(entityId, GroundedComponent.class)) {
 				GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
@@ -166,38 +172,40 @@ public class Physics {
 		for (int iter = 0; iter < iterations; iter++) {
 			ArrayList<Integer[]> contactIds = new ArrayList<>();
 			ArrayList<Contact> contactData = new ArrayList<>();
-			
+
 			// Get all entities with collision components
 			ArrayList<Integer> colliders = new ArrayList<>(entityManager.getEntitiesWith(
-				PositionComponent.class, RigidBodyComponent.class, AABBComponent.class));
-			
+					PositionComponent.class, RigidBodyComponent.class, AABBComponent.class));
+
 			// Check all pairs
 			for (int i = 0; i < colliders.size(); i++) {
 				int ida = colliders.get(i);
-				if (entityManager.hasComponent(ida, DisabledComponent.class)) continue;
+				if (entityManager.hasComponent(ida, DisabledComponent.class))
+					continue;
 				RigidBodyComponent ra = entityManager.getComponent(ida, RigidBodyComponent.class);
 				Vector3f pa = entityManager.getComponent(ida, PositionComponent.class).position();
 				Vector3f halfExtentsA = entityManager.getComponent(ida, AABBComponent.class).halfExtents();
-				
+
 				for (int j = i + 1; j < colliders.size(); j++) {
 					int idb = colliders.get(j);
-					if (entityManager.hasComponent(idb, DisabledComponent.class)) continue;
+					if (entityManager.hasComponent(idb, DisabledComponent.class))
+						continue;
 					RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
-					
+
 					// Skip if both are static
 					if (ra.isStatic() && rb.isStatic())
 						continue;
-					
+
 					Vector3f pb = entityManager.getComponent(idb, PositionComponent.class).position();
 					Vector3f halfExtentsB = entityManager.getComponent(idb, AABBComponent.class).halfExtents();
-					
+
 					Contact contact = checkCollision(pa, halfExtentsA, pb, halfExtentsB);
 					if (contact == null)
 						continue;
 
 					contactIds.add(new Integer[] { ida, idb });
 					contactData.add(contact);
-					
+
 					// Set grounded (only on first iteration)
 					if (iter == 0) {
 						// Normal points from A to B
@@ -209,7 +217,8 @@ public class Physics {
 							Vector3f vb = null;
 							if (entityManager.hasComponent(idb, VelocityComponent.class)) {
 								vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
-								// Don't ground if the lower entity is moving upward (jumping into the upper one).
+								// Don't ground if the lower entity is moving upward (jumping into the upper
+								// one).
 								canGround = vb.y <= 0.1f;
 							}
 							if (canGround && entityManager.hasComponent(ida, VelocityComponent.class)) {
@@ -217,14 +226,14 @@ public class Physics {
 								// Only ground if the upper entity isn't moving upward.
 								canGround = va.y <= 0.1f;
 							}
-							
+
 							if (!canGround) {
 								continue;
 							}
-							
+
 							GroundedComponent grounded = entityManager.getComponent(idb, GroundedComponent.class);
 							grounded.isGrounded = true;
-							
+
 							// Snap vertical velocity to the supporting entity to prevent bounce.
 							if (entityManager.hasComponent(idb, VelocityComponent.class)) {
 								if (vb == null) {
@@ -242,7 +251,7 @@ public class Physics {
 									vb.y = va.y;
 								}
 							}
-							
+
 							if (DEBUG_GROUNDED) {
 								System.out.println("Entity " + idb + " is GROUNDED on entity " + ida);
 							}
@@ -258,17 +267,18 @@ public class Physics {
 							}
 							if (canGround && entityManager.hasComponent(idb, VelocityComponent.class)) {
 								vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
-								// Don't ground if the lower entity is moving upward (jumping into the upper one).
+								// Don't ground if the lower entity is moving upward (jumping into the upper
+								// one).
 								canGround = vb.y <= 0.1f;
 							}
-							
+
 							if (!canGround) {
 								continue;
 							}
-							
+
 							GroundedComponent grounded = entityManager.getComponent(ida, GroundedComponent.class);
 							grounded.isGrounded = true;
-							
+
 							// Snap vertical velocity to the supporting entity to prevent bounce.
 							if (entityManager.hasComponent(ida, VelocityComponent.class)) {
 								if (va == null) {
@@ -286,7 +296,7 @@ public class Physics {
 									va.y = vb.y;
 								}
 							}
-							
+
 							if (DEBUG_GROUNDED) {
 								System.out.println("Entity " + ida + " is GROUNDED on entity " + idb);
 							}
@@ -305,15 +315,15 @@ public class Physics {
 					int idb = contactIds.get(i)[1];
 					RigidBodyComponent ra = entityManager.getComponent(ida, RigidBodyComponent.class);
 					RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
-					
+
 					// Skip impulse resolution if either object is static
 					// Swept collision already handles static collisions
 					if (ra.isStatic() || rb.isStatic())
 						continue;
-					
+
 					Vector3f va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
 					Vector3f vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
-					
+
 					resolveContact(ra, rb, va, vb, c);
 				}
 			}
@@ -345,7 +355,7 @@ public class Physics {
 
 		Vector3f normal = new Vector3f();
 		float penetration;
-		
+
 		if (ox < oy && ox < oz) {
 			penetration = ox;
 			normal.x = d.x >= 0 ? 1f : -1f;
@@ -360,57 +370,60 @@ public class Physics {
 		return new Contact(penetration, normal);
 	}
 
-	private static float sweptAABB(Vector3f startPos, Vector3f endPos, Vector3f movingExtents, Vector3f staticPos, Vector3f staticExtents) {
+	// Calculates collision time
+	private static float sweptAABB(Vector3f startPos, Vector3f endPos, Vector3f movingExtents, Vector3f otherPos,
+			Vector3f otherExtents) {
 		Vector3f velocity = new Vector3f(endPos).sub(startPos);
-		
 		if (velocity.lengthSquared() < 0.0001f)
-			return -1f;
-		
-		Vector3f expandedMin = new Vector3f(staticPos).sub(staticExtents).sub(movingExtents);
-		Vector3f expandedMax = new Vector3f(staticPos).add(staticExtents).add(movingExtents);
-		
+			return -1f; // no collision
+
+		Vector3f expandedMin = new Vector3f(otherPos).sub(otherExtents).sub(movingExtents);
+		Vector3f expandedMax = new Vector3f(otherPos).add(otherExtents).add(movingExtents);
+
 		float tmin = 0f;
 		float tmax = 1f;
-		
+
+		// for each axis
 		for (int i = 0; i < 3; i++) {
 			float v = velocity.get(i);
 			float p = startPos.get(i);
 			float min = expandedMin.get(i);
 			float max = expandedMax.get(i);
-			
+
 			if (Math.abs(v) < 0.0001f) {
 				if (p < min || p > max)
 					return -1f;
 			} else {
 				float t1 = (min - p) / v;
 				float t2 = (max - p) / v;
-				
+
 				if (t1 > t2) {
 					float temp = t1;
 					t1 = t2;
 					t2 = temp;
 				}
-				
+
 				tmin = Math.max(tmin, t1);
 				tmax = Math.min(tmax, t2);
-				
+
 				if (tmin > tmax)
 					return -1f;
 			}
 		}
-		
+
 		return tmin;
 	}
-	
-	private static Vector3f getCollisionNormal(Vector3f movingPos, Vector3f movingExtents, Vector3f staticPos, Vector3f staticExtents) {
+
+	private static Vector3f getCollisionNormal(Vector3f movingPos, Vector3f movingExtents, Vector3f staticPos,
+			Vector3f staticExtents) {
 		Vector3f d = new Vector3f(staticPos).sub(movingPos);
-		
+
 		float ox = (movingExtents.x + staticExtents.x) - Math.abs(d.x);
 		float oy = (movingExtents.y + staticExtents.y) - Math.abs(d.y);
 		float oz = (movingExtents.z + staticExtents.z) - Math.abs(d.z);
-		
+
 		Vector3f normal = new Vector3f();
-		
+
 		if (ox < oy && ox < oz) {
 			normal.x = d.x >= 0 ? 1f : -1f;
 		} else if (oy < oz) {
@@ -418,15 +431,16 @@ public class Physics {
 		} else {
 			normal.z = d.z >= 0 ? 1f : -1f;
 		}
-		
+
 		return normal;
 	}
 
-	private static void resolveContact(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f va, Vector3f vb, Vector3f normal) {
+	private static void resolveContact(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f va, Vector3f vb,
+			Vector3f normal) {
 		Vector3f rv = new Vector3f();
 		va.sub(vb, rv);
 		float rvAlongNormal = rv.dot(normal);
-		
+
 		// Objects are separating or barely touching, don't apply impulse
 		// Use a larger threshold to prevent bouncing
 		if (rvAlongNormal > -1.0f)
@@ -440,13 +454,13 @@ public class Physics {
 
 		float j = -(1 + e) * rvAlongNormal;
 		j /= invMassSum;
-		
+
 		// Clamp impulse much more aggressively
 		float maxImpulse = 20f;
 		j = Math.min(j, maxImpulse);
-		
+
 		Vector3f impulse = new Vector3f(normal).mul(j);
-		
+
 		if (!ra.isStatic()) {
 			Vector3f change = new Vector3f(impulse).mul(ra.invMass());
 			va.sub(change);
@@ -460,22 +474,22 @@ public class Physics {
 		// Friction
 		va.sub(vb, rv);
 		rvAlongNormal = rv.dot(normal);
-		
+
 		Vector3f tangent = new Vector3f(rv).sub(new Vector3f(normal).mul(rvAlongNormal));
-		
+
 		float tLen = tangent.length();
 		if (tLen > 0.0001f) {
 			tangent.normalize();
-			
+
 			float jt = -rv.dot(tangent);
 			jt /= invMassSum;
-			
+
 			float mu = (float) Math.sqrt(ra.friction() * rb.friction());
 			float maxFriction = Math.abs(j * mu);
 			jt = Math.max(-maxFriction, Math.min(maxFriction, jt));
-			
+
 			Vector3f frictionImpulse = new Vector3f(tangent).mul(jt);
-			
+
 			if (!ra.isStatic()) {
 				Vector3f change = new Vector3f(frictionImpulse).mul(ra.invMass());
 				va.sub(change);
@@ -487,14 +501,16 @@ public class Physics {
 		}
 	}
 
-	private static void correctPosition(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f pa, Vector3f pb, Contact contact) {
+	private static void correctPosition(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f pa, Vector3f pb,
+			Contact contact) {
 		float invMassSum = ra.invMass() + rb.invMass();
 		if (invMassSum == 0f)
 			return;
-			
-		float correctionMagnitude = Math.max(contact.penetration() - PENETRATION_ALLOWANCE, 0f) / invMassSum * PENETRATION_CORRECTION;
+
+		float correctionMagnitude = Math.max(contact.penetration() - PENETRATION_ALLOWANCE, 0f) / invMassSum
+				* PENETRATION_CORRECTION;
 		Vector3f correction = new Vector3f(contact.c()).mul(correctionMagnitude);
-		
+
 		if (!ra.isStatic()) {
 			Vector3f corrA = new Vector3f(correction).mul(ra.invMass());
 			pa.sub(corrA);
@@ -505,5 +521,6 @@ public class Physics {
 		}
 	}
 
-	private record Contact(float penetration, Vector3f c) {}
+	private record Contact(float penetration, Vector3f c) {
+	}
 }
