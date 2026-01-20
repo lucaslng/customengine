@@ -17,6 +17,8 @@ public class Deaths {
 	private final EntityManager entityManager;
 	private final Entity player1, player2;
 	private final Exits exits;
+	
+	private static final float LAVA_CONTACT_MARGIN = 0.05f;
 
 	public Deaths(EntityManager entityManager, Entity player1, Entity player2, Exits exits) {
 		this.entityManager = entityManager;
@@ -45,12 +47,12 @@ public class Deaths {
 			Vector3f lavaExtents = entityManager.getComponent(lavaId, AABBComponent.class).halfExtents();
 
 			if (!entityManager.hasComponent(player1.id(), DisabledComponent.class)
-					&& isOverlapping(pos1, player1Aabb.halfExtents(), lavaPos, lavaExtents)) {
+					&& isTouchingLava(pos1, player1Aabb.halfExtents(), lavaPos, lavaExtents)) {
 				killPlayer(true, currentLevel);
 				return;
 			}
 			if (!entityManager.hasComponent(player2.id(), DisabledComponent.class)
-					&& isOverlapping(pos2, player2Aabb.halfExtents(), lavaPos, lavaExtents)) {
+					&& isTouchingLava(pos2, player2Aabb.halfExtents(), lavaPos, lavaExtents)) {
 				killPlayer(false, currentLevel);
 				return;
 			}
@@ -86,9 +88,19 @@ public class Deaths {
 		}
 	}
 
-	private boolean isOverlapping(Vector3f posA, Vector3f extA, Vector3f posB, Vector3f extB) {
-		return Math.abs(posA.x - posB.x) <= (extA.x + extB.x)
-				&& Math.abs(posA.y - posB.y) <= (extA.y + extB.y)
-				&& Math.abs(posA.z - posB.z) <= (extA.z + extB.z);
+	private boolean isTouchingLava(Vector3f playerPos, Vector3f playerExt, Vector3f lavaPos, Vector3f lavaExt) {
+		boolean overlapXZ = Math.abs(playerPos.x - lavaPos.x) <= (playerExt.x + lavaExt.x)
+				&& Math.abs(playerPos.z - lavaPos.z) <= (playerExt.z + lavaExt.z);
+
+		if (!overlapXZ) {
+			return false;
+		}
+
+		float playerBottom = playerPos.y - playerExt.y;
+		float playerTop = playerPos.y + playerExt.y;
+		float lavaBottom = lavaPos.y - lavaExt.y;
+		float lavaTop = lavaPos.y + lavaExt.y;
+
+		return playerBottom <= lavaTop + LAVA_CONTACT_MARGIN && playerTop >= lavaBottom - LAVA_CONTACT_MARGIN;
 	}
 }
