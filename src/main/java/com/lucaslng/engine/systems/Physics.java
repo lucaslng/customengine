@@ -238,9 +238,8 @@ public class Physics {
 									vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
 								}
 								if (ra.isStatic()) {
-									if (vb.y < 0f) {
+									if (vb.y < 0f)
 										vb.y = 0f;
-									}
 								} else if (entityManager.hasComponent(ida, VelocityComponent.class)) {
 									if (va == null) {
 										va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
@@ -250,9 +249,8 @@ public class Physics {
 								}
 							}
 
-							if (DEBUG_GROUNDED) {
+							if (DEBUG_GROUNDED)
 								System.out.println("Entity " + idb + " is GROUNDED on entity " + ida);
-							}
 						}
 						if (contact.c().y < -0.7f && !ra.isStatic() && entityManager.hasComponent(ida, GroundedComponent.class)) {
 							boolean canGround = true;
@@ -516,9 +514,10 @@ public class Physics {
 	private static void correctPosition(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f pa, Vector3f pb,
 			Contact contact) {
 		float invMassSum = ra.invMass() + rb.invMass();
-		if (invMassSum == 0f)
+		if (invMassSum == 0f) // both objects static, early exit
 			return;
 
+		// split correction over multiple frames and only correct if above PENETRATION_ALLOWANCE to avoid jittering
 		float correctionMagnitude = Math.max(contact.penetration() - PENETRATION_ALLOWANCE, 0f) / invMassSum
 				* PENETRATION_CORRECTION;
 		Vector3f correction = new Vector3f(contact.c()).mul(correctionMagnitude);
