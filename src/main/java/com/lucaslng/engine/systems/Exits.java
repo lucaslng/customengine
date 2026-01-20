@@ -5,9 +5,7 @@ import java.util.Set;
 import org.joml.Vector3f;
 
 import com.lucaslng.engine.EntityManager;
-import com.lucaslng.engine.components.DisabledComponent;
-import com.lucaslng.engine.components.ExitComponent;
-import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.entities.ExitEntityFactory;
 
@@ -21,10 +19,14 @@ public class Exits {
 		refresh();
 	}
 
-	public void handleExits(Entity player1, Entity player2) {
+	public void handleExits(Entity player1, Entity player2, double dt) {
 		Vector3f pos1 = entityManager.getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = entityManager.getComponent(player2.id(), PositionComponent.class).position();
 		for (int exit : exits) {
+			// rotate exit
+			Vector3f rotation = entityManager.getComponent(exit, RotationComponent.class).rotation();
+			rotation.z += (float) Math.toRadians(dt * 180d);
+			System.out.println(rotation.toString());
 			Vector3f exitPos = entityManager.getComponent(exit, PositionComponent.class).position();
 			float s = ExitEntityFactory.halfSize;
 			if (!player1Exited && pos1.x() > exitPos.x() - s && pos1.x() < exitPos.x() + s && pos1.y() > exitPos.y() - s && pos1.y() < exitPos.y() + s) {

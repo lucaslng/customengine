@@ -32,7 +32,7 @@ public class ExitEntityFactory implements AbstractEntityFactory {
 
 	@Override
 	public Object[] components() {
-		return new Object[] { new PositionComponent(position), new ExitComponent(),
-				new MeshComponent(new SubMesh[] { new SubMesh(vertices, indices, "Cat") }) };
+		return new Object[] { new PositionComponent(position), new ExitComponent(), new RotationComponent(new Vector3f()),
+				new MeshComponent(new SubMesh[] { new SubMesh(vertices, indices, "Exit") }) };
 	};
 }

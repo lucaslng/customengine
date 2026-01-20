@@ -82,7 +82,7 @@ class PlayingState extends GameState {
 
 			physics.step(dt);
 			deaths.checkDeaths(levels.currentLevel());
-			exits.handleExits(player1, player2);
+			exits.handleExits(player1, player2, dt);
 
 			if (exits.player1Exited && exits.player2Exited) {
 				transition.startTransition(new Runnable() {
