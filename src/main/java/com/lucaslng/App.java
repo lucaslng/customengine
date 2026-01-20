@@ -14,6 +14,7 @@ public class App {
 		gameStates.put(GameStates.PLAYING, new PlayingState(engine));
 		gameStates.put(GameStates.MAIN_MENU, new MainMenuState(engine));
 		gameStates.put(GameStates.OPTIONS, new OptionsState(engine));
+		gameStates.put(GameStates.LEVEL_SELECTION, new LevelSelectionState(engine));
 
 		engine.start(GameStates.MAIN_MENU);
 	}

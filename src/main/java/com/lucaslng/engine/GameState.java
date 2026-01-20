@@ -36,6 +36,7 @@ public abstract class GameState {
 
 	// init method executes everytime the gameState changes to this one
 	public void init(Object payload) {
+		gameStateSwitch = null;
 		uiManager.active = true;
 	}
 
