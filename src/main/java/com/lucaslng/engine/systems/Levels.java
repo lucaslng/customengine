@@ -52,6 +52,10 @@ public class Levels {
 					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,
 							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Platform");
 				}
+				case "lava" -> {
+					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,
+							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Lava");
+				}
 				case "exit" -> {
 					entities[i] = new ExitEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
 				}
