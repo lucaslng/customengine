@@ -25,4 +25,6 @@ public class EngineSettings {
 	public KeyBind player2Right = new KeyBind(GLFW_KEY_RIGHT);
 	public KeyBind player2Jump = new KeyBind(GLFW_KEY_UP);
 
+	public boolean refreshLevels = true;
+
 }

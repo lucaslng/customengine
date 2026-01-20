@@ -17,12 +17,16 @@ import com.lucaslng.entities.ExitEntityFactory;
 public class Levels {
 
 	public static final int LEVEL_COUNT = 2;
-	private final Level[] levels;
+	private Level[] levels;
 	public int currentLevelIndex;
 
 	public Levels() {
 		levels = readLevels();
 		currentLevelIndex = 1;
+	}
+
+	public void refreshLevels() {
+		levels = readLevels();
 	}
 
 	private static Level[] readLevels() {
@@ -40,6 +44,7 @@ public class Levels {
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Failed to read level file.");
 		}
+		int timer = Integer.parseInt(in.nextLine());
 		String[] tokens = in.nextLine().split(" ");
 		assert tokens.length == 4;
 		Vector2f player1Spawn = new Vector2f(parseFloat(tokens[0]), parseFloat(tokens[1]));
@@ -69,13 +74,16 @@ public class Levels {
 			}
 		}
 		in.close();
-		return new Level(player1Spawn, player2Spawn, entities);
+		return new Level(player1Spawn, player2Spawn, entities, timer);
 	}
 
 	public Level currentLevel() {
 		return levels[currentLevelIndex - 1];
 	}
 
-	public record Level(Vector2f player1Spawn, Vector2f player2Spawn, AbstractEntityFactory[] entityFactories) {
+	public record Level(Vector2f player1Spawn, Vector2f player2Spawn, AbstractEntityFactory[] entityFactories, int timer) {
+		public boolean hasTimer() {
+			return timer != 0;
+		}
 	}
 }
