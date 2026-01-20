@@ -10,6 +10,7 @@ import com.lucaslng.engine.GameStateSwitch;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
+import com.lucaslng.engine.systems.Buttons;
 import com.lucaslng.engine.systems.Deaths;
 import com.lucaslng.engine.systems.Exits;
 import com.lucaslng.engine.systems.LevelTransition;
@@ -32,6 +33,7 @@ class PlayingState extends GameState {
 	private final Exits exits;
 	private final Deaths deaths;
 	private final LevelTransition transition;
+	private final Buttons buttons;
 
 	public PlayingState(Engine engine) {
 		super(engine);
@@ -57,6 +59,7 @@ class PlayingState extends GameState {
 		exits = new Exits(entityManager);
 		deaths = new Deaths(entityManager, player1, player2, exits);
 		transition = new LevelTransition();
+		buttons = new Buttons(entityManager, player1, player2);
 	}
 
 	@Override
@@ -81,6 +84,7 @@ class PlayingState extends GameState {
 			applyRopeTension(player1, player2, (float) dt);
 
 			physics.step(dt);
+			buttons.update();
 			deaths.checkDeaths(levels.currentLevel());
 			exits.handleExits(player1, player2, dt);
 
