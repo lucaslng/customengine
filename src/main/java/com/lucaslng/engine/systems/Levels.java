@@ -50,7 +50,7 @@ public class Levels {
 			switch (tokens[0]) {
 				case "platform" -> {
 					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,
-							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Platform");
+							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Grass");
 				}
 				case "lava" -> {
 					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,

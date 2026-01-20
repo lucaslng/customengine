@@ -20,13 +20,13 @@ public final class Engine {
 	public final InputHandler inputHandler;
 	private final HashMap<GameStates, GameState> gameStates;
 
-	public GameStates gameState;
+	public GameStateSwitch gameStateSwitch;
 
 	public Engine(HashMap<GameStates, GameState> gameStates) {
 		System.out.println("Initializing engine...");
 		this.gameStates = gameStates;
 		settings = new EngineSettings();
-		
+
 		fontAtlas = new FontAtlas();
 		fontAtlas.addFont("Arial", Font.PLAIN);
 		fontAtlas.addFontFromTTF("Pixeled", Font.PLAIN);
@@ -54,19 +54,19 @@ public final class Engine {
 	}
 
 	public void start(GameStates startingGameState) {
-		gameState = startingGameState;
+		gameStateSwitch = new GameStateSwitch(startingGameState, null);
 		while (true) {
-			if (!gameStates.containsKey(gameState))
+			if (!gameStates.containsKey(gameStateSwitch.gameState()))
 				break;
-			System.out.println("Switching state to " + gameState.toString());
-			gameStates.get(gameState).init();
-			gameState = gameStates.get(gameState).loop();
+			System.out.println("Switching state to " + gameStateSwitch.gameState().toString());
+			gameStates.get(gameStateSwitch.gameState()).init(gameStateSwitch.payload());
+			gameStateSwitch = gameStates.get(gameStateSwitch.gameState()).loop();
 		}
 	}
 
 	public void doLoop() {
 		if (!renderer.isRendering()) {
-			renderer.render(gameStates.get(gameState).entityManager, gameStates.get(gameState).uiManager);
+			renderer.render(gameStates.get(gameStateSwitch.gameState()).entityManager, gameStates.get(gameStateSwitch.gameState()).uiManager);
 		}
 	}
 

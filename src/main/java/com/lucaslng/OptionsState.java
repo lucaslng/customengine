@@ -4,11 +4,10 @@ import java.awt.Color;
 
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameState;
+import com.lucaslng.engine.GameStateSwitch;
 import com.lucaslng.engine.ui.*;
 
 public class OptionsState extends GameState {
-
-	private GameStates switchGameState;
 
 	public OptionsState(Engine engine) {
 		super(engine);
@@ -25,7 +24,7 @@ public class OptionsState extends GameState {
 
 		Button backButton = new Button(-470f, -400f, 400f, 140f, XAlignment.CENTER, YAlignment.CENTER,
 				new Color(225, 150, 150));
-		backButton.addOperation(() -> switchGameState = GameStates.MAIN_MENU);
+		backButton.addOperation(() -> gameStateSwitch = new GameStateSwitch(GameStates.MAIN_MENU, null));
 		uiManager.elements.add(backButton);
 		uiManager.elements.add(new Text(-600f, -500f, 0f, 0f, XAlignment.CENTER, YAlignment.CENTER, "BACK",
 				new TextStyle("Pixeled", 13f, Color.BLACK)));
@@ -99,14 +98,12 @@ public class OptionsState extends GameState {
 	}
 
 	@Override
-	public void init() {
-		super.init();
-		switchGameState = GameStates.OPTIONS;
+	public void init(Object payload) {
+		super.init(payload);
 	}
 
 	@Override
-	public GameStates doLoop(double dt) {
-		return switchGameState;
+	public void doLoop(double dt) {
 	}
 
 }

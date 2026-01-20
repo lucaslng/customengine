@@ -51,7 +51,7 @@ class PlayingState extends GameState {
 	}
 
 	@Override
-	public GameStates doLoop(double dt) {
+	public void doLoop(double dt) {
 		float baseSpeed = 8f;
 		float speed = baseSpeed * (float) dt;
 
@@ -79,8 +79,6 @@ class PlayingState extends GameState {
 		updateCamera(engine);
 		updateRopeRender();
 		engine.renderer.setFadeAlpha(transition.getFadeAlpha());
-
-		return GameStates.PLAYING;
 	}
 
 	private void performLevelChange(Engine engine) {

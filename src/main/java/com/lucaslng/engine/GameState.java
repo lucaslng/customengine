@@ -9,13 +9,14 @@ public abstract class GameState {
 	protected final Engine engine;
 	protected final UIManager uiManager;
 	protected final EntityManager entityManager;
+	protected GameStateSwitch gameStateSwitch;
 	private long lastTick, lastFpsTime;
 	private int frameCount;
 	private double dt;
 	private final Text fpsText;
 
 	// we only want doLoop to have access to dt
-	abstract public GameStates doLoop(double dt);
+	abstract public void doLoop(double dt);
 
 	// constructor executes only once, when the entire game initializes
 	public GameState(Engine engine) {
@@ -34,7 +35,7 @@ public abstract class GameState {
 	}
 
 	// init method executes everytime the gameState changes to this one
-	public void init() {
+	public void init(Object payload) {
 		uiManager.active = true;
 	}
 
@@ -43,7 +44,7 @@ public abstract class GameState {
 		uiManager.active = false;
 	}
 
-	public GameStates loop() {
+	public GameStateSwitch loop() {
 		while (!engine.shouldClose()) {
 			long frameStart = System.nanoTime();
 
@@ -51,12 +52,12 @@ public abstract class GameState {
 			dt = (frameStart - lastTick) / 1_000_000_000.0;
 			lastTick = frameStart;
 
-			GameStates gameState = doLoop(dt);
+			doLoop(dt);
 			engine.doLoop();
 
-			if (gameState != engine.gameState) {
+			if (gameStateSwitch != null) {
 				dispose();
-				return gameState;
+				return gameStateSwitch;
 			}
 
 			// FPS tracking
@@ -69,7 +70,7 @@ public abstract class GameState {
 				lastFpsTime = currentTime;
 			}
 		}
-		return GameStates.EXIT;
+		return new GameStateSwitch(GameStates.EXIT, null);
 	}
 
 	public double getDt() {
