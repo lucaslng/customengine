@@ -7,6 +7,7 @@ import org.joml.Vector3f;
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.AABBComponent;
 import com.lucaslng.engine.components.CoinComponent;
+import com.lucaslng.engine.components.DisabledComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.entities.Entity;
 
@@ -31,11 +32,16 @@ public class Coins {
 		Vector3f ext2 = entityManager.getComponent(player2.id(), AABBComponent.class).halfExtents();
 
 		for (int coinId : coins) {
+			CoinComponent coin = entityManager.getComponent(coinId, CoinComponent.class);
+			if (coin.collected) {
+				continue;
+			}
 			Vector3f coinPos = entityManager.getComponent(coinId, PositionComponent.class).position();
 			Vector3f coinExt = entityManager.getComponent(coinId, AABBComponent.class).halfExtents();
 
 			if (isOverlapping(pos1, ext1, coinPos, coinExt) || isOverlapping(pos2, ext2, coinPos, coinExt)) {
-				entityManager.removeEntity(coinId);
+				coin.collected = true;
+				entityManager.addComponent(coinId, new DisabledComponent());
 				collectedCount++;
 			}
 		}

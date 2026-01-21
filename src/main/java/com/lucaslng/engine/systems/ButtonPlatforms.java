@@ -1,10 +1,16 @@
 package com.lucaslng.engine.systems;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.joml.Vector3f;
 
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.ButtonComponent;
 import com.lucaslng.engine.components.ButtonMoveComponent;
+import com.lucaslng.engine.components.CoinComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.components.VelocityComponent;
 
@@ -18,11 +24,19 @@ public class ButtonPlatforms {
 	}
 
 	public void update(double dt) {
-		boolean anyButtonPressed = false;
+		Set<Integer> activeButtonFlags = new HashSet<>();
 		for (int buttonId : entityManager.getEntitiesWith(ButtonComponent.class)) {
-			if (entityManager.getComponent(buttonId, ButtonComponent.class).isActive) {
-				anyButtonPressed = true;
-				break;
+			ButtonComponent button = entityManager.getComponent(buttonId, ButtonComponent.class);
+			if (button.isActive) {
+				activeButtonFlags.add(button.flag);
+			}
+		}
+
+		Map<Integer, Integer> collectedCoinCounts = new HashMap<>();
+		for (int coinId : entityManager.getEntitiesWith(CoinComponent.class)) {
+			CoinComponent coin = entityManager.getComponent(coinId, CoinComponent.class);
+			if (coin.collected) {
+				collectedCoinCounts.merge(coin.flag, 1, Integer::sum);
 			}
 		}
 
@@ -34,7 +48,8 @@ public class ButtonPlatforms {
 			Vector3f velocity = entityManager.getComponent(platformId, VelocityComponent.class).velocity();
 
 			Vector3f target = new Vector3f(mover.startPosition);
-			if (anyButtonPressed) {
+			int collectedForFlag = collectedCoinCounts.getOrDefault(mover.flag, 0);
+			if (activeButtonFlags.contains(mover.flag) || collectedForFlag >= mover.requiredCoins) {
 				target.add(mover.pressedOffset);
 			}
 

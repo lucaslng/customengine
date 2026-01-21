@@ -98,43 +98,99 @@ public class Levels {
 				case "button" -> {
 					boolean latch = false;
 					boolean toggle = false;
+					int flag = 0;
 					for (int t = 3; t < tokens.length; t++) {
 						if ("latch".equalsIgnoreCase(tokens[t])) {
 							latch = true;
 						} else if ("toggle".equalsIgnoreCase(tokens[t])) {
 							toggle = true;
+						} else if ("flag".equalsIgnoreCase(tokens[t]) && t + 1 < tokens.length) {
+							flag = Integer.parseInt(tokens[t + 1]);
+							t++;
+						} else if (tokens[t].startsWith("flag=")) {
+							flag = Integer.parseInt(tokens[t].substring(5));
 						}
 					}
-					entities[i] = new ButtonEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), latch, toggle);
+					entities[i] = new ButtonEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), latch, toggle, flag);
 				}
 				case "moving_platform" -> {
 					float x = parseFloat(tokens[1]);
 					float y = parseFloat(tokens[2]);
 					float width = parseFloat(tokens[3]);
 					float height = parseFloat(tokens[4]);
-					float moveX = tokens.length > 5 ? parseFloat(tokens[5]) : MOVING_PLATFORM_DEFAULT_OFFSET_X;
-					float moveY = tokens.length > 6 ? parseFloat(tokens[6]) : MOVING_PLATFORM_DEFAULT_OFFSET_Y;
-					float speed = tokens.length > 7 ? parseFloat(tokens[7]) : MOVING_PLATFORM_DEFAULT_SPEED;
+					int idx = 5;
+					float moveX = MOVING_PLATFORM_DEFAULT_OFFSET_X;
+					float moveY = MOVING_PLATFORM_DEFAULT_OFFSET_Y;
+					float speed = MOVING_PLATFORM_DEFAULT_SPEED;
+					if (idx < tokens.length && isFloat(tokens[idx])) {
+						moveX = parseFloat(tokens[idx++]);
+					}
+					if (idx < tokens.length && isFloat(tokens[idx])) {
+						moveY = parseFloat(tokens[idx++]);
+					}
+					if (idx < tokens.length && isFloat(tokens[idx])) {
+						speed = parseFloat(tokens[idx++]);
+					}
+					int flag = 0;
+					int requiredCoins = 1;
+					for (int t = idx; t < tokens.length; t++) {
+						if ("flag".equalsIgnoreCase(tokens[t]) && t + 1 < tokens.length) {
+							flag = Integer.parseInt(tokens[t + 1]);
+							t++;
+						} else if (tokens[t].startsWith("flag=")) {
+							flag = Integer.parseInt(tokens[t].substring(5));
+						} else if (("coins".equalsIgnoreCase(tokens[t]) || "count".equalsIgnoreCase(tokens[t]))
+								&& t + 1 < tokens.length) {
+							requiredCoins = Integer.parseInt(tokens[t + 1]);
+							t++;
+						} else if (tokens[t].startsWith("coins=")) {
+							requiredCoins = Integer.parseInt(tokens[t].substring(6));
+						} else if (tokens[t].startsWith("count=")) {
+							requiredCoins = Integer.parseInt(tokens[t].substring(6));
+						}
+					}
 					entities[i] = new MovingPlatformEntityFactory(x, y, 0, width, height, PLATFORM_LENGTH,
-							new Vector3f(moveX, moveY, 0f), speed);
+							new Vector3f(moveX, moveY, 0f), speed, "Brown", true, flag, requiredCoins);
 				}
 				case "moving_lava" -> {
 					float x = parseFloat(tokens[1]);
 					float y = parseFloat(tokens[2]);
 					float width = parseFloat(tokens[3]);
 					float height = parseFloat(tokens[4]);
-					float moveX = tokens.length > 5 ? parseFloat(tokens[5]) : MOVING_PLATFORM_DEFAULT_OFFSET_X;
-					float moveY = tokens.length > 6 ? parseFloat(tokens[6]) : MOVING_PLATFORM_DEFAULT_OFFSET_Y;
-					float speed = tokens.length > 7 ? parseFloat(tokens[7]) : MOVING_PLATFORM_DEFAULT_SPEED;
-					float pauseDuration = tokens.length > 8 ? parseFloat(tokens[8]) : MOVING_LAVA_DEFAULT_PAUSE_DURATION;
+					int idx = 5;
+					float moveX = MOVING_PLATFORM_DEFAULT_OFFSET_X;
+					float moveY = MOVING_PLATFORM_DEFAULT_OFFSET_Y;
+					float speed = MOVING_PLATFORM_DEFAULT_SPEED;
+					float pauseDuration = MOVING_LAVA_DEFAULT_PAUSE_DURATION;
+					if (idx < tokens.length && isFloat(tokens[idx])) {
+						moveX = parseFloat(tokens[idx++]);
+					}
+					if (idx < tokens.length && isFloat(tokens[idx])) {
+						moveY = parseFloat(tokens[idx++]);
+					}
+					if (idx < tokens.length && isFloat(tokens[idx])) {
+						speed = parseFloat(tokens[idx++]);
+					}
+					if (idx < tokens.length && isFloat(tokens[idx])) {
+						pauseDuration = parseFloat(tokens[idx++]);
+					}
 					entities[i] = new MovingPlatformEntityFactory(x, y, 0, width, height, PLATFORM_LENGTH,
-							new Vector3f(moveX, moveY, 0f), speed, "Lava", false,
+							new Vector3f(moveX, moveY, 0f), speed, "Lava", false, 0, 1,
 							new TimedMoveComponent(new Vector3f(x, y, 0), new Vector3f(moveX, moveY, 0f), speed,
 									pauseDuration, false),
 							new LavaComponent());
 				}
 				case "coin" -> {
-					entities[i] = new CoinEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
+					int flag = 0;
+					for (int t = 3; t < tokens.length; t++) {
+						if ("flag".equalsIgnoreCase(tokens[t]) && t + 1 < tokens.length) {
+							flag = Integer.parseInt(tokens[t + 1]);
+							t++;
+						} else if (tokens[t].startsWith("flag=")) {
+							flag = Integer.parseInt(tokens[t].substring(5));
+						}
+					}
+					entities[i] = new CoinEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), flag);
 				}
 				default -> {}
 			}
@@ -145,6 +201,15 @@ public class Levels {
 
 	public Level currentLevel() {
 		return levels[currentLevelIndex - 1];
+	}
+
+	private static boolean isFloat(String value) {
+		try {
+			parseFloat(value);
+			return true;
+		} catch (NumberFormatException ex) {
+			return false;
+		}
 	}
 
 	public record Level(Vector2f player1Spawn, Vector2f player2Spawn, boolean ropeEnabled,

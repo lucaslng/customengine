@@ -30,9 +30,15 @@ public class CoinEntityFactory implements AbstractEntityFactory {
 	}
 
 	private final Vector3f position;
+	private final int flag;
 
 	public CoinEntityFactory(float x, float y) {
+		this(x, y, 0);
+	}
+
+	public CoinEntityFactory(float x, float y, int flag) {
 		position = new Vector3f(x, y, 0f);
+		this.flag = flag;
 	}
 
 	@Override
@@ -42,7 +48,7 @@ public class CoinEntityFactory implements AbstractEntityFactory {
 				new RotationComponent(new Vector3f()),
 				new MeshComponent(new SubMesh[] { new SubMesh(VERTICES, INDICES, "CoinYellow") }),
 				new AABBComponent(new Vector3f(HALF_SIZE, HALF_SIZE, HALF_DEPTH)),
-				new CoinComponent()
+				new CoinComponent(flag)
 		};
 	}
 }

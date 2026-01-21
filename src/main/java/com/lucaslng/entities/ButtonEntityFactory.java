@@ -23,15 +23,21 @@ public class ButtonEntityFactory implements AbstractEntityFactory {
 
 	private final boolean isLatch;
 	private final boolean isToggle;
+	private final int flag;
 
 	public ButtonEntityFactory(float x, float y) {
-		this(x, y, false, false);
+		this(x, y, false, false, 0);
 	}
 
 	public ButtonEntityFactory(float x, float y, boolean isLatch, boolean isToggle) {
+		this(x, y, isLatch, isToggle, 0);
+	}
+
+	public ButtonEntityFactory(float x, float y, boolean isLatch, boolean isToggle, int flag) {
 		position = new Vector3f(x, y - 0.5f, 0f);
 		this.isLatch = isLatch;
 		this.isToggle = isToggle;
+		this.flag = flag;
 		
 		// Make it a flat button shape
 		hx = 1.5f; // width (match platform width: 3f)
@@ -89,7 +95,7 @@ public class ButtonEntityFactory implements AbstractEntityFactory {
 			new MeshComponent(new SubMesh[] { new SubMesh(vertices, indices, "ButtonYellow") }),
 			new RigidBodyComponent(0f, 1f, 1f, 1f), 
 			new AABBComponent(new Vector3f(hx, hy, hz)),
-			new ButtonComponent(isLatch, isToggle)
+			new ButtonComponent(isLatch, isToggle, flag)
 		};
 	}
 }
