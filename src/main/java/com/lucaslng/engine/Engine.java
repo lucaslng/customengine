@@ -59,7 +59,7 @@ public final class Engine {
 			if (!gameStates.containsKey(gameStateSwitch.gameState()))
 				break;
 			System.out.println("Switching state to " + gameStateSwitch.gameState().toString());
-			gameStates.get(gameStateSwitch.gameState()).init(gameStateSwitch.payload());
+			gameStates.get(gameStateSwitch.gameState()).init(this, gameStateSwitch.payload());
 			gameStateSwitch = gameStates.get(gameStateSwitch.gameState()).loop();
 		}
 	}

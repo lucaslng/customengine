@@ -3,7 +3,11 @@ package com.lucaslng.engine.systems;
 import org.joml.Vector3f;
 
 import com.lucaslng.engine.EntityManager;
-import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.components.AABBComponent;
+import com.lucaslng.engine.components.ButtonComponent;
+import com.lucaslng.engine.components.DisabledComponent;
+import com.lucaslng.engine.components.MeshComponent;
+import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.entities.Entity;
 
 public class Buttons {
@@ -13,6 +17,8 @@ public class Buttons {
 	
 	private static final float BUTTON_PRESS_DEPTH = 0.35f;
 	private static final float ACTIVATION_MARGIN = 0.5f;
+	private static final float VERTICAL_MARGIN = 0.6f;
+	private static final float VERTICAL_MARGIN_RELEASE = 1.0f;
 
 	public Buttons(EntityManager entityManager, Entity player1, Entity player2) {
 		this.entityManager = entityManager;
@@ -33,33 +39,33 @@ public class Buttons {
 			Vector3f buttonExtents = entityManager.getComponent(buttonId, AABBComponent.class).halfExtents();
 			MeshComponent mesh = entityManager.getComponent(buttonId, MeshComponent.class);
 
+			Vector3f checkPos = new Vector3f(buttonPos);
+			if (button.isActive) {
+				checkPos.y += BUTTON_PRESS_DEPTH;
+			}
+
 			boolean player1OnButton = !entityManager.hasComponent(player1.id(), DisabledComponent.class) 
-					&& isPlayerOnButton(pos1, player1Aabb.halfExtents(), buttonPos, buttonExtents);
+					&& isPlayerOnButton(pos1, player1Aabb.halfExtents(), checkPos, buttonExtents, VERTICAL_MARGIN);
 			boolean player2OnButton = !entityManager.hasComponent(player2.id(), DisabledComponent.class) 
-					&& isPlayerOnButton(pos2, player2Aabb.halfExtents(), buttonPos, buttonExtents);
+					&& isPlayerOnButton(pos2, player2Aabb.halfExtents(), checkPos, buttonExtents, VERTICAL_MARGIN);
 
 			boolean wasVisualPressed = button.isActive;
 			boolean isPressedNow = player1OnButton || player2OnButton;
 
-			if (button.isToggle) {
-				if (isPressedNow && !button.isPressed) {
-					button.isActive = !button.isActive;
-				}
-			} else if (button.isLatch) {
+			if (button.isToggle) {		// only activates when a player is on the button
+				button.isActive = isPressedNow;
+			} else if (button.isLatch) {	// activates once and stays on permanently
 				if (isPressedNow && !button.isPressed) {
 					button.isActive = true;
 				}
-			} else {
-				button.isActive = isPressedNow;
 			}
 
 			button.isPressed = isPressedNow;
 
-			// Update button position and material when state changes
-			if (button.isActive && !wasVisualPressed) {
-				// Press down
+			if (button.isActive && !wasVisualPressed) {		// pressed
 				buttonPos.y -= BUTTON_PRESS_DEPTH;
-				// Change material to blue
+
+				// change colour to blue			
 				if (mesh.subMeshes().length > 0) {
 					mesh.subMeshes()[0] = new com.lucaslng.engine.renderer.SubMesh(
 						getVertices(buttonExtents),
@@ -67,10 +73,10 @@ public class Buttons {
 						"ButtonBlue"
 					);
 				}
-			} else if (!button.isActive && wasVisualPressed) {
-				// Release up
+			} else if (!button.isActive && wasVisualPressed) {		// released
 				buttonPos.y += BUTTON_PRESS_DEPTH;
-				// Change material back to yellow
+				
+				// change colour back to yellow
 				if (mesh.subMeshes().length > 0) {
 					mesh.subMeshes()[0] = new com.lucaslng.engine.renderer.SubMesh(
 						getVertices(buttonExtents),
@@ -82,8 +88,7 @@ public class Buttons {
 		}
 	}
 
-	private boolean isPlayerOnButton(Vector3f playerPos, Vector3f playerExt, Vector3f buttonPos, Vector3f buttonExt) {
-		// Check if player is above button (in XZ plane)
+	private boolean isPlayerOnButton(Vector3f playerPos, Vector3f playerExt, Vector3f buttonPos, Vector3f buttonExt, float verticalMargin) {
 		boolean overlapXZ = Math.abs(playerPos.x - buttonPos.x) <= (playerExt.x + buttonExt.x + ACTIVATION_MARGIN)
 				&& Math.abs(playerPos.z - buttonPos.z) <= (playerExt.z + buttonExt.z + ACTIVATION_MARGIN);
 
@@ -91,12 +96,13 @@ public class Buttons {
 			return false;
 		}
 
-		// Check if player is standing on top of button
+		// check if player is standing on top of button
 		float playerBottom = playerPos.y - playerExt.y;
 		float buttonTop = buttonPos.y + buttonExt.y;
 
-		// Player must be standing on or very close to the button top
-		return playerBottom >= buttonTop - 0.5f && playerBottom <= buttonTop + 0.5f;
+		// Player's bottom should be within the vertical margin of the button's top
+		// This means the player is standing on or very close to the button
+		return playerBottom >= buttonTop - verticalMargin && playerBottom <= buttonTop + verticalMargin;
 	}
 
 	private static final int[] getIndices() {

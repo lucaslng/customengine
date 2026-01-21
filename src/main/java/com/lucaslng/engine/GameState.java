@@ -13,6 +13,7 @@ public abstract class GameState {
 	private long lastTick, lastFpsTime;
 	private int frameCount;
 	private double dt;
+	private boolean active;
 	private final Text fpsText;
 
 	// we only want doLoop to have access to dt
@@ -28,6 +29,7 @@ public abstract class GameState {
 		lastTick = System.nanoTime();
 		frameCount = 0;
 		dt = 0d;
+		active = false;
 		fpsText = new Text(10f, 10f, 0f, 0f, XAlignment.LEFT, YAlignment.TOP, "FPS: ",
 				new TextStyle("Arial", 6f, Color.BLACK));
 		fpsText.visible = engine.settings.showFPS;
@@ -35,14 +37,16 @@ public abstract class GameState {
 	}
 
 	// init method executes everytime the gameState changes to this one
-	public void init(Object payload) {
+	public void init(Engine engine, Object payload) {
 		gameStateSwitch = null;
 		uiManager.active = true;
+		active = true;
 	}
 
 	// called when switching to a different state
 	public void dispose() {
 		uiManager.active = false;
+		active = false;
 	}
 
 	public GameStateSwitch loop() {
@@ -76,6 +80,10 @@ public abstract class GameState {
 
 	public double getDt() {
 		return dt;
+	}
+
+	public boolean active() {
+		return active;
 	}
 
 }

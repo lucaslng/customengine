@@ -10,15 +10,8 @@ import com.lucaslng.engine.GameStateSwitch;
 import com.lucaslng.engine.components.*;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
-import com.lucaslng.engine.systems.Buttons;
-import com.lucaslng.engine.systems.ButtonPlatforms;
-import com.lucaslng.engine.systems.Deaths;
-import com.lucaslng.engine.systems.Exits;
-import com.lucaslng.engine.systems.LevelTransition;
-import com.lucaslng.engine.systems.Levels;
+import com.lucaslng.engine.systems.*;
 import com.lucaslng.engine.systems.Levels.Level;
-import com.lucaslng.engine.systems.Physics;
-import com.lucaslng.engine.systems.Rotations;
 import com.lucaslng.engine.ui.*;
 import com.lucaslng.entities.CameraEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
@@ -33,6 +26,7 @@ class PlayingState extends GameState {
 	private final Levels levels;
 	private final Exits exits;
 	private final Deaths deaths;
+	private final Timers timers;
 	private final LevelTransition transition;
 	private final Buttons buttons;
 	private final ButtonPlatforms buttonPlatforms;
@@ -48,6 +42,13 @@ class PlayingState extends GameState {
 
 		levels = new Levels();
 		Level level = levels.currentLevel();
+
+		Text timerText = new Text(-120f, 10f, 0f, 0f, XAlignment.CENTER, YAlignment.TOP, level.timer() + "", new TextStyle("Pixeled", 10f, Color.BLACK));
+		timerText.visible = level.hasTimer();
+		uiManager.elements.add(timerText);
+
+		timers = new Timers(timerText);
+		timers.setTimer(level.timer());
 
 		player1 = entityManager.buildEntity(new PlayerEntityFactory(level.player1Spawn()));
 		player2 = entityManager.buildEntity(new PlayerEntityFactory(level.player2Spawn()));
@@ -66,12 +67,14 @@ class PlayingState extends GameState {
 	}
 
 	@Override
-	public void init(Object payload) {
-		super.init(payload);
+	public void init(Engine engine, Object payload) {
+		super.init(engine, payload);
 		if (payload != null) {
 			int level = (int) payload;
 			performLevelChange(engine, level);
 		}
+		if (engine.settings.refreshLevels)
+			levels.refreshLevels();
 	}
 
 	@Override
@@ -82,14 +85,16 @@ class PlayingState extends GameState {
 		transition.update((float) dt);
 
 		if (!transition.isTransitioning()) {
-			handlePlayerMovement(engine, player1, speed, engine.settings.player1Left.key, engine.settings.player1Right.key, engine.settings.player1Jump.key);
-			handlePlayerMovement(engine, player2, speed, engine.settings.player2Left.key, engine.settings.player2Right.key, engine.settings.player2Jump.key);
+			handlePlayerMovement(engine, player1, speed, engine.settings.player1Left.key, engine.settings.player1Right.key,
+					engine.settings.player1Jump.key);
+			handlePlayerMovement(engine, player2, speed, engine.settings.player2Left.key, engine.settings.player2Right.key,
+					engine.settings.player2Jump.key);
 			applyRopeTension(player1, player2, (float) dt);
 
 			buttons.update();
 			buttonPlatforms.update(dt);
 			physics.step(dt);
-			deaths.checkDeaths(levels.currentLevel());
+			deaths.checkDeaths(levels.currentLevel(), (levelTimer) -> timers.setTimer(levelTimer));
 			exits.handleExits(player1, player2, dt);
 
 			if (exits.player1Exited && exits.player2Exited) {
@@ -100,6 +105,8 @@ class PlayingState extends GameState {
 					}
 				});
 			}
+
+			timers.step(dt, levels.currentLevel(), (currentLevel, setTimer) -> deaths.killBothPlayers(currentLevel, setTimer));
 		}
 
 		updateCamera(engine);
@@ -121,6 +128,7 @@ class PlayingState extends GameState {
 		}
 
 		Level level = levels.currentLevel();
+		timers.setTimer(level.timer());
 
 		Vector3f pos1 = entityManager.getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = entityManager.getComponent(player2.id(), PositionComponent.class).position();
