@@ -49,6 +49,7 @@ public class Levels {
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Failed to read level file.");
 		}
+		
 		int timer = Integer.parseInt(in.nextLine());
 		String[] tokens = in.nextLine().split(" ");
 		assert tokens.length == 4;

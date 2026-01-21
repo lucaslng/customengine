@@ -451,8 +451,7 @@ public class Physics {
 		return normal;
 	}
 
-	private static void resolveContact(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f va, Vector3f vb,
-			Vector3f normal) {
+	private static void resolveContact(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f va, Vector3f vb, Vector3f normal) {
 		Vector3f rv = new Vector3f();
 		va.sub(vb, rv);
 		float rvAlongNormal = rv.dot(normal);
@@ -513,8 +512,7 @@ public class Physics {
 		}
 	}
 
-	private static void correctPosition(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f pa, Vector3f pb,
-			Contact contact) {
+	private static void correctPosition(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f pa, Vector3f pb, Contact contact) {
 		float invMassSum = ra.invMass() + rb.invMass();
 		if (invMassSum == 0f)
 			return;

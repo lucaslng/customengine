@@ -18,7 +18,6 @@ public class Buttons {
 	private static final float BUTTON_PRESS_DEPTH = 0.35f;
 	private static final float ACTIVATION_MARGIN = 0.5f;
 	private static final float VERTICAL_MARGIN = 0.6f;
-	private static final float VERTICAL_MARGIN_RELEASE = 1.0f;
 
 	public Buttons(EntityManager entityManager, Entity player1, Entity player2) {
 		this.entityManager = entityManager;
