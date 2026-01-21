@@ -31,7 +31,6 @@ A 3D platformer game where you make your way through teamwork-based levels with 
 ## File structure
 
 ```text
-.
 ├── App -> entry point of the program, creates the game engine and game states
 ├── GameStates -> Enum for the different game states
 ├── MainMenuState, EndScreenState, OptionsState, LevelSelectionState -> game states for each corresponding menu
