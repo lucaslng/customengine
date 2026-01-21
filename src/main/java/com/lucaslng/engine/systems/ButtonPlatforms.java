@@ -20,7 +20,7 @@ public class ButtonPlatforms {
 	public void update(double dt) {
 		boolean anyButtonPressed = false;
 		for (int buttonId : entityManager.getEntitiesWith(ButtonComponent.class)) {
-			if (entityManager.getComponent(buttonId, ButtonComponent.class).isPressed) {
+			if (entityManager.getComponent(buttonId, ButtonComponent.class).isActive) {
 				anyButtonPressed = true;
 				break;
 			}

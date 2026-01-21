@@ -68,7 +68,16 @@ public class Levels {
 					entities[i] = new ExitEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
 				}
 				case "button" -> {
-					entities[i] = new ButtonEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
+					boolean latch = false;
+					boolean toggle = false;
+					for (int t = 3; t < tokens.length; t++) {
+						if ("latch".equalsIgnoreCase(tokens[t])) {
+							latch = true;
+						} else if ("toggle".equalsIgnoreCase(tokens[t])) {
+							toggle = true;
+						}
+					}
+					entities[i] = new ButtonEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), latch, toggle);
 				}
 				case "moving_platform" -> {
 					float x = parseFloat(tokens[1]);

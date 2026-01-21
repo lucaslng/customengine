@@ -189,15 +189,21 @@ public class Physics {
 				RigidBodyComponent ra = entityManager.getComponent(ida, RigidBodyComponent.class);
 				Vector3f pa = entityManager.getComponent(ida, PositionComponent.class).position();
 				Vector3f halfExtentsA = entityManager.getComponent(ida, AABBComponent.class).halfExtents();
+				boolean aIsMovingPlatform = entityManager.hasComponent(ida, ButtonMoveComponent.class);
 
 				for (int j = i + 1; j < colliders.size(); j++) {
 					int idb = colliders.get(j);
 					if (entityManager.hasComponent(idb, DisabledComponent.class))
 						continue;
 					RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
-					// Skip if both are static
+					boolean bIsMovingPlatform = entityManager.hasComponent(idb, ButtonMoveComponent.class);
+					
+					// let moving platforms pass through static geometry, but keep their player hitbox.
+					if ((aIsMovingPlatform && rb.isStatic()) || (bIsMovingPlatform && ra.isStatic()))
+						continue;
 					if (ra.isStatic() && rb.isStatic())
 						continue;
+
 					Vector3f pb = entityManager.getComponent(idb, PositionComponent.class).position();
 					Vector3f halfExtentsB = entityManager.getComponent(idb, AABBComponent.class).halfExtents();
 

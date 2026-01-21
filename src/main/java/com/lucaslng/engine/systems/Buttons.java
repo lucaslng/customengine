@@ -38,11 +38,25 @@ public class Buttons {
 			boolean player2OnButton = !entityManager.hasComponent(player2.id(), DisabledComponent.class) 
 					&& isPlayerOnButton(pos2, player2Aabb.halfExtents(), buttonPos, buttonExtents);
 
-			boolean wasPressed = button.isPressed;
-			button.isPressed = player1OnButton || player2OnButton;
+			boolean wasVisualPressed = button.isActive;
+			boolean isPressedNow = player1OnButton || player2OnButton;
+
+			if (button.isToggle) {
+				if (isPressedNow && !button.isPressed) {
+					button.isActive = !button.isActive;
+				}
+			} else if (button.isLatch) {
+				if (isPressedNow && !button.isPressed) {
+					button.isActive = true;
+				}
+			} else {
+				button.isActive = isPressedNow;
+			}
+
+			button.isPressed = isPressedNow;
 
 			// Update button position and material when state changes
-			if (button.isPressed && !wasPressed) {
+			if (button.isActive && !wasVisualPressed) {
 				// Press down
 				buttonPos.y -= BUTTON_PRESS_DEPTH;
 				// Change material to blue
@@ -53,7 +67,7 @@ public class Buttons {
 						"ButtonBlue"
 					);
 				}
-			} else if (!button.isPressed && wasPressed) {
+			} else if (!button.isActive && wasVisualPressed) {
 				// Release up
 				buttonPos.y += BUTTON_PRESS_DEPTH;
 				// Change material back to yellow
