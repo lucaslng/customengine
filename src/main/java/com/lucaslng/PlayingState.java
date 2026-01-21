@@ -31,6 +31,7 @@ class PlayingState extends GameState {
 	private final Buttons buttons;
 	private final ButtonPlatforms buttonPlatforms;
 	private final BlinkingPlatforms blinkingPlatforms;
+	private final TimedPlatforms timedPlatforms;
 
 	public PlayingState(Engine engine) {
 		super(engine);
@@ -66,6 +67,7 @@ class PlayingState extends GameState {
 		buttons = new Buttons(entityManager, player1, player2);
 		buttonPlatforms = new ButtonPlatforms(entityManager);
 		blinkingPlatforms = new BlinkingPlatforms(entityManager);
+		timedPlatforms = new TimedPlatforms(entityManager);
 	}
 
 	@Override
@@ -96,6 +98,7 @@ class PlayingState extends GameState {
 			buttons.update();
 			buttonPlatforms.update(dt);
 			blinkingPlatforms.update((float) dt);
+			timedPlatforms.update(dt);
 			physics.step(dt);
 			deaths.checkDeaths(levels.currentLevel(), (levelTimer) -> timers.setTimer(levelTimer));
 			exits.handleExits(player1, player2, dt);

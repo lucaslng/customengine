@@ -10,6 +10,7 @@ import org.joml.Vector3f;
 
 import com.lucaslng.engine.components.BlinkComponent;
 import com.lucaslng.engine.components.LavaComponent;
+import com.lucaslng.engine.components.TimedMoveComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.entities.BoxEntityFactory;
 import com.lucaslng.entities.ButtonEntityFactory;
@@ -22,6 +23,9 @@ public class Levels {
 	private static final float MOVING_PLATFORM_DEFAULT_OFFSET_X = 0f;
 	private static final float MOVING_PLATFORM_DEFAULT_OFFSET_Y = 0f;
 	private static final float MOVING_PLATFORM_DEFAULT_SPEED = 0f;
+	private static final float MOVING_LAVA_DEFAULT_ON_DURATION = 2f;
+	private static final float MOVING_LAVA_DEFAULT_OFF_DURATION = 2f;
+	private static final float MOVING_LAVA_DEFAULT_PAUSE_DURATION = 0f;
 	private Level[] levels;
 	public int currentLevelIndex;
 
@@ -110,6 +114,23 @@ public class Levels {
 					float speed = tokens.length > 7 ? parseFloat(tokens[7]) : MOVING_PLATFORM_DEFAULT_SPEED;
 					entities[i] = new MovingPlatformEntityFactory(x, y, -1.1f, width, height, 2.2f,
 							new Vector3f(moveX, moveY, 0f), speed);
+				}
+				case "moving_lava" -> {
+					float x = parseFloat(tokens[1]);
+					float y = parseFloat(tokens[2]);
+					float width = parseFloat(tokens[3]);
+					float height = parseFloat(tokens[4]);
+					float moveX = tokens.length > 5 ? parseFloat(tokens[5]) : MOVING_PLATFORM_DEFAULT_OFFSET_X;
+					float moveY = tokens.length > 6 ? parseFloat(tokens[6]) : MOVING_PLATFORM_DEFAULT_OFFSET_Y;
+					float speed = tokens.length > 7 ? parseFloat(tokens[7]) : MOVING_PLATFORM_DEFAULT_SPEED;
+					float onDuration = tokens.length > 8 ? parseFloat(tokens[8]) : MOVING_LAVA_DEFAULT_ON_DURATION;
+					float offDuration = tokens.length > 9 ? parseFloat(tokens[9]) : MOVING_LAVA_DEFAULT_OFF_DURATION;
+					float pauseDuration = tokens.length > 10 ? parseFloat(tokens[10]) : MOVING_LAVA_DEFAULT_PAUSE_DURATION;
+					entities[i] = new MovingPlatformEntityFactory(x, y, -1.1f, width, height, 2.2f,
+							new Vector3f(moveX, moveY, 0f), speed, "Lava", false,
+							new TimedMoveComponent(new Vector3f(x, y, -1.1f), new Vector3f(moveX, moveY, 0f), speed,
+									onDuration, offDuration, pauseDuration, false),
+							new LavaComponent());
 				}
 				default -> {
 				}

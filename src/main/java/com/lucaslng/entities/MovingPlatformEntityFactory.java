@@ -2,6 +2,8 @@ package com.lucaslng.entities;
 
 import org.joml.Vector3f;
 
+import java.util.Arrays;
+
 import com.lucaslng.engine.components.AABBComponent;
 import com.lucaslng.engine.components.ButtonMoveComponent;
 import com.lucaslng.engine.components.MeshComponent;
@@ -28,12 +30,28 @@ public class MovingPlatformEntityFactory implements AbstractEntityFactory {
 	private final float speed;
 	private final float[] vertices;
 	private final float hx, hy, hz;
+	private final String materialName;
+	private final Object[] extraComponents;
+	private final boolean buttonControlled;
 
 	public MovingPlatformEntityFactory(float x, float y, float z, float width, float height, float length,
 			Vector3f moveOffset, float speed) {
+		this(x, y, z, width, height, length, moveOffset, speed, "Brown", true);
+	}
+
+	public MovingPlatformEntityFactory(float x, float y, float z, float width, float height, float length,
+			Vector3f moveOffset, float speed, String materialName) {
+		this(x, y, z, width, height, length, moveOffset, speed, materialName, true);
+	}
+
+	public MovingPlatformEntityFactory(float x, float y, float z, float width, float height, float length,
+			Vector3f moveOffset, float speed, String materialName, boolean buttonControlled, Object... extraComponents) {
 		position = new Vector3f(x, y, z);
 		this.moveOffset = new Vector3f(moveOffset);
 		this.speed = speed;
+		this.materialName = materialName;
+		this.extraComponents = extraComponents == null ? new Object[0] : extraComponents;
+		this.buttonControlled = buttonControlled;
 		hx = width / 2f;
 		hy = height / 2f;
 		hz = length / 2f;
@@ -81,10 +99,26 @@ public class MovingPlatformEntityFactory implements AbstractEntityFactory {
 
 	@Override
 	public Object[] components() {
-		return new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
-				new MeshComponent(new SubMesh[] { new SubMesh(vertices, INDICES, "Brown") }),
-				new VelocityComponent(new Vector3f()), new RigidBodyComponent(200f, 0.1f, 0.9f, 0f),
-				new AABBComponent(new Vector3f(hx, hy, hz)),
-				new ButtonMoveComponent(position, moveOffset, speed) };
+		Object[] baseComponents;
+		if (buttonControlled) {
+			baseComponents = new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
+					new MeshComponent(new SubMesh[] { new SubMesh(vertices, INDICES, materialName) }),
+					new VelocityComponent(new Vector3f()), new RigidBodyComponent(200f, 0.1f, 0.9f, 0f),
+					new AABBComponent(new Vector3f(hx, hy, hz)),
+					new ButtonMoveComponent(position, moveOffset, speed) };
+		} else {
+			baseComponents = new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
+					new MeshComponent(new SubMesh[] { new SubMesh(vertices, INDICES, materialName) }),
+					new VelocityComponent(new Vector3f()), new RigidBodyComponent(200f, 0.1f, 0.9f, 0f),
+					new AABBComponent(new Vector3f(hx, hy, hz)) };
+		}
+
+		if (extraComponents.length == 0) {
+			return baseComponents;
+		}
+
+		Object[] components = Arrays.copyOf(baseComponents, baseComponents.length + extraComponents.length);
+		System.arraycopy(extraComponents, 0, components, baseComponents.length, extraComponents.length);
+		return components;
 	}
 }

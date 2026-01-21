@@ -6,12 +6,13 @@ import org.joml.Vector3f;
 
 import com.lucaslng.engine.EntityManager;
 import com.lucaslng.engine.components.AABBComponent;
-import com.lucaslng.engine.components.ButtonMoveComponent;
 import com.lucaslng.engine.components.DisabledComponent;
 import com.lucaslng.engine.components.GroundedComponent;
 import com.lucaslng.engine.components.PositionComponent;
 import com.lucaslng.engine.components.RigidBodyComponent;
+import com.lucaslng.engine.components.TimedMoveComponent;
 import com.lucaslng.engine.components.VelocityComponent;
+import com.lucaslng.engine.components.ButtonMoveComponent;
 
 public class Physics {
 
@@ -55,7 +56,7 @@ public class Physics {
 		for (int entityId : entityManager.getEntitiesWith(RigidBodyComponent.class, VelocityComponent.class)) {
 			if (entityManager.hasComponent(entityId, DisabledComponent.class))
 				continue;
-			if (entityManager.hasComponent(entityId, ButtonMoveComponent.class))
+			if (isMovingPlatform(entityId))
 				continue;
 			RigidBodyComponent rigidBody = entityManager.getComponent(entityId, RigidBodyComponent.class);
 			if (rigidBody.isStatic())
@@ -95,7 +96,7 @@ public class Physics {
 			}
 
 			RigidBodyComponent rb = entityManager.getComponent(entityId, RigidBodyComponent.class);
-			if (entityManager.hasComponent(entityId, ButtonMoveComponent.class))
+			if (isMovingPlatform(entityId))
 				continue;
 			if (rb.isStatic())
 				continue;
@@ -181,14 +182,14 @@ public class Physics {
 				RigidBodyComponent ra = entityManager.getComponent(ida, RigidBodyComponent.class);
 				Vector3f pa = entityManager.getComponent(ida, PositionComponent.class).position();
 				Vector3f halfExtentsA = entityManager.getComponent(ida, AABBComponent.class).halfExtents();
-				boolean aIsMovingPlatform = entityManager.hasComponent(ida, ButtonMoveComponent.class);
+				boolean aIsMovingPlatform = isMovingPlatform(ida);
 
 				for (int j = i + 1; j < colliders.size(); j++) {
 					int idb = colliders.get(j);
 					if (entityManager.hasComponent(idb, DisabledComponent.class))
 						continue;
 					RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
-					boolean bIsMovingPlatform = entityManager.hasComponent(idb, ButtonMoveComponent.class);
+					boolean bIsMovingPlatform = isMovingPlatform(idb);
 					
 					if ((aIsMovingPlatform && rb.isStatic()) || (bIsMovingPlatform && ra.isStatic()))
 						continue;
@@ -240,7 +241,7 @@ public class Physics {
 									vb.y = va.y;
 								}
 							}
-							if (entityManager.hasComponent(ida, ButtonMoveComponent.class)
+							if (isMovingPlatform(ida)
 									&& entityManager.hasComponent(ida, VelocityComponent.class)
 									&& entityManager.hasComponent(idb, VelocityComponent.class)) {
 								if (va == null) {
@@ -291,7 +292,7 @@ public class Physics {
 									va.y = vb.y;
 								}
 							}
-							if (entityManager.hasComponent(idb, ButtonMoveComponent.class)
+							if (isMovingPlatform(idb)
 									&& entityManager.hasComponent(idb, VelocityComponent.class)
 									&& entityManager.hasComponent(ida, VelocityComponent.class)) {
 								if (vb == null) {
@@ -358,6 +359,11 @@ public class Physics {
 				velocity.z *= 0.5f;
 			}
 		}
+	}
+
+	private boolean isMovingPlatform(int entityId) {
+		return entityManager.hasComponent(entityId, ButtonMoveComponent.class)
+				|| entityManager.hasComponent(entityId, TimedMoveComponent.class);
 	}
 
 	private static Contact checkCollision(Vector3f ca, Vector3f ha, Vector3f cb, Vector3f hb) {
