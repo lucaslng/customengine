@@ -78,12 +78,14 @@ entitycount
 entitytype entityarg1 entityarg2 entityarg3 …
 …
 
-platform posx posy width height [blink onseconds offseconds]
-moving_platform posx posy width height moveX moveY speed flag flagnum coins requiredcoins
+(flags in square brackets are optional)
+platform posx posy width height [blink] [onseconds] [offseconds]
+moving_platform posx posy width height [moveX] [moveY] [speed] [flag flagnum] [coins requiredcoins]
 lava posx posy width height
-coin posx posy
-moving_lava posx posy width height moveX moveY speed pauseDuration
-button posx posy toggle/latch flag flagnum
-
+coin posx posy [flag flagnum]
+moving_lava posx posy width height [moveX] [moveY] [speed] [pauseDuration]
+button posx posy [latch] [toggle] [flag flagnum]
+exit posx posy
+wall posx posy width height
 …
 ```
