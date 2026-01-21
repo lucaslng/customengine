@@ -10,7 +10,7 @@ A 3D platformer game where you make your way through teamwork-based levels with 
 
 - The y positions of the hitboxes of the buttons are not aligned with the locations of the buttons when the window is stretched vertically; however, this is not an issue when playing with a normal aspect ratio (16:9).
 - We can't center align drawn text onto a position. As we mentioned in the showcase, this is because it is a bit difficult to calculate the width of the drawn text. We probably could have done this with a bit more time.
-- When first loading into a level, the timer is often a few seconds short because of the loading time. Perhaps we could fix this by creating objects beforehand and just cutting down the number of objects we are creating.
+- When first loading into a level with a timer, the timer is often a few seconds short because of the loading time. Perhaps we could fix this by creating objects beforehand and just cutting down the number of objects we are creating.
 - Our lighting system doesn't yet take into account the normals of the textures that we have downloaded. This means that all materials are "shiny", including grass or bricks.
 
 ## Other notes
