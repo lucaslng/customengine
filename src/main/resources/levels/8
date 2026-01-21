@@ -3,9 +3,9 @@
 true
 15
 platform 0 22 25 5
-lava -12 28 0.6 10
-exit -17 28
-lava 14.5 21.7 3 5
+lava -12 28 1 10
+exit -22 28
+lava 14.5 21.7 4 5
 platform 19 24 5 0.5
 platform 24 18 5 0.5
 platform 19 12 5 0.5
