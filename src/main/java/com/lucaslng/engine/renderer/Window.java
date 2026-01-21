@@ -57,7 +57,6 @@ public class Window {
 		if (window == NULL) {
 			throw new RuntimeException("Failed to create the GLFW window");
 		}
-		System.out.println("GLFW window created successfully");
 
 		glfwSetFramebufferSizeCallback(window, (window, w, h) -> {
 			this.w = w;

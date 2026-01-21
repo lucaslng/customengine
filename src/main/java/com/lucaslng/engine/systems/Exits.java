@@ -30,12 +30,10 @@ public class Exits {
 			Vector3f exitPos = entityManager.getComponent(exit, PositionComponent.class).position();
 			float s = ExitEntityFactory.halfSize;
 			if (!player1Exited && pos1.x() > exitPos.x() - s && pos1.x() < exitPos.x() + s && pos1.y() > exitPos.y() - s && pos1.y() < exitPos.y() + s) {
-				System.out.println("player 1 exit");
 				entityManager.addComponent(player1.id(), new DisabledComponent());
 				player1Exited = true;
 			}
 			if (!player2Exited && pos2.x() > exitPos.x() - s && pos2.x() < exitPos.x() + s && pos2.y() > exitPos.y() - s && pos2.y() < exitPos.y() + s) {
-				System.out.println("player 2 exit");
 				entityManager.addComponent(player2.id(), new DisabledComponent());
 				player2Exited = true;
 			}

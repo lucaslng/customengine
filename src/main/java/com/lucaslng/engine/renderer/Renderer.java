@@ -56,18 +56,13 @@ public final class Renderer {
 		camera = new Camera();
 		isRendering = false;
 
-		System.out.println("Initializing OpenGL...");
 		GL.createCapabilities();
-		// System.out.println("OpenGL Vendor  : " + glGetString(GL_VENDOR));
-		// System.out.println("OpenGL Renderer: " + glGetString(GL_RENDERER));
-		// System.out.println("OpenGL Version : " + glGetString(GL_VERSION));
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glClearColor(0.8f, 0.7f, 0.6f, 1.0f);
 
 		checkErrors();
-		System.out.println("OpenGL initialized successfully.");
 
 		projectionMatrix.setPerspective(engineSettings.FOV, (float) window.w() / window.h(), 0.1f, engineSettings.Z_FAR);
 		background = new RectElement(0f, 0f, 1f, 1f, XAlignment.LEFT, YAlignment.TOP);

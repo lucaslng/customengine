@@ -87,9 +87,9 @@ class ShaderProgram{
 		}
 
 		int location = glGetUniformLocation(id, name);
-		if (location == -1) {
-			System.out.println("WARNING: shader uniform " + name + " location is -1.");
-		}
+		// if (location == -1) {
+		// 	System.out.println("WARNING: shader uniform " + name + " location is -1.");
+		// }
 		uniformLocationCache.put(nameString, location);
 		return location;
 	}

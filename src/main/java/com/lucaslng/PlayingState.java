@@ -4,15 +4,37 @@ import java.awt.Color;
 import java.util.Set;
 
 import org.joml.Vector3f;
+
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameState;
 import com.lucaslng.engine.GameStateSwitch;
-import com.lucaslng.engine.components.*;
+import com.lucaslng.engine.components.DeathsComponent;
+import com.lucaslng.engine.components.DisabledComponent;
+import com.lucaslng.engine.components.GroundedComponent;
+import com.lucaslng.engine.components.HeadRotationComponent;
+import com.lucaslng.engine.components.PositionComponent;
+import com.lucaslng.engine.components.RigidBodyComponent;
+import com.lucaslng.engine.components.RotationComponent;
+import com.lucaslng.engine.components.VelocityComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.engine.entities.Entity;
-import com.lucaslng.engine.systems.*;
+import com.lucaslng.engine.systems.BlinkingPlatforms;
+import com.lucaslng.engine.systems.ButtonPlatforms;
+import com.lucaslng.engine.systems.Buttons;
+import com.lucaslng.engine.systems.Deaths;
+import com.lucaslng.engine.systems.Exits;
+import com.lucaslng.engine.systems.LevelTransition;
+import com.lucaslng.engine.systems.Levels;
 import com.lucaslng.engine.systems.Levels.Level;
-import com.lucaslng.engine.ui.*;
+import com.lucaslng.engine.systems.Physics;
+import com.lucaslng.engine.systems.Rotations;
+import com.lucaslng.engine.systems.TimedPlatforms;
+import com.lucaslng.engine.systems.Timers;
+import com.lucaslng.engine.ui.Button;
+import com.lucaslng.engine.ui.Text;
+import com.lucaslng.engine.ui.TextStyle;
+import com.lucaslng.engine.ui.XAlignment;
+import com.lucaslng.engine.ui.YAlignment;
 import com.lucaslng.entities.CameraEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
 
@@ -42,7 +64,7 @@ class PlayingState extends GameState {
 		uiManager.elements.add(new Text(260f, 20f, 0f, 0f, XAlignment.RIGHT, YAlignment.TOP, "Home",
 				new TextStyle("Pixeled", 8f, Color.BLACK)));
 
-		levels = new Levels();
+		levels = engine.getLevels();
 		Level level = levels.currentLevel();
 
 		Text timerText = new Text(-120f, 10f, 0f, 0f, XAlignment.CENTER, YAlignment.TOP, level.timer() + "", new TextStyle("Pixeled", 10f, Color.BLACK));
@@ -335,11 +357,25 @@ class PlayingState extends GameState {
 		Vector3f pos1 = entityManager.getComponent(player1.id(), PositionComponent.class).position();
 		Vector3f pos2 = entityManager.getComponent(player2.id(), PositionComponent.class).position();
 
-		// calculate midpoint between players
-		Vector3f midpoint = new Vector3f((pos1.x + pos2.x) / 2f, (pos1.y + pos2.y) / 2f, (pos1.z + pos2.z) / 2f);
+		boolean player1Disabled = entityManager.hasComponent(player1.id(), DisabledComponent.class);
+		boolean player2Disabled = entityManager.hasComponent(player2.id(), DisabledComponent.class);
 
-		// calculate distance between players
-		float distance = pos1.distance(pos2);
+		Vector3f midpoint;
+		float distance;
+		
+		if (!player1Disabled && !player2Disabled) {		// if both players are active
+			midpoint = new Vector3f((pos1.x + pos2.x) / 2f, (pos1.y + pos2.y) / 2f, (pos1.z + pos2.z) / 2f);
+			distance = pos1.distance(pos2);
+		} else if (!player1Disabled) {		// player 1 only alive - center on player 1
+			midpoint = new Vector3f(pos1);
+			distance = 0f;
+		} else if (!player2Disabled) {		// same for player 2
+			midpoint = new Vector3f(pos2);
+			distance = 0f;
+		} else {
+			midpoint = new Vector3f((pos1.x + pos2.x) / 2f, (pos1.y + pos2.y) / 2f, (pos1.z + pos2.z) / 2f);
+			distance = 0f;
+		}
 
 		// calculate camera distance based on player separation
 		float baseDistance = 15f;

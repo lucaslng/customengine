@@ -10,6 +10,7 @@ import com.lucaslng.GameStates;
 import com.lucaslng.engine.renderer.FontAtlas;
 import com.lucaslng.engine.renderer.Renderer;
 import com.lucaslng.engine.renderer.Window;
+import com.lucaslng.engine.systems.Levels;
 
 public final class Engine {
 
@@ -23,7 +24,6 @@ public final class Engine {
 	public GameStateSwitch gameStateSwitch;
 
 	public Engine(HashMap<GameStates, GameState> gameStates) {
-		System.out.println("Initializing engine...");
 		this.gameStates = gameStates;
 		settings = new EngineSettings();
 
@@ -35,12 +35,18 @@ public final class Engine {
 		window = new Window(settings);
 		inputHandler = new InputHandler(window);
 		renderer = new Renderer(settings, window, fontAtlas);
-
-		System.out.println("Engine initialized.");
 	}
 
 	public void setCamera(Vector3f position, Vector3f rotation, int entityId) {
 		renderer.setCamera(position, rotation, entityId);
+	}
+
+	private Levels cachedLevels;
+	public Levels getLevels() {
+		if (cachedLevels == null) {
+			cachedLevels = new Levels();
+		}
+		return cachedLevels;
 	}
 
 	public void linkMouseToRotation(Vector3f rotation) {
@@ -56,9 +62,9 @@ public final class Engine {
 	public void start(GameStates startingGameState) {
 		gameStateSwitch = new GameStateSwitch(startingGameState, null);
 		while (true) {
-			if (!gameStates.containsKey(gameStateSwitch.gameState()))
+			if (!gameStates.containsKey(gameStateSwitch.gameState())) {
 				break;
-			System.out.println("Switching state to " + gameStateSwitch.gameState().toString());
+			}
 			gameStates.get(gameStateSwitch.gameState()).init(this, gameStateSwitch.payload());
 			gameStateSwitch = gameStates.get(gameStateSwitch.gameState()).loop();
 		}
