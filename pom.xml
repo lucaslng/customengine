@@ -80,10 +80,6 @@
     </dependency>
     <dependency>
       <groupId>org.lwjgl</groupId>
-      <artifactId>lwjgl-assimp</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-glfw</artifactId>
     </dependency>
     <dependency>
@@ -104,11 +100,6 @@
     </dependency>
     <dependency>
       <groupId>org.lwjgl</groupId>
-      <artifactId>lwjgl-assimp</artifactId>
-      <classifier>natives-linux</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-glfw</artifactId>
       <classifier>natives-linux</classifier>
     </dependency>
@@ -121,11 +112,6 @@
     <dependency>
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl</artifactId>
-      <classifier>natives-macos</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.lwjgl</groupId>
-      <artifactId>lwjgl-assimp</artifactId>
       <classifier>natives-macos</classifier>
     </dependency>
     <dependency>
@@ -146,11 +132,6 @@
     </dependency>
     <dependency>
       <groupId>org.lwjgl</groupId>
-      <artifactId>lwjgl-assimp</artifactId>
-      <classifier>natives-macos-arm64</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl-glfw</artifactId>
       <classifier>natives-macos-arm64</classifier>
     </dependency>
@@ -163,11 +144,6 @@
     <dependency>
       <groupId>org.lwjgl</groupId>
       <artifactId>lwjgl</artifactId>
-      <classifier>natives-windows</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.lwjgl</groupId>
-      <artifactId>lwjgl-assimp</artifactId>
       <classifier>natives-windows</classifier>
     </dependency>
     <dependency>
