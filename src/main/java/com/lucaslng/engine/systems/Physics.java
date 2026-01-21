@@ -35,13 +35,20 @@ public class Physics {
 		if (DEBUG_VELOCITIES)
 			System.out.println("=== Physics Step, dt=" + dt + " ===");
 
-		// Reset grounded status for all entities, it gets recalculated every frame
-		// Grounded status decides whether an entity is allowed to jump
+		// Reset grounded status for all entities and store previous state
 		for (int entityId : entityManager.getEntitiesWith(GroundedComponent.class)) {
 			if (entityManager.hasComponent(entityId, DisabledComponent.class))
 				continue;
 			GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
-			grounded.isGrounded = false;
+			
+			// If was grounded but about to become not grounded, clear horizontal velocity from platform
+			if (grounded.isGrounded && entityManager.hasComponent(entityId, VelocityComponent.class)) {
+				// Store that we were grounded this frame (will be recalculated below)
+				boolean wasGrounded = grounded.isGrounded;
+				grounded.isGrounded = false;
+			} else {
+				grounded.isGrounded = false;
+			}
 		}
 
 		// Apply gravity
@@ -51,7 +58,7 @@ public class Physics {
 			if (entityManager.hasComponent(entityId, ButtonMoveComponent.class))
 				continue;
 			RigidBodyComponent rigidBody = entityManager.getComponent(entityId, RigidBodyComponent.class);
-			if (rigidBody.isStatic()) // static entities dont get gravity
+			if (rigidBody.isStatic())
 				continue;
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
 
@@ -60,7 +67,6 @@ public class Physics {
 
 			velocity.y -= G * rigidBody.gravityScale() * dt;
 
-			// Clamp velocity to prevent tunneling (objects moving through walls because they have too much velocity)
 			float speed = velocity.length();
 			if (speed > MAX_VELOCITY) {
 				if (DEBUG_VELOCITIES)
@@ -80,7 +86,6 @@ public class Physics {
 			Vector3f position = entityManager.getComponent(entityId, PositionComponent.class).position();
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
 
-			// If e doesn't have collision related components, just move normally without checking for collision
 			if (!entityManager.hasComponent(entityId, RigidBodyComponent.class)
 					|| !entityManager.hasComponent(entityId, AABBComponent.class)) {
 				Vector3f change = new Vector3f();
@@ -98,16 +103,12 @@ public class Physics {
 			
 			boolean hitFloor = false;
 
-			// regular movement before collisions
 			Vector3f movement = new Vector3f(velocity).mul((float) dt);
 
-			// Move on each axis separately to prevent one axis from blocking another
-			// Order: X -> Y -> Z
 			for (int axis = 0; axis < 3; axis++) {
-				if (Math.abs(movement.get(axis)) < 0.0001f) // ignore tiny movement
+				if (Math.abs(movement.get(axis)) < 0.0001f)
 					continue;
 
-				// calculate endPos of moving only on this axis
 				Vector3f startPos = new Vector3f(position);
 				Vector3f axisMovement = new Vector3f();
 				axisMovement.setComponent(axis, movement.get(axis));
@@ -115,7 +116,6 @@ public class Physics {
 
 				boolean collided = false;
 
-				// Check all colliders
 				for (int otherId : entityManager.getEntitiesWith(PositionComponent.class, RigidBodyComponent.class,
 						AABBComponent.class)) {
 					if (entityManager.hasComponent(otherId, DisabledComponent.class))
@@ -127,26 +127,21 @@ public class Physics {
 
 					float collisionTime = sweptAABB(startPos, endPos, halfExtents, otherPos, otherExtents);
 
-					// if there was collision
 					if (collisionTime >= 0f && collisionTime < 1f) {
-						// Collision on this axis
 						Vector3f collisionPos = new Vector3f(startPos).lerp(endPos, collisionTime);
 						Vector3f normal = getCollisionNormal(collisionPos, halfExtents, otherPos, otherExtents);
 
-						if (Math.abs(normal.get(axis)) > 0.5f) { // if this is the face that is touching
-							// Push back slightly from collision point
+						if (Math.abs(normal.get(axis)) > 0.5f) {
 							float epsilon = 0.001f;
 							collisionPos.sub(new Vector3f(normal).mul(epsilon));
 							position.setComponent(axis, collisionPos.get(axis));
 
-							// Stop velocity on this axis if moving into surface
 							float velOnAxis = velocity.get(axis);
 							float normalOnAxis = normal.get(axis);
 							if (velOnAxis * normalOnAxis > 0.01f) {
 								velocity.setComponent(axis, 0f);
 							}
 
-							// Check if we hit a floor (Y axis, normal pointing down)
 							if (axis == 1 && normal.y < -0.7f) {
 								hitFloor = true;
 							}
@@ -162,7 +157,6 @@ public class Physics {
 				}
 			}
 
-			// Set grounded if we hit a floor during swept collision
 			if (hitFloor && entityManager.hasComponent(entityId, GroundedComponent.class)) {
 				GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
 				grounded.isGrounded = true;
@@ -177,11 +171,9 @@ public class Physics {
 		for (int iter = 0; iter < iterations; iter++) {
 			ArrayList<Integer[]> contactIds = new ArrayList<>();
 			ArrayList<Contact> contactData = new ArrayList<>();
-			// Get all entities with collision components
 			ArrayList<Integer> colliders = new ArrayList<>(entityManager.getEntitiesWith(
 					PositionComponent.class, RigidBodyComponent.class, AABBComponent.class));
 
-			// Check all pairs
 			for (int i = 0; i < colliders.size(); i++) {
 				int ida = colliders.get(i);
 				if (entityManager.hasComponent(ida, DisabledComponent.class))
@@ -198,7 +190,6 @@ public class Physics {
 					RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
 					boolean bIsMovingPlatform = entityManager.hasComponent(idb, ButtonMoveComponent.class);
 					
-					// let moving platforms pass through static geometry, but keep their player hitbox.
 					if ((aIsMovingPlatform && rb.isStatic()) || (bIsMovingPlatform && ra.isStatic()))
 						continue;
 					if (ra.isStatic() && rb.isStatic())
@@ -214,24 +205,17 @@ public class Physics {
 					contactIds.add(new Integer[] { ida, idb });
 					contactData.add(contact);
 
-					// Set grounded (only on first iteration)
 					if (iter == 0) {
-						// Normal points from A to B
-						// If normal.y > 0.7, B is above A, so B is grounded on A
-						// If normal.y < -0.7, A is above B, so A is grounded on B
 						if (contact.c().y > 0.7f && !rb.isStatic() && entityManager.hasComponent(idb, GroundedComponent.class)) {
 							boolean canGround = true;
 							Vector3f va = null;
 							Vector3f vb = null;
 							if (entityManager.hasComponent(idb, VelocityComponent.class)) {
 								vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
-								// Don't ground if the lower entity is moving upward (jumping into the upper
-								// one).
 								canGround = vb.y <= 0.1f;
 							}
 							if (canGround && entityManager.hasComponent(ida, VelocityComponent.class)) {
 								va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
-								// Only ground if the upper entity isn't moving upward.
 								canGround = va.y <= 0.1f;
 							}
 
@@ -242,7 +226,6 @@ public class Physics {
 							GroundedComponent grounded = entityManager.getComponent(idb, GroundedComponent.class);
 							grounded.isGrounded = true;
 
-							// Snap vertical velocity to the supporting entity to prevent bounce.
 							if (entityManager.hasComponent(idb, VelocityComponent.class)) {
 								if (vb == null) {
 									vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
@@ -254,7 +237,6 @@ public class Physics {
 									if (va == null) {
 										va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
 									}
-									// Match the lower entity's vertical velocity when grounded.
 									vb.y = va.y;
 								}
 							}
@@ -267,7 +249,6 @@ public class Physics {
 								if (vb == null) {
 									vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
 								}
-								// Carry grounded entities along moving platforms.
 								vb.x = va.x;
 								vb.z = va.z;
 							}
@@ -281,13 +262,10 @@ public class Physics {
 							Vector3f vb = null;
 							if (entityManager.hasComponent(ida, VelocityComponent.class)) {
 								va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
-								// Only ground if the upper entity isn't moving upward.
 								canGround = va.y <= 0.1f;
 							}
 							if (canGround && entityManager.hasComponent(idb, VelocityComponent.class)) {
 								vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
-								// Don't ground if the lower entity is moving upward (jumping into the upper
-								// one).
 								canGround = vb.y <= 0.1f;
 							}
 
@@ -298,7 +276,6 @@ public class Physics {
 							GroundedComponent grounded = entityManager.getComponent(ida, GroundedComponent.class);
 							grounded.isGrounded = true;
 
-							// Snap vertical velocity to the supporting entity to prevent bounce.
 							if (entityManager.hasComponent(ida, VelocityComponent.class)) {
 								if (va == null) {
 									va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
@@ -311,7 +288,6 @@ public class Physics {
 									if (vb == null) {
 										vb = entityManager.getComponent(idb, VelocityComponent.class).velocity();
 									}
-									// Match the lower entity's vertical velocity when grounded.
 									va.y = vb.y;
 								}
 							}
@@ -324,7 +300,6 @@ public class Physics {
 								if (va == null) {
 									va = entityManager.getComponent(ida, VelocityComponent.class).velocity();
 								}
-								// Carry grounded entities along moving platforms.
 								va.x = vb.x;
 								va.z = vb.z;
 							}
@@ -337,9 +312,6 @@ public class Physics {
 				}
 			}
 
-			// Resolve contacts (only on first iteration)
-			// Only apply impulses for dynamic-vs-dynamic collisions where both are moving
-			// Static collisions are already handled by swept collision
 			if (iter == 0) {
 				for (int i = 0; i < contactIds.size(); i++) {
 					Vector3f c = contactData.get(i).c;
@@ -348,8 +320,6 @@ public class Physics {
 					RigidBodyComponent ra = entityManager.getComponent(ida, RigidBodyComponent.class);
 					RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
 
-					// Skip impulse resolution if either object is static
-					// Swept collision already handles static collisions
 					if (ra.isStatic() || rb.isStatic())
 						continue;
 
@@ -360,7 +330,6 @@ public class Physics {
 				}
 			}
 
-			// Correct positions (every iteration)
 			for (int i = 0; i < contactIds.size(); i++) {
 				Contact contact = contactData.get(i);
 				int ida = contactIds.get(i)[0];
@@ -370,6 +339,23 @@ public class Physics {
 				RigidBodyComponent rb = entityManager.getComponent(idb, RigidBodyComponent.class);
 				Vector3f pb = entityManager.getComponent(idb, PositionComponent.class).position();
 				correctPosition(ra, rb, pa, pb, contact);
+			}
+		}
+		
+		// Clear horizontal velocity for entities that were grounded but are no longer grounded
+		// This prevents players from retaining platform velocity after leaving
+		for (int entityId : entityManager.getEntitiesWith(GroundedComponent.class, VelocityComponent.class)) {
+			if (entityManager.hasComponent(entityId, DisabledComponent.class))
+				continue;
+			
+			GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
+			
+			// If not grounded anymore, dampen horizontal velocity to prevent sliding with platform speed
+			if (!grounded.isGrounded) {
+				Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
+				// Apply strong damping to horizontal components only
+				velocity.x *= 0.5f;
+				velocity.z *= 0.5f;
 			}
 		}
 	}
@@ -402,74 +388,58 @@ public class Physics {
 		return new Contact(penetration, normal);
 	}
 
-	// Calculates collision time
-	// startPos - center of moving box at start
-	// endPos - center of moving box at end
-	// movingExtents - half size of moving box
-	// staticPos - center of static box
-	// staticExtents - half size of static box
 	private static float sweptAABB(Vector3f startPos, Vector3f endPos, Vector3f movingExtents, Vector3f staticPos,
 			Vector3f staticExtents) {
 		Vector3f velocity = new Vector3f(endPos).sub(startPos);
-		if (velocity.lengthSquared() < 0.0001f) // exit early if no movement
-			return -1f; // return -1 if no collision
+		if (velocity.lengthSquared() < 0.0001f)
+			return -1f;
 
-		// expand the static box, so that instead of comparing box vs box, we are now comparing point vs box
-		// When the center of the moving object collides the expanded box, there is collision
 		Vector3f expandedMin = new Vector3f(staticPos).sub(staticExtents).sub(movingExtents);
 		Vector3f expandedMax = new Vector3f(staticPos).add(staticExtents).add(movingExtents);
 
 		float tmin = 0f;
 		float tmax = 1f;
 
-		// for each axis
 		for (int i = 0; i < 3; i++) {
 			float v = velocity.get(i);
 			float p = startPos.get(i);
 			float min = expandedMin.get(i);
 			float max = expandedMax.get(i);
 
-			if (Math.abs(v) < 0.0001f) { // if no movement along this axis
-				if (p < min || p > max) // if starts outside the slab, it will never enter
+			if (Math.abs(v) < 0.0001f) {
+				if (p < min || p > max)
 					return -1f;
 			} else {
-				// the times when the ray hits the near and far faces of the slab
 				float t1 = (min - p) / v;
 				float t2 = (max - p) / v;
 
-				// swap order to ensure that t1 is the start and t2 is the end
 				if (t1 > t2) {
 					float temp = t1;
 					t1 = t2;
 					t2 = temp;
 				}
 
-				tmin = Math.max(tmin, t1); // the latest time the moving point enters all axis slabs
-				tmax = Math.min(tmax, t2); // the earliest time the moving point exits any axis slab
+				tmin = Math.max(tmin, t1);
+				tmax = Math.min(tmax, t2);
 
-				// point must be inside all axis slab's at once to be in the box (collision)
 				if (tmin > tmax)
 					return -1f;
 			}
 		}
 
-		return tmin; // the first time the point is inside every slab
+		return tmin;
 	}
 
-	// Finds which face of the boxes is touching by seeing which axis overlaps the least
 	private static Vector3f getCollisionNormal(Vector3f movingPos, Vector3f movingExtents, Vector3f staticPos,
 			Vector3f staticExtents) {
-		Vector3f d = new Vector3f(staticPos).sub(movingPos); // d = staticCenter - movingCenter
-		// d.x > 0 -> static box is to the right; d.x < 0 -> to the left
+		Vector3f d = new Vector3f(staticPos).sub(movingPos);
 
-		// overlap depth for each axis
 		float ox = (movingExtents.x + staticExtents.x) - Math.abs(d.x);
 		float oy = (movingExtents.y + staticExtents.y) - Math.abs(d.y);
 		float oz = (movingExtents.z + staticExtents.z) - Math.abs(d.z);
 
 		Vector3f normal = new Vector3f();
 
-		// gets the least overlap
 		if (ox < oy && ox < oz) {
 			normal.x = d.x >= 0 ? 1f : -1f;
 		} else if (oy < oz) {
@@ -487,12 +457,9 @@ public class Physics {
 		va.sub(vb, rv);
 		float rvAlongNormal = rv.dot(normal);
 
-		// Objects are separating or barely touching, don't apply impulse
-		// Use a larger threshold to prevent bouncing
 		if (rvAlongNormal > -1.0f)
 			return;
 
-		// Use minimal restitution for player-player collisions to prevent bouncing
 		float e = Math.min(ra.restitution(), rb.restitution()) * 0.1f;
 		float invMassSum = ra.invMass() + rb.invMass();
 		if (invMassSum == 0f)
@@ -501,7 +468,6 @@ public class Physics {
 		float j = -(1 + e) * rvAlongNormal;
 		j /= invMassSum;
 
-		// Clamp impulse much more aggressively
 		float maxImpulse = 20f;
 		j = Math.min(j, maxImpulse);
 
@@ -550,10 +516,9 @@ public class Physics {
 	private static void correctPosition(RigidBodyComponent ra, RigidBodyComponent rb, Vector3f pa, Vector3f pb,
 			Contact contact) {
 		float invMassSum = ra.invMass() + rb.invMass();
-		if (invMassSum == 0f) // both objects static, early exit
+		if (invMassSum == 0f)
 			return;
 
-		// split correction over multiple frames and only correct if above PENETRATION_ALLOWANCE to avoid jittering
 		float correctionMagnitude = Math.max(contact.penetration() - PENETRATION_ALLOWANCE, 0f) / invMassSum
 				* PENETRATION_CORRECTION;
 		Vector3f correction = new Vector3f(contact.c()).mul(correctionMagnitude);

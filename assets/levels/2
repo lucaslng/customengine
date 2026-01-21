@@ -2,12 +2,12 @@
 -2 75 1 75
 true
 9
-platform 0 70 10 5
-platform 10 73.5 10 5
-platform 20 77 10 5
-platform 55 80.5 50.5 5
-platform 53 70 55 5
+platform 0 70 10 1
+platform 10 73.5 10 1
+platform 20 77 10 1
+platform 55 80.5 50.5 1
+platform 53 72 55 1
 button 72 73.5 latch
 moving_platform 78 82 2 20 0 20 10
-platform 85 70 18 5
+platform 85 72 18 1
 exit 88 75
