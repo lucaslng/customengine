@@ -19,7 +19,8 @@ import com.lucaslng.entities.MovingPlatformEntityFactory;
 
 public class Levels {
 
-	public static final int LEVEL_COUNT = 5;
+	public static final int LEVEL_COUNT = 6;
+	private static final float PLATFORM_LENGTH = 3f;
 	private static final float MOVING_PLATFORM_DEFAULT_OFFSET_X = 0f;
 	private static final float MOVING_PLATFORM_DEFAULT_OFFSET_Y = 0f;
 	private static final float MOVING_PLATFORM_DEFAULT_SPEED = 0f;
@@ -82,15 +83,18 @@ public class Levels {
 						extras = new Object[] { new BlinkComponent(blinkOn, blinkOff, false) };
 					}
 
-					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,
-							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Grass", extras);
+					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), 0f,
+							parseFloat(tokens[3]), parseFloat(tokens[4]), PLATFORM_LENGTH, "Grass", extras);
 				}
 				case "lava" -> {
-					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,
-							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Lava", new LavaComponent());
+					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), 0f,
+							parseFloat(tokens[3]), parseFloat(tokens[4]), PLATFORM_LENGTH, "Lava", new LavaComponent());
 				}
 				case "exit" -> {
 					entities[i] = new ExitEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
+				}
+				case "wall" -> {
+					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), PLATFORM_LENGTH / 2f + 0.5f, parseFloat(tokens[3]), parseFloat(tokens[4]), 0.4f, "Wall");
 				}
 				case "button" -> {
 					boolean latch = false;
@@ -112,7 +116,7 @@ public class Levels {
 					float moveX = tokens.length > 5 ? parseFloat(tokens[5]) : MOVING_PLATFORM_DEFAULT_OFFSET_X;
 					float moveY = tokens.length > 6 ? parseFloat(tokens[6]) : MOVING_PLATFORM_DEFAULT_OFFSET_Y;
 					float speed = tokens.length > 7 ? parseFloat(tokens[7]) : MOVING_PLATFORM_DEFAULT_SPEED;
-					entities[i] = new MovingPlatformEntityFactory(x, y, -1.1f, width, height, 2.2f,
+					entities[i] = new MovingPlatformEntityFactory(x, y, 0, width, height, PLATFORM_LENGTH,
 							new Vector3f(moveX, moveY, 0f), speed);
 				}
 				case "moving_lava" -> {
@@ -126,9 +130,9 @@ public class Levels {
 					float onDuration = tokens.length > 8 ? parseFloat(tokens[8]) : MOVING_LAVA_DEFAULT_ON_DURATION;
 					float offDuration = tokens.length > 9 ? parseFloat(tokens[9]) : MOVING_LAVA_DEFAULT_OFF_DURATION;
 					float pauseDuration = tokens.length > 10 ? parseFloat(tokens[10]) : MOVING_LAVA_DEFAULT_PAUSE_DURATION;
-					entities[i] = new MovingPlatformEntityFactory(x, y, -1.1f, width, height, 2.2f,
+					entities[i] = new MovingPlatformEntityFactory(x, y, 0, width, height, PLATFORM_LENGTH,
 							new Vector3f(moveX, moveY, 0f), speed, "Lava", false,
-							new TimedMoveComponent(new Vector3f(x, y, -1.1f), new Vector3f(moveX, moveY, 0f), speed,
+							new TimedMoveComponent(new Vector3f(x, y, 0), new Vector3f(moveX, moveY, 0f), speed,
 									onDuration, offDuration, pauseDuration, false),
 							new LavaComponent());
 				}
