@@ -20,7 +20,7 @@ import com.lucaslng.entities.MovingPlatformEntityFactory;
 
 public class Levels {
 
-	public static final int LEVEL_COUNT = 7;
+	public static final int LEVEL_COUNT = 8;
 	private static final float PLATFORM_LENGTH = 3f;
 	private static final float MOVING_PLATFORM_DEFAULT_OFFSET_X = 0f;
 	private static final float MOVING_PLATFORM_DEFAULT_OFFSET_Y = 0f;
