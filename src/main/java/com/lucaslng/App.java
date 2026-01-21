@@ -2,12 +2,14 @@ package com.lucaslng;
 
 import com.lucaslng.engine.Engine;
 import com.lucaslng.engine.GameState;
+import com.lucaslng.engine.SoundHandler;
 
 import java.util.HashMap;
 
 public class App {
 	public static void main(String[] args) {
 
+		SoundHandler.loop("music");
 		HashMap<GameStates, GameState> gameStates = new HashMap<>();
 		Engine engine = new Engine(gameStates);
 
