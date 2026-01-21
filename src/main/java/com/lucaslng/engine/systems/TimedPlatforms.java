@@ -28,16 +28,13 @@ public class TimedPlatforms {
 			Vector3f position = entityManager.getComponent(platformId, PositionComponent.class).position();
 			Vector3f velocity = entityManager.getComponent(platformId, VelocityComponent.class).velocity();
 
-			mover.timer -= dtf;
-			if (mover.timer <= 0f) {
-				mover.active = !mover.active;
-				mover.timer = mover.active ? mover.onDuration : mover.offDuration;
-				mover.arrived = false;
-			}
-
 			if (mover.pauseTimer > 0f) {
 				mover.pauseTimer -= dtf;
 				velocity.set(0f, 0f, 0f);
+				if (mover.pauseTimer <= 0f && mover.arrived) {
+					mover.active = !mover.active;
+					mover.arrived = false;
+				}
 				continue;
 			}
 
@@ -51,10 +48,15 @@ public class TimedPlatforms {
 			if (distance < SNAP_DISTANCE) {
 				position.set(target);
 				velocity.set(0f, 0f, 0f);
-				if (!mover.arrived && mover.pauseDuration > 0f) {
-					mover.pauseTimer = mover.pauseDuration;
+				if (!mover.arrived) {
+					mover.arrived = true;
+					if (mover.pauseDuration > 0f) {
+						mover.pauseTimer = mover.pauseDuration;
+					} else {
+						mover.active = !mover.active;
+						mover.arrived = false;
+					}
 				}
-				mover.arrived = true;
 				continue;
 			}
 
