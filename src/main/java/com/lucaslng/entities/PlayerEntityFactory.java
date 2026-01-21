@@ -14,13 +14,16 @@ public class PlayerEntityFactory implements AbstractEntityFactory {
 			.parseObj("model");
 	private final MeshComponent meshComponent;
 
-	public PlayerEntityFactory(Vector2f xy) {
+	public PlayerEntityFactory(Vector2f xy, int player) {
 		position = new Vector3f(xy.x(), xy.y(), 0f);
 
 		SubMesh[] subMeshes = new SubMesh[parsedObject.subParsedObjects().length];
 		for (int i=0;i<subMeshes.length;i++) {
 			SubParsedObj subParsedObject = parsedObject.subParsedObjects()[i];
 			subMeshes[i] = new SubMesh(subParsedObject.vertices(), subParsedObject.indices(), subParsedObject.materialName());
+			if (subMeshes[i].materialName.equals("Primary")) {
+				subMeshes[i].materialName = "Player" + player;
+			}
 		}
 		meshComponent = new MeshComponent(subMeshes);
 	}

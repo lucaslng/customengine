@@ -5,6 +5,7 @@ import java.util.Set;
 import org.joml.Vector3f;
 
 import com.lucaslng.engine.EntityManager;
+import com.lucaslng.engine.SoundHandler;
 import com.lucaslng.engine.components.AABBComponent;
 import com.lucaslng.engine.components.CoinComponent;
 import com.lucaslng.engine.components.DisabledComponent;
@@ -40,6 +41,7 @@ public class Coins {
 			Vector3f coinExt = entityManager.getComponent(coinId, AABBComponent.class).halfExtents();
 
 			if (isOverlapping(pos1, ext1, coinPos, coinExt) || isOverlapping(pos2, ext2, coinPos, coinExt)) {
+				SoundHandler.play("coin");
 				coin.collected = true;
 				entityManager.addComponent(coinId, new DisabledComponent());
 				collectedCount++;

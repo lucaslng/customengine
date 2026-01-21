@@ -1,7 +1,7 @@
 # Blender 5.0.1 MTL File: 'model.blend'
 # www.blender.org
 
-newmtl Material.002
+newmtl Primary
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.800007 0.000690 0.000000

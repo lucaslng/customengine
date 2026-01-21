@@ -76,8 +76,8 @@ class PlayingState extends GameState {
 		timers = new Timers(timerText);
 		timers.setTimer(level.timer());
 
-		player1 = entityManager.buildEntity(new PlayerEntityFactory(level.player1Spawn()));
-		player2 = entityManager.buildEntity(new PlayerEntityFactory(level.player2Spawn()));
+		player1 = entityManager.buildEntity(new PlayerEntityFactory(level.player1Spawn(), 1));
+		player2 = entityManager.buildEntity(new PlayerEntityFactory(level.player2Spawn(), 2));
 
 		for (AbstractEntityFactory entityFactory : level.entityFactories())
 			entityManager.buildEntity(entityFactory);
