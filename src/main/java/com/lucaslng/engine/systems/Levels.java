@@ -132,8 +132,7 @@ public class Levels {
 									onDuration, offDuration, pauseDuration, false),
 							new LavaComponent());
 				}
-				default -> {
-				}
+				default -> {}
 			}
 		}
 		in.close();

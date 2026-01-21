@@ -1,6 +1,5 @@
 package com.lucaslng.entities;
 
-
 import org.joml.Vector3f;
 
 import com.lucaslng.engine.components.HeadRotationComponent;
