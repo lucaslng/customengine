@@ -21,6 +21,7 @@ public class Materials {
 		materials.put("Brown", new Material(new Vector4f(0.55f, 0.35f, 0.2f, 1f)));
 		materials.put("ButtonYellow", new Material(new Vector4f(1.0f, 0.9f, 0.2f, 1f))); // Yellow button
 		materials.put("ButtonBlue", new Material(new Vector4f(0.2f, 0.4f, 1.0f, 1f))); // Blue button (pressed)
+		materials.put("CoinYellow", new Material(new Vector4f(1.0f, 0.85f, 0.1f, 1f)));
 		materials.putAll(ModelParser.parseMtl("model"));
 		return materials;
 	}
