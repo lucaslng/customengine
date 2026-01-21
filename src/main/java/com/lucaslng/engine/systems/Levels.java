@@ -1,16 +1,16 @@
 package com.lucaslng.engine.systems;
 
-import static java.lang.Float.parseFloat;
-
 import java.io.File;
 import java.io.FileNotFoundException;
+import static java.lang.Float.parseFloat;
 import java.util.Scanner;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import com.lucaslng.engine.entities.AbstractEntityFactory;
+import com.lucaslng.engine.components.BlinkComponent;
 import com.lucaslng.engine.components.LavaComponent;
+import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.entities.BoxEntityFactory;
 import com.lucaslng.entities.ButtonEntityFactory;
 import com.lucaslng.entities.ExitEntityFactory;
@@ -18,7 +18,7 @@ import com.lucaslng.entities.MovingPlatformEntityFactory;
 
 public class Levels {
 
-	public static final int LEVEL_COUNT = 2;
+	public static final int LEVEL_COUNT = 3;
 	private static final float MOVING_PLATFORM_DEFAULT_OFFSET_X = 0f;
 	private static final float MOVING_PLATFORM_DEFAULT_OFFSET_Y = 6f;
 	private static final float MOVING_PLATFORM_DEFAULT_SPEED = 6f;
@@ -62,8 +62,23 @@ public class Levels {
 			tokens = in.nextLine().split(" ");
 			switch (tokens[0]) {
 				case "platform" -> {
+					Float blinkOn = null;
+					Float blinkOff = null;
+					for (int t = 5; t < tokens.length; t++) {
+						if ("blink".equalsIgnoreCase(tokens[t]) && t + 2 < tokens.length) {
+							blinkOn = parseFloat(tokens[t + 1]);
+							blinkOff = parseFloat(tokens[t + 2]);
+							t += 2;
+						}
+					}
+
+					Object[] extras = new Object[0];
+					if (blinkOn != null && blinkOff != null) {
+						extras = new Object[] { new BlinkComponent(blinkOn, blinkOff, false) };
+					}
+
 					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,
-							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Grass");
+							parseFloat(tokens[3]), parseFloat(tokens[4]), 2.2f, "Grass", extras);
 				}
 				case "lava" -> {
 					entities[i] = new BoxEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]), -1.1f,

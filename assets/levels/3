@@ -1,0 +1,16 @@
+0
+-10 28 -8 28
+false
+12
+lava 49.25 5 58.5 20
+platform 0 10 40 30
+platform 25 24.5 3 1 blink 4 1
+platform 32 24 4 2.5
+platform 40.5 24.5 3 1 blink 4 2.5
+platform 46.5 24.5 3 1 blink 4 2.5
+platform 54.5 24 4 2.5
+platform 58 24.5 3 1 blink 4 2
+platform 65 24.5 3 1 blink 4 2
+platform 72 24.5 3 1 blink 4 2
+platform 98.5 10 40 30
+exit 107 28
