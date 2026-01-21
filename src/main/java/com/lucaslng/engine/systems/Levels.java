@@ -14,6 +14,7 @@ import com.lucaslng.engine.components.TimedMoveComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
 import com.lucaslng.entities.BoxEntityFactory;
 import com.lucaslng.entities.ButtonEntityFactory;
+import com.lucaslng.entities.CoinEntityFactory;
 import com.lucaslng.entities.ExitEntityFactory;
 import com.lucaslng.entities.MovingPlatformEntityFactory;
 
@@ -131,6 +132,9 @@ public class Levels {
 							new TimedMoveComponent(new Vector3f(x, y, 0), new Vector3f(moveX, moveY, 0f), speed,
 									pauseDuration, false),
 							new LavaComponent());
+				}
+				case "coin" -> {
+					entities[i] = new CoinEntityFactory(parseFloat(tokens[1]), parseFloat(tokens[2]));
 				}
 				default -> {}
 			}

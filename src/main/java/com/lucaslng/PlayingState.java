@@ -21,6 +21,7 @@ import com.lucaslng.engine.entities.Entity;
 import com.lucaslng.engine.systems.BlinkingPlatforms;
 import com.lucaslng.engine.systems.ButtonPlatforms;
 import com.lucaslng.engine.systems.Buttons;
+import com.lucaslng.engine.systems.Coins;
 import com.lucaslng.engine.systems.Deaths;
 import com.lucaslng.engine.systems.Exits;
 import com.lucaslng.engine.systems.LevelTransition;
@@ -39,9 +40,9 @@ import com.lucaslng.entities.CameraEntityFactory;
 import com.lucaslng.entities.PlayerEntityFactory;
 
 class PlayingState extends GameState {
-	private static final float ROPE_MAX_DISTANCE = 10f;
-	private static final float ROPE_STIFFNESS = 27f;
-	private static final float ROPE_DAMPING = 2.5f;
+	private static final float ROPE_MAX_DISTANCE = 6f;
+	private static final float ROPE_STIFFNESS = 80f;
+	private static final float ROPE_DAMPING = 6f;
 
 	private final Entity player1, player2, camera;
 	private final Physics physics;
@@ -54,6 +55,7 @@ class PlayingState extends GameState {
 	private final ButtonPlatforms buttonPlatforms;
 	private final BlinkingPlatforms blinkingPlatforms;
 	private final TimedPlatforms timedPlatforms;
+	private final Coins coins;
 
 	public PlayingState(Engine engine) {
 		super(engine);
@@ -90,6 +92,7 @@ class PlayingState extends GameState {
 		buttonPlatforms = new ButtonPlatforms(entityManager);
 		blinkingPlatforms = new BlinkingPlatforms(entityManager);
 		timedPlatforms = new TimedPlatforms(entityManager);
+		coins = new Coins(entityManager);
 	}
 
 	@Override
@@ -122,6 +125,7 @@ class PlayingState extends GameState {
 			blinkingPlatforms.update((float) dt);
 			timedPlatforms.update(dt);
 			physics.step(dt);
+			coins.update(player1, player2);
 			deaths.checkDeaths(levels.currentLevel(), (levelTimer) -> timers.setTimer(levelTimer));
 			exits.handleExits(player1, player2, dt);
 
@@ -182,6 +186,7 @@ class PlayingState extends GameState {
 		entityManager.removeComponent(player1.id(), DisabledComponent.class);
 		entityManager.removeComponent(player2.id(), DisabledComponent.class);
 		exits.refresh();
+		coins.resetCount();
 	}
 
 	private void handlePlayerMovement(Engine engine, Entity player, float speed, int leftKey, int rightKey, int jumpKey) {
