@@ -202,7 +202,7 @@ public final class Renderer {
 		shader.setUniformMatrix4v("view", false, matBuf);
 		if (entityManager.entityExists(camera.entityId())) {
 			Vector3f cameraPos = entityManager.getComponent(camera.entityId(), PositionComponent.class).position();
-			shader.setUniform3f("lightPos", cameraPos);
+			shader.setUniform3f("lightPos", cameraPos.add(0f, 4f, 10f, new Vector3f()));
 		} else {
 			shader.setUniform3f("lightPos", new Vector3f());
 		}
