@@ -20,6 +20,9 @@ public class MainMenuState extends GameState {
 		uiManager.elements.add(new Text(174f, 66f, 0f, 0f, XAlignment.RIGHT, YAlignment.TOP, "x",
 				new TextStyle("Pixeled", 10f, Color.BLACK)));
 
+		uiManager.elements.add(new Text(-320f, 150f, 0f, 0f, XAlignment.CENTER, YAlignment.TOP, "Together",
+				new TextStyle("Pixeled", 16f, Color.BLACK)));
+
 		// x ignored due to center alignment
 		playButton = new Button(0f, 440f, 550f, 160f, XAlignment.CENTER, YAlignment.TOP, ColorList.BLUE);
 		playButton.addOperation(() -> gameStateSwitch = new GameStateSwitch(GameStates.LEVEL_SELECTION, null));

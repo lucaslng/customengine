@@ -16,7 +16,7 @@ public class Materials {
 		materials.put("Black", new Material(new Vector4f(0f, 0f, 0f, 1f)));
 		materials.put("Platform", new Material(new Vector4f(0.9f, 0.9f, 0.9f, 1f)));
 		materials.put("Grass", new Material(new Texture(FileReader.readImage("grass.jpg"), GL_REPEAT)));
-		materials.put("Wall", new Material(new Vector4f(0.05f, 0.05f, 0.05f, 1f)));
+		materials.put("Wall", new Material(new Texture(FileReader.readImage("wall.jpg"), GL_REPEAT)));
 		materials.put("Lava", new Material(new Texture(FileReader.readImage("lava.jpg"), GL_REPEAT)));
 		materials.put("Brown", new Material(new Vector4f(0.55f, 0.35f, 0.2f, 1f)));
 		materials.put("ButtonYellow", new Material(new Vector4f(1.0f, 0.9f, 0.2f, 1f))); // Yellow button
