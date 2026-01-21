@@ -5,6 +5,6 @@ false
 platform 0 10 25 30
 platform 35 10 25 30
 lava 17.5 5 10 20
-button 35 26 toggle
+button 35 25.7 toggle
 moving_platform 28 24 11 1 -10.5 0 3
 exit 40 28

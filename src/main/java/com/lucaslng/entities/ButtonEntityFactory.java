@@ -29,15 +29,14 @@ public class ButtonEntityFactory implements AbstractEntityFactory {
 	}
 
 	public ButtonEntityFactory(float x, float y, boolean isLatch, boolean isToggle) {
-		// Position the button slightly below the platform surface
-		position = new Vector3f(x, y - 0.5f, -1f);
+		position = new Vector3f(x, y - 0.5f, 0f);
 		this.isLatch = isLatch;
 		this.isToggle = isToggle;
 		
 		// Make it a flat button shape
-		hx = 1.5f; // width
+		hx = 1.5f; // width (match platform width: 3f)
 		hy = 0.25f; // height (thin)
-		hz = 1.1f; // depth (match platform z-width: 2.2f)
+		hz = 1.5f; // depth (match platform length: 3f)
 		
 		float tx = hx / 2f;
 		float ty = hy / 2f;
