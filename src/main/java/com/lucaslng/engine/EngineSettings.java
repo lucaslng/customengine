@@ -10,7 +10,7 @@ public class EngineSettings {
 
 	public float FOV = (float) Math.toRadians(90.0f);
 
-	public float Z_FAR = 100.f;
+	public float Z_FAR = 200.f;
 
 	public float sensitivity = 0.01f;
 
