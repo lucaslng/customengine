@@ -1,4 +1,6 @@
-# Together
+# Together - Ryan C and Lucas
+
+A 3D platformer game where you make your way through teamwork-based levels with a friend!
 
 ## Things we wrote in the initial proposal but didn't do
 
