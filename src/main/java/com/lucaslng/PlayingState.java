@@ -123,15 +123,16 @@ class PlayingState extends GameState {
 	@Override
 	public void dispose() {
 		engine.renderer.setRopeEnabled(false);
+		engine.renderer.setFadeAlpha(0f);
 	}
 
 	private void performLevelChange(Engine engine, int newLevel) {
-		levels.currentLevelIndex = newLevel;
-
-		if (levels.currentLevelIndex > Levels.LEVEL_COUNT) {
-			System.out.println("You won!");
-			System.exit(0);
+		if (newLevel > Levels.LEVEL_COUNT) {
+			gameStateSwitch = new GameStateSwitch(GameStates.END_SCREEN, null);
+			return;
 		}
+
+		levels.currentLevelIndex = newLevel;
 
 		Level level = levels.currentLevel();
 		timers.setTimer(level.timer());
