@@ -6,7 +6,10 @@ import java.util.HashMap;
 
 import org.joml.Vector4f;
 
+import com.lucaslng.ColorList;
 import com.lucaslng.engine.utils.FileReader;
+
+import static com.lucaslng.engine.utils.ColorUtils.color2Vec;
 
 public class Materials {
 	public static HashMap<String, Material> createMaterials() {
@@ -22,6 +25,8 @@ public class Materials {
 		materials.put("ButtonYellow", new Material(new Vector4f(1.0f, 0.9f, 0.2f, 1f))); // Yellow button
 		materials.put("ButtonBlue", new Material(new Vector4f(0.2f, 0.4f, 1.0f, 1f))); // Blue button (pressed)
 		materials.put("CoinYellow", new Material(new Vector4f(1.0f, 0.85f, 0.1f, 1f)));
+		materials.put("Player1", new Material(new Vector4f(0.8f, 0.0006f, 0f, 1f)));
+		materials.put("Player2", new Material(new Vector4f(color2Vec(ColorList.BLUE), 1f)));
 		materials.putAll(ModelParser.parseMtl("model"));
 		return materials;
 	}

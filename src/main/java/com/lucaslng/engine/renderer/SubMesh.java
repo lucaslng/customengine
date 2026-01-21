@@ -7,7 +7,7 @@ import static org.lwjgl.opengl.GL15C.GL_ELEMENT_ARRAY_BUFFER;
 public final class SubMesh {
 	public final VertexArray vao;
 	public final int indexCount;
-	public final String materialName;
+	public String materialName;
 
 	public SubMesh(float[] vertices, int[] indices, String materialName) {
 		this.materialName = materialName;
