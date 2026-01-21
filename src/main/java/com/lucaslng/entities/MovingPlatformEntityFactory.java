@@ -33,6 +33,8 @@ public class MovingPlatformEntityFactory implements AbstractEntityFactory {
 	private final String materialName;
 	private final Object[] extraComponents;
 	private final boolean buttonControlled;
+	private final int flag;
+	private final int requiredCoins;
 
 	public MovingPlatformEntityFactory(float x, float y, float z, float width, float height, float length,
 			Vector3f moveOffset, float speed) {
@@ -45,13 +47,20 @@ public class MovingPlatformEntityFactory implements AbstractEntityFactory {
 	}
 
 	public MovingPlatformEntityFactory(float x, float y, float z, float width, float height, float length,
-			Vector3f moveOffset, float speed, String materialName, boolean buttonControlled, Object... extraComponents) {
+			Vector3f moveOffset, float speed, String materialName, boolean buttonControlled) {
+		this(x, y, z, width, height, length, moveOffset, speed, materialName, buttonControlled, 0, 1);
+	}
+
+	public MovingPlatformEntityFactory(float x, float y, float z, float width, float height, float length,
+			Vector3f moveOffset, float speed, String materialName, boolean buttonControlled, int flag, int requiredCoins, Object... extraComponents) {
 		position = new Vector3f(x, y, z);
 		this.moveOffset = new Vector3f(moveOffset);
 		this.speed = speed;
 		this.materialName = materialName;
 		this.extraComponents = extraComponents == null ? new Object[0] : extraComponents;
 		this.buttonControlled = buttonControlled;
+		this.flag = flag;
+		this.requiredCoins = requiredCoins;
 		hx = width / 2f;
 		hy = height / 2f;
 		hz = length / 2f;
@@ -105,7 +114,7 @@ public class MovingPlatformEntityFactory implements AbstractEntityFactory {
 					new MeshComponent(new SubMesh[] { new SubMesh(vertices, INDICES, materialName) }),
 					new VelocityComponent(new Vector3f()), new RigidBodyComponent(200f, 0.1f, 0.9f, 0f),
 					new AABBComponent(new Vector3f(hx, hy, hz)),
-					new ButtonMoveComponent(position, moveOffset, speed) };
+					new ButtonMoveComponent(position, moveOffset, speed, flag, requiredCoins) };
 		} else {
 			baseComponents = new Object[] { new PositionComponent(position), new RotationComponent(new Vector3f()),
 					new MeshComponent(new SubMesh[] { new SubMesh(vertices, INDICES, materialName) }),
