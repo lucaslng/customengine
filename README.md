@@ -68,3 +68,23 @@ A 3D platformer game where you make your way through teamwork-based levels with 
 │   │   ├── FontAtlas, TextRenderer -> Stuff related to drawing text
 ├── entities -> The actual types of entities in our game which all implement AbstractEntityFactory. Eg. Player, Box, Camera, etc.
 ```
+
+## How levels are defined
+
+```text
+timer (0 = no time)
+player1x player1y player2x, player2y
+ropeEnabled (true/false)
+entitycount
+entitytype entityarg1 entityarg2 entityarg3 …
+…
+
+platform posx posy width height [blink onseconds offseconds]
+moving_platform posx posy width height moveX moveY speed flag flagnum coins requiredcoins
+lava posx posy width height
+coin posx posy
+moving_lava posx posy width height moveX moveY speed pauseDuration
+button posx posy toggle/latch flag flagnum
+
+…
+```
