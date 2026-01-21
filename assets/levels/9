@@ -1,0 +1,29 @@
+0
+-4 28 0 28
+false
+25
+lava 20.5 5 6 20
+lava 31.3 5 6.3 20
+lava 42.7 5 6.5 20
+platform 0 10 35 20
+platform 26 10 5 20
+platform 37 10 5 22
+platform 48.5 10 5 26
+platform 65 3 30 40
+platform 8 26 7 1
+platform 20 28.5 3 1
+platform 28.5 29.5 3 1
+platform 37 30.5 3 1
+platform 46 30 3 1
+coin 15 25
+coin 15 22
+coin 22 23
+coin 27 23
+coin 27 26
+coin 32 23
+coin 20 32
+coin 28.5 33
+coin 37 34
+coin 37 23
+moving_platform 50 30 2 18 0 20 10 coins 10
+exit 65 25

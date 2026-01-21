@@ -86,13 +86,13 @@ class PlayingState extends GameState {
 		setCamera();
 		physics = new Physics(entityManager);
 		exits = new Exits(entityManager);
-		deaths = new Deaths(entityManager, player1, player2, exits);
+		coins = new Coins(entityManager);
+		deaths = new Deaths(entityManager, player1, player2, exits, coins);
 		transition = new LevelTransition();
 		buttons = new Buttons(entityManager, player1, player2);
 		buttonPlatforms = new ButtonPlatforms(entityManager);
 		blinkingPlatforms = new BlinkingPlatforms(entityManager);
 		timedPlatforms = new TimedPlatforms(entityManager);
-		coins = new Coins(entityManager);
 	}
 
 	@Override

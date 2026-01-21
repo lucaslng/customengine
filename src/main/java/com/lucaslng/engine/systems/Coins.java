@@ -55,6 +55,15 @@ public class Coins {
 		collectedCount = 0;
 	}
 
+	public void resetAll() {
+		collectedCount = 0;
+		for (int coinId : entityManager.getEntitiesWith(CoinComponent.class)) {
+			CoinComponent coin = entityManager.getComponent(coinId, CoinComponent.class);
+			coin.collected = false;
+			entityManager.removeComponent(coinId, DisabledComponent.class);
+		}
+	}
+
 	private boolean isOverlapping(Vector3f posA, Vector3f extA, Vector3f posB, Vector3f extB) {
 		return Math.abs(posA.x - posB.x) <= (extA.x + extB.x)
 				&& Math.abs(posA.y - posB.y) <= (extA.y + extB.y)

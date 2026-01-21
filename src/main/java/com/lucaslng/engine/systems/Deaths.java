@@ -17,14 +17,16 @@ public class Deaths {
 	private final EntityManager entityManager;
 	private final Entity player1, player2;
 	private final Exits exits;
+	private final Coins coins;
 
 	private static final float LAVA_CONTACT_MARGIN = 0.05f;
 
-	public Deaths(EntityManager entityManager, Entity player1, Entity player2, Exits exits) {
+	public Deaths(EntityManager entityManager, Entity player1, Entity player2, Exits exits, Coins coins) {
 		this.entityManager = entityManager;
 		this.player1 = player1;
 		this.player2 = player2;
 		this.exits = exits;
+		this.coins = coins;
 	}
 
 	public void checkDeaths(Level currentLevel, SetTimerI setTimer) {
@@ -88,6 +90,7 @@ public class Deaths {
 		entityManager.removeComponent(player2.id(), DisabledComponent.class);
 		exits.player1Exited = false;
 		exits.player2Exited = false;
+		coins.resetAll();
 		setTimer.setTimer(currentLevel.timer());
 	}
 
