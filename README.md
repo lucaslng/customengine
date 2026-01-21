@@ -5,8 +5,6 @@ Things we wrote in the initial proposal but didn't do:
 
 Known bugs:
 - The y positions of the hitboxes of the buttons are not aligned with the locations of the buttons when the window is stretched vertically; however, this is not an issue when playing with a normal aspect ratio.
-- When drawing text, there are sometimes artifacts at the edges of each letter. This is because to render text, we first had to use AWT to draw every character of a font onto an image, then render the characters from this font atlas.
-- There may be possible bugs regarding the rope system, particulary how velocity is applied to the players.
 
 Other notes:
 - The game has a lot of code related to drawing things with OpenGL. This is what we spent most of our time on. Specifically, rendering text and rendering 3D models each took a few full days of time.

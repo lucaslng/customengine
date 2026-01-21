@@ -15,6 +15,8 @@ public class FontAtlas {
 		}
 	}
 	public static final int WIDTH = 6000, HEIGHT = 1000;
+	private static final int CHAR_PADDING = 4;
+
 	private final Graphics2D g;
 	protected final BufferedImage atlas;
 	protected final ArrayList<int[]> fontStarts;
@@ -55,37 +57,42 @@ public class FontAtlas {
 		}
 	}
 
-	private void addFont(Font font) {
-		assert font.getSize() == 50;
-		if (fontIndexes.containsKey(font.getFamily())) // font already added
-			return;
-		fontIndexes.put(font.getFamily(), fontStarts.size());
-		fontRows.add(yy);
+    private void addFont(Font font) {
+        assert font.getSize() == 50;
+        if (fontIndexes.containsKey(font.getFamily()))
+            return;
 
-		g.setFont(font);
-		FontMetrics fontMetrics = g.getFontMetrics();
-		fontHeights.add(fontMetrics.getHeight());
+        fontIndexes.put(font.getFamily(), fontStarts.size());
+        fontRows.add(yy);
 
-		int x = 0, y = fontMetrics.getAscent() + fontMetrics.getLeading() + yy;
+        g.setFont(font);
+        FontMetrics fontMetrics = g.getFontMetrics();
+        fontHeights.add(fontMetrics.getHeight());
 
-		g.drawString(String.valueOf(chars), x, y);
+        int x = 0, y = fontMetrics.getAscent() + fontMetrics.getLeading() + yy;
 
-		int[] advances = new int[chars.length];
-		int[] starts = new int[chars.length];
-		advances[0] = fontMetrics.charWidth(START);
-		starts[0] = 0;
-		for (char c = START + 1; c <= END; c++) {
-			advances[c - START] = fontMetrics.charWidth(c);
-			starts[c - START] = starts[c - START - 1] + fontMetrics.charWidth(c - 1);
-		}
-		fontStarts.add(starts);
-		fontAdvances.add(advances);
+        // draw characters with padding
+        int[] advances = new int[chars.length];
+        int[] starts = new int[chars.length];
+        starts[0] = 0;
+        
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            g.drawString(String.valueOf(c), x, y);
+            advances[i] = fontMetrics.charWidth(c);
+            if (i > 0) {
+                starts[i] = starts[i - 1] + fontMetrics.charWidth(chars[i - 1]) + CHAR_PADDING;
+            }
+            x += advances[i] + CHAR_PADDING; 	// add padding after each character
+        }
+        
+        fontStarts.add(starts);
+        fontAdvances.add(advances);
 
-		yy += fontMetrics.getHeight() * 2;
-	}
+        yy += fontMetrics.getHeight() * 2;
+    }
 
 	public void dispose() {
 		g.dispose();
 	}
-
 }
