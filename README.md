@@ -21,9 +21,9 @@
 
 ## Libraries used
 
-- lwjgl - Lightweight Java Game Library
-- OpenGL and GLFW - for 3D stuff
-- JOML - for useful vector and matrix objects
+- [LWJGL](https://www.lwjgl.org/) - Lightweight Java Game Library
+- [OpenGL](https://www.opengl.org/) and [GLFW](https://github.com/glfw/glfw) - for 3D stuff
+- [JOML](https://github.com/JOML-CI/JOML) - for useful vector and matrix objects, boring math stuff
 - We could have used libraries for physics, text rendering, and reading and rendering 3D models but we did not (maybe in grade 12!)
 
 ## File structure
