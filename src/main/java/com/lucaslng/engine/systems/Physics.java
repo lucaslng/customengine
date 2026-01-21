@@ -23,19 +23,11 @@ public class Physics {
 	private static final float PENETRATION_CORRECTION = 1.0f;
 	private static final float MAX_VELOCITY = 50f;
 
-	public static boolean DEBUG_COLLISIONS = false;
-	public static boolean DEBUG_VELOCITIES = false;
-	public static boolean DEBUG_GROUNDED = false;
-	public static boolean DEBUG_PENETRATION = false;
-
 	public Physics(EntityManager entityManager) {
 		this.entityManager = entityManager;
 	}
 
 	public void step(double dt) {
-		if (DEBUG_VELOCITIES)
-			System.out.println("=== Physics Step, dt=" + dt + " ===");
-
 		// Reset grounded status for all entities and store previous state
 		for (int entityId : entityManager.getEntitiesWith(GroundedComponent.class)) {
 			if (entityManager.hasComponent(entityId, DisabledComponent.class))
@@ -63,21 +55,12 @@ public class Physics {
 				continue;
 			Vector3f velocity = entityManager.getComponent(entityId, VelocityComponent.class).velocity();
 
-			if (DEBUG_VELOCITIES)
-				System.out.println("Entity " + entityId + " velocity before gravity: " + velocity);
-
 			velocity.y -= G * rigidBody.gravityScale() * dt;
 
 			float speed = velocity.length();
 			if (speed > MAX_VELOCITY) {
-				if (DEBUG_VELOCITIES)
-					System.out.println("Entity " + entityId + " velocity clamped from " + speed + " to " + MAX_VELOCITY);
-
 				velocity.normalize().mul(MAX_VELOCITY);
 			}
-
-			if (DEBUG_VELOCITIES)
-				System.out.println("Entity " + entityId + " velocity after gravity: " + velocity);
 		}
 
 		// Apply velocity with swept collision detection per-axis
@@ -161,9 +144,6 @@ public class Physics {
 			if (hitFloor && entityManager.hasComponent(entityId, GroundedComponent.class)) {
 				GroundedComponent grounded = entityManager.getComponent(entityId, GroundedComponent.class);
 				grounded.isGrounded = true;
-
-				if (DEBUG_GROUNDED)
-					System.out.println("Entity " + entityId + " is GROUNDED via swept collision");
 			}
 		}
 
@@ -253,9 +233,6 @@ public class Physics {
 								vb.x = va.x;
 								vb.z = va.z;
 							}
-
-							if (DEBUG_GROUNDED)
-								System.out.println("Entity " + idb + " is GROUNDED on entity " + ida);
 						}
 						if (contact.c().y < -0.7f && !ra.isStatic() && entityManager.hasComponent(ida, GroundedComponent.class)) {
 							boolean canGround = true;
@@ -303,10 +280,6 @@ public class Physics {
 								}
 								va.x = vb.x;
 								va.z = vb.z;
-							}
-
-							if (DEBUG_GROUNDED) {
-								System.out.println("Entity " + ida + " is GROUNDED on entity " + idb);
 							}
 						}
 					}

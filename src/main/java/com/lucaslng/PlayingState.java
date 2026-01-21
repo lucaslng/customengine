@@ -64,7 +64,7 @@ class PlayingState extends GameState {
 		uiManager.elements.add(new Text(260f, 20f, 0f, 0f, XAlignment.RIGHT, YAlignment.TOP, "Home",
 				new TextStyle("Pixeled", 8f, Color.BLACK)));
 
-		levels = new Levels();
+		levels = engine.getLevels();
 		Level level = levels.currentLevel();
 
 		Text timerText = new Text(-120f, 10f, 0f, 0f, XAlignment.CENTER, YAlignment.TOP, level.timer() + "", new TextStyle("Pixeled", 10f, Color.BLACK));
