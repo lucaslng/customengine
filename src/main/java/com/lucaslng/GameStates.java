@@ -6,4 +6,5 @@ public enum GameStates {
     LEVEL_SELECTION,
     PLAYING,
     EXIT,
+    END_SCREEN,
 }
