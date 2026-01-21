@@ -1,30 +1,32 @@
 package com.lucaslng.engine;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.BufferedInputStream;
 import java.util.HashMap;
 
 import javax.sound.sampled.*;
+
+import com.lucaslng.engine.utils.FileReader;
 
 public class SoundHandler {
 
 	static final private HashMap<String, Clip> clipMap;
 
 	static {
+		String[] fileNames = { "click", "coin", "music", "old" };
 		clipMap = new HashMap<>();
 		try {
-			Files.walk(Paths.get("assets/sounds")).filter(Files::isRegularFile).forEach((p) -> {
+			for (String name : fileNames) {
 				try {
-					AudioInputStream sound = AudioSystem.getAudioInputStream(p.toFile());
+					AudioInputStream sound = AudioSystem.getAudioInputStream(new BufferedInputStream(FileReader.getStream("sounds/" + name + ".wav")));
 					Clip clip = AudioSystem.getClip();
 					clip.open(sound);
-					String name = p.getFileName().toString();
-					clipMap.put(name.substring(0, name.length() - 4), clip); // remove .wav file extension
+					clipMap.put(name, clip);
 				} catch (Exception e) {
+					e.printStackTrace();
 				}
-			});
-
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 

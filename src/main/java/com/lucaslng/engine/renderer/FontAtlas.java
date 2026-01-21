@@ -2,9 +2,10 @@ package com.lucaslng.engine.renderer;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.lucaslng.engine.utils.FileReader;
 
 public class FontAtlas {
 	public static final char START = ' ', END = '~';
@@ -41,10 +42,11 @@ public class FontAtlas {
 
 	public void addFontFromTTF(String fileName, int style) {
 		try {
-			Font font = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream("assets/fonts/" + fileName + ".ttf")).deriveFont(style, 50);
+			Font font = Font.createFont(Font.TRUETYPE_FONT, FileReader.getStream("fonts/" + fileName + ".ttf")).deriveFont(style, 50);
 			addFont(font);
 		} catch (Exception e) {
-			throw new RuntimeException("Failed to open font file.");
+			e.printStackTrace();
+			throw new RuntimeException("Failed to open font file");
 		}
 	}
 

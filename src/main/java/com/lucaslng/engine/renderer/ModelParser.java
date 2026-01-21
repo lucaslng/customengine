@@ -1,12 +1,13 @@
 package com.lucaslng.engine.renderer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.*;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+
+import com.lucaslng.engine.utils.FileReader;
+
 public class ModelParser {
 
 	private static final int STRIDE = 8;
@@ -21,13 +22,7 @@ public class ModelParser {
 		HashMap<String, ArrayList<Integer>> indices = new HashMap<>();
 		String material = "Fallback";
 
-		
-		Scanner in;
-		try {
-			in = new Scanner(new File("assets/models/" + fileName + ".obj"));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Failed to read model file.");
-		}
+		Scanner in = new Scanner(FileReader.getStream("models/" + fileName + ".obj"));
 		while (in.hasNextLine()) {
 			String line = in.nextLine();
 			String[] tokens = line.split(" ");
@@ -127,12 +122,7 @@ public class ModelParser {
 	public static HashMap<String, Material> parseMtl(String fileName) {
 		HashMap<String, Material> materials = new HashMap<>();
 		String material = "";
-		Scanner in;
-		try {
-			in = new Scanner(new File("assets/materials/" + fileName + ".mtl"));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Failed to read material file.");
-		}
+		Scanner in = new Scanner(FileReader.getStream("materials/" + fileName + ".mtl"));
 		while (in.hasNextLine()) {
 			String line = in.nextLine();
 			String[] tokens = line.split(" ");

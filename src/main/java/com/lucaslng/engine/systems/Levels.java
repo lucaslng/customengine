@@ -1,7 +1,5 @@
 package com.lucaslng.engine.systems;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import static java.lang.Float.parseFloat;
 import java.util.Scanner;
 
@@ -12,6 +10,7 @@ import com.lucaslng.engine.components.BlinkComponent;
 import com.lucaslng.engine.components.LavaComponent;
 import com.lucaslng.engine.components.TimedMoveComponent;
 import com.lucaslng.engine.entities.AbstractEntityFactory;
+import com.lucaslng.engine.utils.FileReader;
 import com.lucaslng.entities.BoxEntityFactory;
 import com.lucaslng.entities.ButtonEntityFactory;
 import com.lucaslng.entities.CoinEntityFactory;
@@ -47,12 +46,7 @@ public class Levels {
 	}
 
 	private static Level parseLevel(int level) {
-		Scanner in;
-		try {
-			in = new Scanner(new File("assets/levels/" + level));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Failed to read level file.");
-		}
+		Scanner in = new Scanner(FileReader.getStream("levels/" + level));
 		
 		int timer = Integer.parseInt(in.nextLine());
 		String[] tokens = in.nextLine().split(" ");
